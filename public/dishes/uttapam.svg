@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="uttapam illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fee2e2"/><stop offset="1" stop-color="#f97316" stop-opacity=".55"/></linearGradient></defs>
+<rect width="400" height="400" fill="url(#g)"/>
+<ellipse cx="200" cy="240" rx="150" ry="100" fill="#ffffff" opacity=".85"/>
+<ellipse cx="200" cy="240" rx="128" ry="82" fill="none" stroke="#e7e5e4" stroke-width="3"/>
+<circle cx="200" cy="230" r="95" fill="#fbbf24"/><g fill="#dc2626"><circle cx="170" cy="200" r="10"/><circle cx="230" cy="250" r="10"/><circle cx="200" cy="275" r="8"/></g><g fill="#16a34a"><circle cx="220" cy="195" r="7"/><circle cx="160" cy="255" r="7"/><circle cx="250" cy="215" r="6"/></g><g fill="#7c3aed"><circle cx="190" cy="230" r="6"/><circle cx="245" cy="275" r="6"/></g>
+</svg>

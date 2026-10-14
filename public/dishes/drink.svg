@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="drink illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecfeff"/><stop offset="1" stop-color="#06b6d4" stop-opacity=".55"/></linearGradient></defs>
+<rect width="400" height="400" fill="url(#g)"/>
+<ellipse cx="200" cy="240" rx="150" ry="100" fill="#ffffff" opacity=".85"/>
+<ellipse cx="200" cy="240" rx="128" ry="82" fill="none" stroke="#e7e5e4" stroke-width="3"/>
+<path d="M150 130 L250 130 L235 320 L165 320 Z" fill="#ffffff" stroke="#e5e7eb" stroke-width="4"/><path d="M155 175 L245 175 L235 315 L165 315 Z" fill="#fde68a"/><circle cx="225" cy="160" r="22" fill="#84cc16"/><rect x="215" y="100" width="6" height="90" fill="#ef4444" transform="rotate(15 218 145)"/>
+</svg>

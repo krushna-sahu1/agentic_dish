@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="biryani illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fef9c3"/><stop offset="1" stop-color="#ca8a04" stop-opacity=".55"/></linearGradient></defs>
+<rect width="400" height="400" fill="url(#g)"/>
+<ellipse cx="200" cy="240" rx="150" ry="100" fill="#ffffff" opacity=".85"/>
+<ellipse cx="200" cy="240" rx="128" ry="82" fill="none" stroke="#e7e5e4" stroke-width="3"/>
+<ellipse cx="200" cy="245" rx="115" ry="60" fill="#a16207"/><path d="M110 240 Q200 130 290 240 Z" fill="#fde047"/><g fill="#fff"><circle cx="170" cy="215" r="4"/><circle cx="200" cy="195" r="4"/><circle cx="230" cy="215" r="4"/><circle cx="185" cy="230" r="4"/></g><g fill="#ea580c"><circle cx="215" cy="225" r="5"/><circle cx="160" cy="232" r="5"/></g><circle cx="200" cy="210" r="18" fill="#92400e"/>
+</svg>
