@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ExternalLink, LayoutDashboard, Menu as MenuIcon, ReceiptText, Settings, Sparkles, UtensilsCrossed, X } from "lucide-react";
+import { AudioLines, ExternalLink, LayoutDashboard, Menu as MenuIcon, ReceiptText, Settings, Sparkles, UtensilsCrossed, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
@@ -97,7 +97,12 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
     { href: "/owner/orders", label: "Orders", icon: ReceiptText, count: kpis?.new_orders_waiting },
     { href: "/owner/menu", label: "Menu", icon: UtensilsCrossed },
     { href: "/owner/assistant", label: "AI assistant", icon: Sparkles },
-    ...(role === "owner" ? [{ href: "/owner/settings", label: "Settings", icon: Settings }] : []),
+    ...(role === "owner"
+      ? [
+          { href: "/owner/jarvis", label: "Jarvis", icon: AudioLines },
+          { href: "/owner/settings", label: "Settings", icon: Settings },
+        ]
+      : []),
   ];
   const current = nav.find((n) => (n.exact ? pathname === n.href : pathname.startsWith(n.href)));
 

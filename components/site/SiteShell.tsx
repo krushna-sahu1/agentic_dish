@@ -1,5 +1,6 @@
 import { Megaphone } from "lucide-react";
 import { getSettings, openStatus } from "@/lib/services/settings";
+import { getMenu } from "@/lib/services/menu";
 import { LazyCustomerChat } from "@/components/chat/LazyCustomerChat";
 import { BRAND } from "@/lib/brand";
 import { Header } from "./Header";
@@ -17,6 +18,10 @@ export async function SiteShell({ children, bleed = false }: { children: React.R
   const status = openStatus(settings);
   const isOpen = status.isOpen && settings.accepting_orders;
   const label = !settings.accepting_orders ? "Online orders paused" : status.label;
+  // Dish names help the assistant match misheard voice input; a menu failure must not break the shell.
+  const menuItemNames = await getMenu()
+    .then((m) => m.items.map((i) => i.name))
+    .catch(() => []);
   return (
     <>
       {settings.announcement && (
@@ -32,7 +37,7 @@ export async function SiteShell({ children, bleed = false }: { children: React.R
         {children}
       </main>
       <Footer settings={settings} />
-      <LazyCustomerChat restaurantName={BRAND.name} isOpen={isOpen} statusLabel={label} />
+      <LazyCustomerChat restaurantName={BRAND.name} isOpen={isOpen} statusLabel={label} menuItemNames={menuItemNames} />
     </>
   );
 }

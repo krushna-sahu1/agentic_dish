@@ -31,6 +31,41 @@ export async function askCustomer(page: Page, text: string) {
   return panel;
 }
 
+/**
+ * Replaces the browser's SpeechRecognition with a fake that "hears" `text`
+ * (an interim chunk, then the final result) and then ends, like a real utterance.
+ * Must run before the page loads.
+ */
+export async function fakeSpeechRecognition(page: Page, text: string) {
+  await page.addInitScript((spoken: string) => {
+    const result = (transcript: string, isFinal: boolean) => Object.assign([{ transcript, confidence: 0.9 }], { isFinal });
+    class FakeRecognition {
+      lang = "";
+      continuous = false;
+      interimResults = false;
+      maxAlternatives = 1;
+      onstart: ((e: Event) => void) | null = null;
+      onresult: ((e: unknown) => void) | null = null;
+      onerror: ((e: unknown) => void) | null = null;
+      onend: ((e: Event) => void) | null = null;
+      private timers: number[] = [];
+      start() {
+        const half = spoken.split(" ").slice(0, 3).join(" ");
+        this.timers.push(
+          window.setTimeout(() => this.onresult?.({ resultIndex: 0, results: [result(half, false)] }), 150),
+          window.setTimeout(() => this.onresult?.({ resultIndex: 0, results: [result(spoken, true)] }), 500),
+          window.setTimeout(() => this.onend?.(new Event("end")), 700),
+        );
+      }
+      stop() {}
+      abort() {
+        this.timers.forEach(clearTimeout);
+      }
+    }
+    Object.assign(window, { SpeechRecognition: FakeRecognition, webkitSpeechRecognition: FakeRecognition });
+  }, text);
+}
+
 export async function askOwner(page: Page, text: string) {
   const input = page.locator("main textarea").first();
   await input.fill(text);

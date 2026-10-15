@@ -1,6 +1,6 @@
 /** §6.4 customer agent flows (mock LLM → real tools, guards, DB and cards). */
 import { expect, test } from "@playwright/test";
-import { admin, askCustomer, clearCustomerCart, login, requireDb, simulateCapturedWebhook } from "./helpers";
+import { admin, askCustomer, clearCustomerCart, fakeSpeechRecognition, login, requireDb, simulateCapturedWebhook } from "./helpers";
 
 test.describe("customer agent", () => {
   test.beforeEach(async ({ page }) => {
@@ -13,6 +13,17 @@ test.describe("customer agent", () => {
     const panel = await askCustomer(page, "add one paneer masala dosa to my cart");
     await expect(panel.getByTestId("cart-summary")).toContainText("Paneer Masala Dosa");
     await expect(page.getByTestId("cart-count")).toHaveText("1");
+  });
+
+  test("voice: saying 'add one paneer masala dosa' → item added", async ({ page }) => {
+    await fakeSpeechRecognition(page, "add one paneer masala dosa to my cart");
+    await page.reload();
+    const panel = page.getByTestId("chat-panel");
+    await page.getByTestId("chat-launcher").click();
+    await panel.getByRole("button", { name: "Start voice input" }).click();
+    await expect(panel.getByTestId("cart-summary")).toContainText("Paneer Masala Dosa");
+    await expect(page.getByTestId("cart-count")).toHaveText("1");
+    await expect(panel.locator("textarea").first()).toHaveValue("");
   });
 
   test("2. which dish is spicy? → cards with spice ≥ 3", async ({ page }) => {

@@ -6,7 +6,7 @@ import { ChatLauncher } from "./ChatLauncher";
 
 const CustomerChat = dynamic(() => import("./CustomerChat").then((m) => m.CustomerChat), { ssr: false });
 
-type Props = { restaurantName: string; isOpen: boolean; statusLabel: string };
+type Props = { restaurantName: string; isOpen: boolean; statusLabel: string; menuItemNames: string[] };
 
 /**
  * Keeps the AI chat bundle off the critical path (Lighthouse): renders only the

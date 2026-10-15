@@ -46,6 +46,7 @@ import {
   type OrderStatusData,
 } from "./CustomerCards";
 import { useChatPersistence } from "./useChatPersistence";
+import { VoiceChatView } from "./VoiceInput";
 
 const anyArgs = z.any();
 type RenderProps = { name: string; toolCallId: string; args: Record<string, unknown>; status: string; result?: string };
@@ -145,7 +146,7 @@ const SUGGESTIONS = [
   { title: "Track my order", message: "Where's my food?" },
 ];
 
-function CustomerBindings({ isOpen, statusLabel }: { isOpen: boolean; statusLabel: string }) {
+function CustomerBindings({ isOpen, statusLabel, menuItemNames }: { isOpen: boolean; statusLabel: string; menuItemNames: string[] }) {
   const pathname = usePathname();
   const session = useSession();
   const { cart } = useCart();
@@ -164,6 +165,7 @@ function CustomerBindings({ isOpen, statusLabel }: { isOpen: boolean; statusLabe
     value: session ? { name: session.name, allergies: session.allergies, dietary_prefs: session.dietaryPrefs, spice_tolerance: session.spiceTolerance } : "not logged in",
   });
   useAgentContext({ description: "Restaurant open status right now", value: { open: isOpen, label: statusLabel } });
+  useAgentContext({ description: "Every dish name on the menu (use to match misheard or misspelled dish names)", value: menuItemNames });
   useConfigureSuggestions({ suggestions: SUGGESTIONS, available: "before-first-message" });
   useChatPersistence("customer", !!session);
   return null;
@@ -184,12 +186,14 @@ export function CustomerChat({
   restaurantName,
   isOpen,
   statusLabel,
+  menuItemNames = [],
   initialOpen = false,
   initialPrompt,
 }: {
   restaurantName: string;
   isOpen: boolean;
   statusLabel: string;
+  menuItemNames?: string[];
   initialOpen?: boolean;
   initialPrompt?: string;
 }) {
@@ -233,7 +237,7 @@ export function CustomerChat({
       }}
     >
       <ChatActionsProvider>
-        <CustomerBindings isOpen={isOpen} statusLabel={statusLabel} />
+        <CustomerBindings isOpen={isOpen} statusLabel={statusLabel} menuItemNames={menuItemNames} />
         <PendingPrompt prompt={pending} onSent={() => setPending(null)} />
 
         {!open && <ChatLauncher onClick={() => setOpen(true)} />}
@@ -280,14 +284,13 @@ export function CustomerChat({
           <div className="relative min-h-0 flex-1 [&_.copilotKitChat]:h-full">
             <CopilotChat
               className="h-full"
+              chatView={VoiceChatView}
               labels={{
                 chatInputPlaceholder: "e.g. add one paneer masala dosa to my cart",
                 welcomeMessageText: `Hi! I'm the ${restaurantName} host. Ask me about dishes, or tell me what to add to your cart.`,
                 chatDisclaimerText: "AI can make mistakes. Prices are always calculated by our server. Only you can pay.",
               }}
             />
-            {/* Voice seam (§14): a mic button will mount here and call submitUserMessage(text). */}
-            <div data-slot="mic" className="hidden" aria-hidden />
           </div>
         </div>
       </ChatActionsProvider>
