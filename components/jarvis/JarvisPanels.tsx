@@ -6,6 +6,7 @@ import { AlertTriangle, ArrowDownRight, ArrowUpRight, Check, Loader2, X } from "
 import { formatINR, STATUS_LABEL } from "@/lib/format";
 import { stripUserText, type PanelSpec } from "@/lib/jarvis/panels";
 import { cn } from "@/lib/utils";
+import { EmailDraftCard, type EmailOutcome } from "@/components/owner/EmailDraftCard";
 import type { Panel } from "./useJarvis";
 
 const glass = "relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-4 text-white shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl";
@@ -343,7 +344,19 @@ function ConfirmPanel({ panel, onConfirm, onCancel, onDismiss }: { panel: Extrac
   );
 }
 
-export function JarvisPanels({ panels, onConfirm, onCancel, onDismiss }: { panels: Panel[]; onConfirm: (id: string) => void; onCancel: (id: string) => void; onDismiss: (id: string) => void }) {
+export function JarvisPanels({
+  panels,
+  onConfirm,
+  onCancel,
+  onDismiss,
+  onEmailOutcome,
+}: {
+  panels: Panel[];
+  onConfirm: (id: string) => void;
+  onCancel: (id: string) => void;
+  onDismiss: (id: string) => void;
+  onEmailOutcome: (id: string, o: EmailOutcome) => void;
+}) {
   return (
     <div className="flex flex-col gap-3" aria-live="polite">
       <AnimatePresence initial={false} mode="popLayout">
@@ -356,7 +369,9 @@ export function JarvisPanels({ panels, onConfirm, onCancel, onDismiss }: { panel
             exit={{ opacity: 0, x: 24, scale: 0.96, filter: "blur(6px)", transition: { duration: 0.35 } }}
             transition={{ type: "spring", stiffness: 260, damping: 28 }}
           >
-            {p.type === "confirm" ? (
+            {p.type === "email" ? (
+              <EmailDraftCard variant="jarvis" draft={p.draft} onOutcome={(o) => onEmailOutcome(p.id, o)} onDismiss={() => onDismiss(p.id)} />
+            ) : p.type === "confirm" ? (
               <ConfirmPanel panel={p} onConfirm={() => onConfirm(p.id)} onCancel={() => onCancel(p.id)} onDismiss={() => onDismiss(p.id)} />
             ) : (
               <DataPanel spec={p.spec} onDismiss={() => onDismiss(p.id)} />

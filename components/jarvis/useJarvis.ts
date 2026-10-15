@@ -8,6 +8,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangePreview } from "@/lib/agents/owner/changes";
 import { toolToPanel, type PanelSpec } from "@/lib/jarvis/panels";
+import type { EmailDraftView } from "@/lib/bulk-email/schema";
+import type { EmailOutcome } from "@/components/owner/EmailDraftCard";
 import { MicCapture, PcmPlayer } from "./audio";
 
 export type JarvisStatus = "idle" | "connecting" | "listening" | "thinking" | "speaking";
@@ -20,7 +22,8 @@ export interface Caption {
 export type ConfirmState = "pending" | "running" | "done" | "cancelled" | "error";
 export type Panel =
   | { id: string; type: "data"; tool: string; spec: PanelSpec }
-  | { id: string; type: "confirm"; tool: string; args: unknown; preview: ChangePreview; state: ConfirmState; message?: string };
+  | { id: string; type: "confirm"; tool: string; args: unknown; preview: ChangePreview; state: ConfirmState; message?: string }
+  | { id: string; type: "email"; draft: EmailDraftView; done: boolean };
 
 type ServerMsg = { type: string; [k: string]: unknown };
 type FnCall = { id: string; name: string; arguments: string; client_side?: boolean };
@@ -144,7 +147,11 @@ export function useJarvis() {
     if (s.current.cancelled.has(fn.id)) return;
     send(s.current, { type: "FunctionCallResponse", id: fn.id, name: fn.name, content: body.content ?? JSON.stringify({ error: "No result." }) });
 
-    if (body.kind === "read" && body.ok) {
+    if (fn.name === "draft_email" && body.ok && body.data) {
+      // One card per draft: a revision replaces the previous version's card.
+      const draft = body.data as EmailDraftView;
+      setPanels((p) => [{ id: `email-${draft.draft_id}-${draft.version}`, type: "email" as const, draft, done: false }, ...p.filter((x) => !(x.type === "email" && x.draft.draft_id === draft.draft_id))]);
+    } else if (body.kind === "read" && body.ok) {
       const spec = toolToPanel(fn.name, body.data);
       if (spec) setPanels((p) => [{ id: uid(), type: "data" as const, tool: fn.name, spec }, ...p.filter((x) => !(x.type === "data" && x.tool === fn.name))].slice(0, 6));
     } else if (body.kind === "confirm" && body.ok && body.preview) {
@@ -177,7 +184,7 @@ export function useJarvis() {
           if (msg.role === "user") {
             addCaption("user", text);
             // New question: earlier answers fade out; pending confirmations stay.
-            setPanels((p) => p.filter((x) => x.type === "confirm" && (x.state === "pending" || x.state === "running")));
+            setPanels((p) => p.filter((x) => (x.type === "confirm" && (x.state === "pending" || x.state === "running")) || (x.type === "email" && !x.done)));
             setStatus("thinking");
           } else {
             addCaption("assistant", text);
@@ -364,6 +371,20 @@ export function useJarvis() {
     [inject, panels],
   );
 
+  /** The owner tapped Send/Cancel on an email card: Jarvis says what happened. */
+  const emailOutcome = useCallback(
+    (id: string, o: EmailOutcome) => {
+      touch(s.current);
+      setPanels((p) => p.map((x) => (x.id === id && x.type === "email" ? { ...x, done: true } : x)));
+      if (o.status === "sent") {
+        inject(`Sent to ${o.sent === 1 ? "one person" : `${o.sent} people`}, boss.${o.failed ? ` ${o.failed} didn't go through.` : ""}`);
+        setDataTick((t) => t + 1);
+      } else if (o.status === "cancelled") inject("Okay, cancelled. Nothing was sent.");
+      else inject("That email didn't go out. Check the card for details.");
+    },
+    [inject],
+  );
+
   const dismiss = useCallback((id: string) => setPanels((p) => p.filter((x) => x.id !== id)), []);
 
   useEffect(() => () => teardown(), [teardown]);
@@ -386,5 +407,6 @@ export function useJarvis() {
     confirm: (id: string) => resolveConfirm(id, "execute"),
     cancel: (id: string) => resolveConfirm(id, "reject"),
     dismiss,
+    emailOutcome,
   };
 }

@@ -4,19 +4,28 @@ import { AddressForm } from "@/components/site/AddressForm";
 import { DeleteAddressButton } from "@/components/site/DeleteAddressButton";
 import { requireUser } from "@/lib/auth";
 import { getProfile, listAddresses } from "@/lib/services/account";
+import { OfferEmailsToggle } from "@/components/site/OfferEmailsToggle";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Profile" };
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const user = await requireUser();
-  const [profile, addresses] = await Promise.all([getProfile(user.userId), listAddresses(user.userId)]);
+  const [profile, addresses, unsub] = await Promise.all([
+    getProfile(user.userId),
+    listAddresses(user.userId),
+    user.email ? createAdminClient().from("email_unsubscribes").select("email").eq("email", user.email.toLowerCase()).maybeSingle() : null,
+  ]);
   return (
     <div className="mx-auto max-w-3xl space-y-8 py-6">
       <h1 className="font-display text-4xl sm:text-5xl">Your profile</h1>
       <section className="rounded-xl border bg-card p-4">
         <p className="mb-3 text-sm text-muted-foreground">{user.email}</p>
         <ProfileForm profile={profile} />
+        <div className="mt-5 border-t pt-4">
+          <OfferEmailsToggle initial={!unsub?.data} />
+        </div>
       </section>
       <section id="addresses" className="rounded-xl border bg-card p-4">
         <h2 className="mb-3 font-semibold">Addresses</h2>

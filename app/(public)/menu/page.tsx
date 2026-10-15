@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import { MenuBrowser } from "@/components/site/MenuBrowser";
 import { AskAiButton } from "@/components/site/AskAiButton";
+import { CouponFromLink } from "@/components/site/CouponFromLink";
 import { toCardItem } from "@/components/site/to-card";
 import { getMenu } from "@/lib/services/menu";
 
 export const metadata: Metadata = { title: "Menu", description: "Dosas, idli, uttapam, rice, Odia specials, snacks, drinks and desserts." };
 
-export default async function MenuPage() {
-  const menu = await getMenu();
+export default async function MenuPage({ searchParams }: { searchParams: Promise<{ coupon?: string }> }) {
+  const [menu, { coupon }] = await Promise.all([getMenu(), searchParams]);
   return (
     <div className="py-6">
+      <CouponFromLink code={coupon} />
       <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-4xl sm:text-5xl">Our menu</h1>

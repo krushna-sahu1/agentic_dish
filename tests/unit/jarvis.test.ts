@@ -76,6 +76,7 @@ describe("voice agent settings", () => {
     expect(s.agent.listen.provider).toMatchObject({ type: "deepgram", model: "nova-3" });
     expect(s.agent.speak.provider).toMatchObject({ type: "deepgram", model: expect.stringMatching(/^aura-2-/) });
     expect(JSON.stringify(s.agent.think.provider)).not.toMatch(/deepseek/i);
+    expect(s.agent.think.provider).toMatchObject({ type: "open_ai", model: "gpt-5.6-luna" }); // Deepgram-managed default
     expect(s.agent.listen.provider.keyterms).toContain("Idli");
     expect(s.audio.input).toEqual({ encoding: "linear16", sample_rate: 16000 });
   });

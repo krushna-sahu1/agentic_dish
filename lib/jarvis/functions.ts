@@ -6,6 +6,7 @@
  */
 import { z } from "zod";
 import { ownerReadTools } from "@/lib/agents/owner/tools";
+import { ownerEmailTools } from "@/lib/agents/owner/email-tool";
 import { OWNER_CHANGE_SCHEMAS } from "@/lib/agents/owner/change-schemas";
 
 export interface DeepgramFunction {
@@ -15,7 +16,9 @@ export interface DeepgramFunction {
 }
 
 export const JARVIS_WRITE_TOOLS = new Set<string>(Object.keys(OWNER_CHANGE_SCHEMAS));
-export const JARVIS_READ_TOOLS = new Set<string>(ownerReadTools.map((t) => t.name));
+/** Tools that run straight away (reads, plus draft_email which only drafts). */
+export const JARVIS_DIRECT_TOOLS = [...ownerReadTools, ...ownerEmailTools];
+export const JARVIS_READ_TOOLS = new Set<string>(JARVIS_DIRECT_TOOLS.map((t) => t.name));
 
 /** Zod → plain JSON Schema object (input side, so defaulted fields stay optional). */
 export function zodToParameters(schema: z.ZodTypeAny): Record<string, unknown> {
@@ -27,7 +30,7 @@ export function zodToParameters(schema: z.ZodTypeAny): Record<string, unknown> {
 }
 
 export function jarvisFunctions(): DeepgramFunction[] {
-  const reads = ownerReadTools.map((t) => ({ name: t.name, description: t.description, parameters: zodToParameters(t.schema) }));
+  const reads = JARVIS_DIRECT_TOOLS.map((t) => ({ name: t.name, description: t.description, parameters: zodToParameters(t.schema) }));
   const writes = Object.entries(OWNER_CHANGE_SCHEMAS).map(([name, def]) => ({
     name,
     description: `${def.description} WRITE ACTION: calling this only shows a Confirm card; nothing changes until the owner taps Confirm.`,

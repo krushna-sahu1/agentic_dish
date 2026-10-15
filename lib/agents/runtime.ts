@@ -14,6 +14,7 @@ import type { ToolDef } from "./tool-def";
 import { customerTools } from "./customer/tools";
 import { customerSystemPrompt } from "./customer/prompt";
 import { ownerReadTools } from "./owner/tools";
+import { ownerEmailTools } from "./owner/email-tool";
 import { ownerSystemPrompt } from "./owner/prompt";
 
 /** Resolve the caller from the request's Supabase auth cookies. */
@@ -68,7 +69,7 @@ async function buildAgent(ctx: AgentContext): Promise<BuiltInAgent> {
   return new BuiltInAgent({
     model: getModel("owner"),
     prompt: ownerSystemPrompt({ restaurantName: settings.name, role: ctx.role === "staff" ? "staff" : "owner", name: profile?.full_name ?? null }),
-    tools: toAgentTools(ctx, ownerReadTools),
+    tools: toAgentTools(ctx, [...ownerReadTools, ...ownerEmailTools]),
     maxSteps: 6,
     temperature: 0.2,
     maxRetries: 1,

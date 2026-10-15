@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
 import { audit, runTool, type AgentContext } from "@/lib/agents/guard";
-import { ownerReadTools } from "@/lib/agents/owner/tools";
-import { JARVIS_WRITE_TOOLS } from "@/lib/jarvis/functions";
+import { JARVIS_DIRECT_TOOLS, JARVIS_WRITE_TOOLS } from "@/lib/jarvis/functions";
 import { voiceContent } from "@/lib/jarvis/spoken";
 import { executeOwnerChange, previewOwnerChange, rejectOwnerChange } from "@/app/actions/owner";
 import type { OwnerChangeName } from "@/lib/agents/owner/changes";
@@ -53,7 +52,7 @@ export async function POST(req: Request) {
     return NextResponse.json(r.ok ? { ok: true, message: r.data.message } : { ok: false, error: r.error });
   }
 
-  const read = ownerReadTools.find((t) => t.name === name);
+  const read = JARVIS_DIRECT_TOOLS.find((t) => t.name === name);
   if (read) {
     const r = await runTool(ctx, name, read.schema, args, (a) => read.handler(ctx, a));
     return NextResponse.json(

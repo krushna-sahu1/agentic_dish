@@ -15,6 +15,7 @@ import { OWNER_CHANGE_SCHEMAS, type OwnerChangeSchemaName } from "@/lib/agents/o
 import { executeOwnerChange, previewOwnerChange, rejectOwnerChange, uploadDishImageAction } from "@/app/actions/owner";
 import { newConversationAction } from "@/app/actions/chat";
 import { formatINR, formatNumber } from "@/lib/format";
+import { EmailDraftCard } from "./EmailDraftCard";
 import { AlertCard, BarChartCard, ChartFrame, ComparisonCard, DataTable, HeatmapCard, KpiCards, LineChartCard, OrderCard, OrderListCard, PieChartCard, ReportCard, type Column } from "./OwnerCards";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -119,6 +120,7 @@ function buildRenderers(): ReactToolCallRenderer<any>[] {
     card("get_audit_log", (d) => <ChartFrame title="Changes made" subtitle={d.range.label} columns={[{ key: "created_at", label: "When" }, { key: "actor", label: "By" }, { key: "tool_name", label: "Change" }, { key: "result_summary", label: "Result" }, { key: "status", label: "Status" }]} rows={d.entries.map((e: any) => ({ ...e, created_at: new Date(e.created_at).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "numeric", minute: "2-digit" }) }))} />),
     card("list_alerts", (d) => <AlertCard alerts={d.alerts} />),
     card("generate_report", (d) => <ReportCard label={d.range.label} summary={d.summary} downloads={d.downloads} />),
+    card("draft_email", (d) => <EmailDraftCard key={`${d.draft_id}-${d.version}`} draft={d} />),
     { name: "*", args: z.any(), render: ((p: RenderProps) => (p.status !== "complete" ? <ToolProgress name={p.name} /> : (() => { const r = parseResult<any>(p.result); if (r && !r.ok) return <ErrorNote message={r.error} />; const rows = Array.isArray(r?.data) ? r.data : null; return rows?.length ? <div className="my-2 w-full"><DataTable columns={autoCols(rows)} rows={rows} /></div> : <ToolProgress name={p.name} done />; })())) as never },
   ];
 }

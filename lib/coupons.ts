@@ -13,6 +13,8 @@ export interface CouponRow {
   usage_limit: number | null;
   per_user_limit: number | null;
   is_active: boolean;
+  /** Coupon attached to an unsent email draft — unusable until the owner taps Send. */
+  is_draft?: boolean;
 }
 
 export interface CouponUsage {
@@ -24,6 +26,7 @@ export type CouponCheck = { ok: true } | { ok: false; reason: string };
 
 export function checkCouponEligibility(c: CouponRow | null, usage: CouponUsage, now = new Date()): CouponCheck {
   if (!c) return { ok: false, reason: "That coupon code doesn't exist." };
+  if (c.is_draft) return { ok: false, reason: `${c.code} isn't available yet.` };
   if (!c.is_active) return { ok: false, reason: `${c.code} is no longer active.` };
   if (c.valid_from && new Date(c.valid_from) > now) return { ok: false, reason: `${c.code} isn't valid yet.` };
   if (c.valid_to && new Date(c.valid_to) < now) return { ok: false, reason: `${c.code} has expired.` };

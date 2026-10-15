@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { ArrowRight, Minus, Plus, ShoppingBag, Sparkles, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { DishImage } from "./DishImage";
 import { VegMark } from "./Markers";
 import { openChat } from "./chat-events";
+import { clearPendingCoupon, readPendingCoupon } from "./CouponFromLink";
 
 type Coupon = { code: string; description: string | null };
 
@@ -39,6 +40,29 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
       setCart(r.data);
       if (success) toast.success(success);
     });
+
+  // Coupon from an email's "Order now" link (/menu?coupon=CODE): apply it once.
+  const triedLinkCoupon = useRef(false);
+  const [linkCouponNote, setLinkCouponNote] = useState<string | null>(null);
+  useEffect(() => {
+    if (triedLinkCoupon.current || !cart || cart.lines.length === 0) return;
+    const code = readPendingCoupon();
+    if (!code) return;
+    triedLinkCoupon.current = true;
+    if (cart.coupon_code === code) return clearPendingCoupon();
+    if (cart.coupon_code) return;
+    start(async () => {
+      const r = await applyCouponAction(code);
+      if (r.ok) {
+        setCart(r.data);
+        clearPendingCoupon();
+        toast.success(`Offer ${code} applied`);
+      } else {
+        setCoupon(code);
+        setLinkCouponNote(`${code}: ${r.error}`);
+      }
+    });
+  }, [cart, setCart]);
 
   if (!cart)
     return loading ? (
@@ -257,6 +281,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
               </form>
             )}
             {cart.coupon_message && <p className="text-xs text-amber-700 dark:text-amber-300">{cart.coupon_message}</p>}
+            {!cart.coupon_code && linkCouponNote && <p className="text-xs text-amber-700 dark:text-amber-300">{linkCouponNote}</p>}
             {!cart.coupon_code && coupons.length > 0 && (
               <ul className="space-y-1 text-xs text-muted-foreground">
                 {coupons.slice(0, 4).map((c) => (

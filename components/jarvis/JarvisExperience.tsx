@@ -189,7 +189,7 @@ export function JarvisExperience() {
 
         {/* Floating panels: beside the orb on desktop, below it on mobile */}
         <aside className="min-h-0 lg:overflow-y-auto lg:py-6 lg:pr-1 [scrollbar-width:thin]" aria-label="Jarvis results">
-          <JarvisPanels panels={j.panels} onConfirm={j.confirm} onCancel={j.cancel} onDismiss={j.dismiss} />
+          <JarvisPanels panels={j.panels} onConfirm={j.confirm} onCancel={j.cancel} onDismiss={j.dismiss} onEmailOutcome={j.emailOutcome} />
         </aside>
       </div>
     </div>

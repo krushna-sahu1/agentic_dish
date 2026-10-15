@@ -1,6 +1,7 @@
 /** Jarvis voice persona, greeting and the Deepgram Voice Agent Settings message. */
 import { DEFAULT_TZ, zonedDateString, zonedParts } from "@/lib/time";
 import { jarvisFunctions } from "./functions";
+import { EMAIL_RULES } from "@/lib/agents/owner/prompt";
 
 export function timeOfDay(now = new Date(), tz = DEFAULT_TZ): "morning" | "afternoon" | "evening" {
   const h = zonedParts(now, tz).hour;
@@ -39,6 +40,9 @@ WRITE ACTIONS (update_order_status, set_item_availability, update_stock, cancel_
 - "Mark X out of stock" → set_item_availability {item_ref:"X", is_available:false}.
 - "Accept order 42 and say 20 minutes" → update_order_status {order_ref:"42", status:"accepted", eta_minutes:20}.
 
+${EMAIL_RULES}
+- Out loud, after drafting: one line like "Ready to email 412 customers. Tap Send to confirm." Don't read the whole email aloud.
+
 If interrupted, stop and listen. If you didn't catch something, ask briefly.`;
 }
 
@@ -68,7 +72,7 @@ export function jarvisSettings(opts: { restaurantName: string; ownerName: string
         },
       },
       think: {
-        provider: { type: env("DEEPGRAM_THINK_PROVIDER", "open_ai"), model: env("DEEPGRAM_THINK_MODEL", "gpt-4.1-mini"), temperature: 0.3 },
+        provider: { type: env("DEEPGRAM_THINK_PROVIDER", "open_ai"), model: env("DEEPGRAM_THINK_MODEL", "gpt-5.6-luna"), temperature: 0.3 },
         prompt: jarvisPrompt(opts),
         functions: jarvisFunctions(),
       },
