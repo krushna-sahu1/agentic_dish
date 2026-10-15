@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChefHat, ExternalLink } from "lucide-react";
+import { ExternalLink, LayoutDashboard, Menu as MenuIcon, ReceiptText, Settings, Sparkles, UtensilsCrossed, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
+import { LogoMark } from "@/components/site/Logo";
 import { alertsAction, liveKpisAction, markAlertsReadAction } from "@/app/actions/owner";
 import { createClient } from "@/lib/supabase/client";
-import { formatINR } from "@/lib/format";
+import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { AlertCard, AlertsBellIcon } from "./OwnerCards";
 
@@ -36,12 +37,15 @@ function chime() {
   }
 }
 
+/** Dashboard chrome: sidebar navigation (drawer on mobile), alerts and live new-order notifications. */
 export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; name: string | null; children: React.ReactNode }) {
   const pathname = usePathname();
   const [kpis, setKpis] = useState<Kpis | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [bellOpen, setBellOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const seen = useRef<Set<string>>(new Set());
+  const bellRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async () => {
     const [k, a] = await Promise.all([liveKpisAction(), alertsAction()]);
@@ -61,7 +65,7 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
         if (row?.status === "paid" && !seen.current.has(row.id)) {
           seen.current.add(row.id);
           chime();
-          toast.success(`New order ${row.order_number}`, { description: "Waiting to be accepted", action: { label: "Open board", onClick: () => (window.location.href = "/owner/orders") } });
+          toast.success(`New order ${row.order_number}`, { description: "Waiting to be accepted", action: { label: "Open", onClick: () => (window.location.href = `/owner/orders/${row.id}`) } });
         }
         void refresh();
       })
@@ -73,71 +77,156 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
     };
   }, [refresh]);
 
+  useEffect(() => setNavOpen(false), [pathname]);
+
+  useEffect(() => {
+    if (!bellOpen) return;
+    const close = (e: MouseEvent) => !bellRef.current?.contains(e.target as Node) && setBellOpen(false);
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setBellOpen(false);
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [bellOpen]);
+
   const unread = alerts.filter((a) => !a.is_read && a.type !== "internal");
   const nav = [
-    { href: "/owner", label: "Assistant" },
-    { href: "/owner/orders", label: "Live orders" },
-    { href: "/owner/menu", label: "Menu & stock" },
-    ...(role === "owner" ? [{ href: "/owner/settings", label: "Settings" }] : []),
+    { href: "/owner", label: "Overview", icon: LayoutDashboard, exact: true },
+    { href: "/owner/orders", label: "Orders", icon: ReceiptText, count: kpis?.new_orders_waiting },
+    { href: "/owner/menu", label: "Menu", icon: UtensilsCrossed },
+    { href: "/owner/assistant", label: "AI assistant", icon: Sparkles },
+    ...(role === "owner" ? [{ href: "/owner/settings", label: "Settings", icon: Settings }] : []),
   ];
+  const current = nav.find((n) => (n.exact ? pathname === n.href : pathname.startsWith(n.href)));
 
-  return (
-    <div className="flex h-dvh flex-col">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2">
-          <Link href="/owner" className="flex items-center gap-2 font-display font-semibold">
-            <ChefHat className="size-5 text-primary" /> <span className="hidden sm:inline">Kitchen HQ</span>
-          </Link>
-          <nav aria-label="Owner" className="flex gap-1 overflow-x-auto">
-            {nav.map((n) => (
-              <Link key={n.href} href={n.href} className={cn("whitespace-nowrap rounded-lg px-3 py-1.5 text-sm", pathname === n.href ? "bg-accent font-medium" : "text-muted-foreground hover:bg-accent")}>
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="ml-auto flex items-center gap-1">
-            <div className="relative">
-              <Button variant="ghost" size="icon" aria-label={`Alerts, ${unread.length} unread`} aria-expanded={bellOpen} onClick={() => setBellOpen((o) => !o)}>
-                <AlertsBellIcon count={unread.length} />
-              </Button>
-              {bellOpen && (
-                <div className="absolute right-0 z-50 mt-2 max-h-[70vh] w-[min(92vw,380px)] overflow-auto rounded-xl border bg-popover p-2 shadow-xl">
-                  <div className="flex items-center justify-between px-1">
-                    <p className="text-sm font-semibold">Alerts</p>
-                    <Button variant="ghost" size="sm" onClick={async () => { await markAlertsReadAction(); void refresh(); }}>Mark all read</Button>
-                  </div>
-                  <AlertCard alerts={alerts.filter((a) => a.type !== "internal")} />
-                </div>
-              )}
-            </div>
-            <ThemeToggle />
-            <Link href="/" className="hidden items-center gap-1 rounded-lg px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent sm:flex">
-              Site <ExternalLink className="size-3.5" />
-            </Link>
+  const bell = (
+    <div className="relative" ref={bellRef}>
+      <Button variant="ghost" size="icon" aria-label={`Alerts, ${unread.length} unread`} aria-expanded={bellOpen} onClick={() => setBellOpen((o) => !o)}>
+        <AlertsBellIcon count={unread.length} />
+      </Button>
+      {bellOpen && (
+        <div className="absolute right-0 z-50 mt-2 max-h-[70vh] w-[min(92vw,380px)] animate-rise overflow-auto rounded-2xl border bg-popover p-2 shadow-xl">
+          <div className="flex items-center justify-between px-2 py-1">
+            <p className="text-sm font-semibold">Alerts</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await markAlertsReadAction();
+                void refresh();
+              }}
+            >
+              Mark all read
+            </Button>
           </div>
+          {alerts.filter((a) => a.type !== "internal").length ? (
+            <AlertCard alerts={alerts.filter((a) => a.type !== "internal")} />
+          ) : (
+            <p className="px-2 py-8 text-center text-sm text-muted-foreground">You&apos;re all caught up.</p>
+          )}
         </div>
-        <div className="border-t bg-muted/40">
-          <dl className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 px-4 py-1.5 text-xs sm:grid-cols-4" data-testid="kpi-strip" aria-live="polite">
-            {role === "owner" && <Kpi label="Revenue today" value={kpis ? formatINR(kpis.revenue_today_paise) : "…"} />}
-            <Kpi label="Orders today" value={kpis ? String(kpis.orders_today) : "…"} />
-            <Kpi label="Active orders" value={kpis ? `${kpis.active_orders}${kpis.new_orders_waiting ? ` (${kpis.new_orders_waiting} new)` : ""}` : "…"} highlight={!!kpis?.new_orders_waiting} />
-            <Kpi label="Avg rating (30d)" value={kpis?.avg_rating_30d ? `${kpis.avg_rating_30d} ★` : "…"} />
-          </dl>
-        </div>
-      </header>
-      <main id="main" className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col px-4 py-3">
-        <p className="sr-only">Signed in as {name} ({role})</p>
-        {children}
-      </main>
+      )}
     </div>
   );
-}
 
-function Kpi({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  const sidebar = (
+    <div className="flex h-full flex-col">
+      <Link href="/owner" className="flex items-center gap-2.5 px-3 pb-6 pt-1">
+        <LogoMark className="size-8" />
+        <span className="min-w-0">
+          <span className="block font-display text-2xl leading-none">{BRAND.name}</span>
+          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Dashboard</span>
+        </span>
+      </Link>
+      <nav aria-label="Dashboard" className="grid gap-0.5">
+        {nav.map((n) => {
+          const active = n === current;
+          return (
+            <Link
+              key={n.href}
+              href={n.href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
+                active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              <n.icon className="size-4" aria-hidden />
+              <span className="flex-1">{n.label}</span>
+              {!!n.count && (
+                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums", active ? "bg-primary text-primary-foreground" : "bg-primary/12 text-primary")}>
+                  {n.count}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+      <div className="mt-auto space-y-3 pt-6">
+        {kpis && (
+          <div className="rounded-2xl border bg-background/60 p-3 text-xs" aria-live="polite">
+            <p className="flex items-center gap-2 font-medium">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-success" />
+              </span>
+              Live
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              {kpis.active_orders} active · {kpis.orders_today} today
+            </p>
+          </div>
+        )}
+        <div className="flex items-center gap-2 border-t px-1 pt-3">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold uppercase">{(name ?? role).slice(0, 1)}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium">{name ?? "Team member"}</span>
+            <span className="block text-xs capitalize text-muted-foreground">{role}</span>
+          </span>
+          <ThemeToggle />
+        </div>
+        <Link href="/" className="flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
+          View website <ExternalLink className="size-3" aria-hidden />
+        </Link>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex items-baseline gap-2">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className={cn("font-semibold tabular-nums", highlight && "text-primary")}>{value}</dd>
+    <div className="flex h-dvh bg-background">
+      {/* Desktop sidebar */}
+      <aside className="hidden w-64 shrink-0 border-r bg-card/50 p-4 lg:block">{sidebar}</aside>
+
+      {/* Mobile drawer */}
+      {navOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Dashboard navigation">
+          <button className="absolute inset-0 animate-fade bg-black/40" aria-label="Close navigation" onClick={() => setNavOpen(false)} />
+          <aside className="relative h-full w-72 max-w-[85vw] animate-rise border-r bg-background p-4 shadow-2xl">
+            <Button variant="ghost" size="icon" className="absolute right-3 top-3" aria-label="Close navigation" onClick={() => setNavOpen(false)}>
+              <X />
+            </Button>
+            {sidebar}
+          </aside>
+        </div>
+      )}
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur sm:px-6 lg:h-16">
+          <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={() => setNavOpen(true)}>
+            <MenuIcon />
+          </Button>
+          <p className="text-sm font-medium">{current?.label ?? "Dashboard"}</p>
+          <div className="ml-auto flex items-center gap-1">{bell}</div>
+        </header>
+        <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+          <p className="sr-only">
+            Signed in as {name} ({role})
+          </p>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

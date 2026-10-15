@@ -16,7 +16,7 @@ export default async function OrdersPage() {
   const orders = await listMyOrders(user.userId, 30);
   return (
     <div className="mx-auto max-w-3xl py-6">
-      <h1 className="mb-4 font-display text-3xl font-semibold">My orders</h1>
+      <h1 className="mb-4 font-display text-4xl sm:text-5xl">My orders</h1>
       {orders.length === 0 ? (
         <p className="text-muted-foreground">
           No orders yet. <Link href="/menu" className="text-primary hover:underline">Browse the menu</Link>

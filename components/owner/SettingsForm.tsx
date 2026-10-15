@@ -65,9 +65,12 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   );
 
   return (
-    <form onSubmit={submit} className="space-y-6 overflow-y-auto pb-10">
-      <h1 className="font-display text-2xl font-semibold">Settings</h1>
-      <section className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+      <div>
+        <h1 className="font-display text-4xl leading-none sm:text-5xl">Settings</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Hours, fees and ordering. Changes are previewed before they apply.</p>
+      </div>
+      <section className="grid gap-4 rounded-2xl border bg-card p-5 sm:grid-cols-2">
         <div>
           <Label htmlFor="override">Open / closed</Label>
           <Select id="override" value={f.is_open_override} onChange={(e) => setF({ ...f, is_open_override: e.target.value as Settings["is_open_override"] })}>
@@ -84,7 +87,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
           <Textarea id="ann" maxLength={200} value={f.announcement} onChange={(e) => setF({ ...f, announcement: e.target.value })} className="min-h-14" />
         </div>
       </section>
-      <section className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-3">
+      <section className="grid gap-4 rounded-2xl border bg-card p-5 sm:grid-cols-3">
         {num("delivery_fee", "Delivery fee (₹)")}
         {num("free_delivery_above", "Free delivery above (₹)")}
         {num("packaging_fee", "Packaging fee (₹)")}
@@ -93,7 +96,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         {num("avg_prep_minutes", "Avg prep (min)")}
         {num("delivery_radius_km", "Delivery radius (km)", "0.5")}
       </section>
-      <section className="rounded-xl border bg-card p-4">
+      <section className="rounded-2xl border bg-card p-5">
         <h2 className="mb-2 text-sm font-semibold">Opening hours <span className="font-normal text-muted-foreground">(e.g. 07:00-15:30, 17:30-23:00; empty = closed)</span></h2>
         <div className="grid gap-2 sm:grid-cols-2">
           {DAYS.map((d) => (

@@ -1,5 +1,5 @@
 -- =============================================================================
--- Seed: Kalinga Dosa House — South Indian & Odia kitchen, Bhubaneswar.
+-- Seed: Agentic Dish — South Indian & Odia kitchen, Bhubaneswar.
 -- Demo logins (test-only credentials, see README):
 --   owner@example.com / Owner@12345
 --   staff@example.com / Staff@12345
@@ -18,10 +18,10 @@ insert into public.restaurant_settings (
   delivery_radius_km, serviceable_pincodes, delivery_fee_paise, free_delivery_above_paise,
   packaging_fee_paise, gst_percent, min_order_paise, avg_prep_minutes, accepting_orders, announcement
 ) values (
-  'Kalinga Dosa House',
+  'Agentic Dish',
   'Crisp dosas, Odia comfort food, served with a smile.',
   '+91 674 255 0142',
-  'hello@kalingadosa.example',
+  'hello@agenticdish.example',
   'Plot 42, Saheed Nagar, Bhubaneswar, Odisha 751007',
   20.2906, 85.8446, 'Asia/Kolkata',
   '{

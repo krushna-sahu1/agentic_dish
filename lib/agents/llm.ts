@@ -19,5 +19,5 @@ export function getModel(agent: "customer" | "owner"): LanguageModel {
     baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
     apiKey: process.env.DEEPSEEK_API_KEY,
   });
-  return provider.chat(process.env.DEEPSEEK_MODEL || "deepseek-v4.1-flash");
+  return provider.chat(process.env.DEEPSEEK_MODEL || "deepseek-flash");
 }

@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { MessageCircle } from "lucide-react";
+import { ChatLauncher } from "./ChatLauncher";
 
 const CustomerChat = dynamic(() => import("./CustomerChat").then((m) => m.CustomerChat), { ssr: false });
 
@@ -34,16 +34,11 @@ export function LazyCustomerChat(props: Props) {
 
   if (load) return <CustomerChat {...props} initialOpen={initial.open} initialPrompt={initial.prompt} />;
   return (
-    <button
+    <ChatLauncher
       onClick={() => {
         setInitial({ open: true });
         setLoad(true);
       }}
-      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg"
-      aria-label="Open the AI assistant"
-      data-testid="chat-launcher"
-    >
-      <MessageCircle className="size-5" /> <span className="hidden sm:inline">Ask our AI</span>
-    </button>
+    />
   );
 }

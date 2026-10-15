@@ -1,8 +1,9 @@
 /** Transactional email via Resend. No-ops (logs) when RESEND_API_KEY is unset. */
+import { BRAND } from "@/lib/brand";
 import { formatINR, STATUS_LABEL } from "@/lib/format";
 import { formatDateTime } from "@/lib/time";
 
-const FROM = process.env.EMAIL_FROM || "Kalinga Dosa House <orders@resend.dev>";
+const FROM = process.env.EMAIL_FROM || `${BRAND.name} <orders@resend.dev>`;
 
 export async function sendEmail(to: string | null | undefined, subject: string, html: string): Promise<boolean> {
   if (!to) return false;
@@ -31,7 +32,7 @@ function layout(title: string, body: string) {
   return `<!doctype html><html><body style="font-family:system-ui,sans-serif;background:#faf7f2;padding:24px;color:#1c1917">
   <div style="max-width:560px;margin:auto;background:#fff;border-radius:12px;padding:24px;border:1px solid #e7e5e4">
   <h2 style="margin:0 0 12px;color:#c2410c">${esc(title)}</h2>${body}
-  <p style="margin-top:24px;font-size:12px;color:#78716c">Kalinga Dosa House · <a href="${site}">${site}</a></p></div></body></html>`;
+  <p style="margin-top:24px;font-size:12px;color:#78716c">${BRAND.name} · <a href="${site}">${site}</a></p></div></body></html>`;
 }
 
 export interface EmailOrder {

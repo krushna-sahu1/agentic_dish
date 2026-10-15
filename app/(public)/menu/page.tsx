@@ -12,7 +12,7 @@ export default async function MenuPage() {
     <div className="py-6">
       <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-semibold">Our menu</h1>
+          <h1 className="font-display text-4xl sm:text-5xl">Our menu</h1>
           <p className="text-sm text-muted-foreground">Veg 🟩 · Non-veg 🟥 · 🌶 = spice level. Prices include no hidden charges — GST is shown at checkout.</p>
         </div>
         <AskAiButton variant="outline" size="sm" prompt="What do you recommend today?" label="Not sure? Ask our AI" />

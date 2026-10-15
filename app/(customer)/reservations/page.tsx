@@ -11,7 +11,7 @@ export default async function ReservationsPage() {
   const reservations = await listMyReservations(user.userId);
   return (
     <div className="mx-auto max-w-3xl py-6">
-      <h1 className="mb-4 font-display text-3xl font-semibold">Book a table</h1>
+      <h1 className="mb-4 font-display text-4xl sm:text-5xl">Book a table</h1>
       <ReservationsClient reservations={reservations} />
     </div>
   );

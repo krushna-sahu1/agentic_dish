@@ -180,7 +180,7 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
       ) : (
         grouped.map((g) => (
           <section key={g.slug} id={`cat-${g.slug}`} data-category-section className="pt-8">
-            <h2 className="mb-3 font-display text-2xl font-semibold">{g.name}</h2>
+            <h2 className="mb-3 font-display text-2xl">{g.name}</h2>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {g.items.map((i) => (
                 <DishCard key={i.id} item={i} />

@@ -13,7 +13,7 @@ export default async function ProfilePage() {
   const [profile, addresses] = await Promise.all([getProfile(user.userId), listAddresses(user.userId)]);
   return (
     <div className="mx-auto max-w-3xl space-y-8 py-6">
-      <h1 className="font-display text-3xl font-semibold">Your profile</h1>
+      <h1 className="font-display text-4xl sm:text-5xl">Your profile</h1>
       <section className="rounded-xl border bg-card p-4">
         <p className="mb-3 text-sm text-muted-foreground">{user.email}</p>
         <ProfileForm profile={profile} />

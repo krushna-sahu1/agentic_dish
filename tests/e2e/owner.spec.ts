@@ -5,7 +5,7 @@ import { admin, askOwner, login, requireDb } from "./helpers";
 test.describe("owner agent", () => {
   test.beforeEach(async ({ page }) => {
     requireDb();
-    await login(page, "owner", "/owner");
+    await login(page, "owner", "/owner/assistant");
     await page.waitForURL(/\/owner/);
   });
 
@@ -99,7 +99,7 @@ test.describe("owner agent", () => {
 
 test("staff cannot use owner-only tools", async ({ page }) => {
   requireDb();
-  await login(page, "staff", "/owner");
+  await login(page, "staff", "/owner/assistant");
   const main = await askOwner(page, "how much revenue did we make?");
   await expect(main.getByText(/Staff accounts can't use this/)).toBeVisible();
 });

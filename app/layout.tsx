@@ -1,23 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Geist, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 import type { ClientSession } from "@/components/providers/SessionProvider";
 import { getSessionUser } from "@/lib/auth";
+import { BRAND } from "@/lib/brand";
 
-const sans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-sans-family", display: "swap" });
-const display = Fraunces({ subsets: ["latin"], variable: "--font-display-family", display: "swap" });
+const sans = Geist({ subsets: ["latin"], variable: "--font-sans-family", display: "swap" });
+const display = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-display-family", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Kalinga Dosa House — South Indian & Odia kitchen", template: "%s · Kalinga Dosa House" },
-  description: "Crisp dosas, Odia comfort food and an AI host that takes your order. Order online for delivery, pickup or dine-in in Bhubaneswar.",
+  title: { default: `${BRAND.name} — South Indian & Odia kitchen`, template: `%s · ${BRAND.name}` },
+  description: BRAND.description,
+  applicationName: BRAND.name,
+  openGraph: { siteName: BRAND.name, title: BRAND.name, description: BRAND.description, type: "website" },
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf7f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1714" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f1e7" },
+    { media: "(prefers-color-scheme: dark)", color: "#171310" },
   ],
 };
 
@@ -37,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en-IN" suppressHydrationWarning className={`${sans.variable} ${display.variable}`}>
       <body className="min-h-dvh">
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-card focus:px-4 focus:py-2">
+        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-card focus:shadow-lg focus:px-4 focus:py-2">
           Skip to content
         </a>
         <Providers session={session}>{children}</Providers>

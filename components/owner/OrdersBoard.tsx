@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { Clock, X } from "lucide-react";
 import { toast } from "sonner";
@@ -58,19 +59,19 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid min-h-0 flex-1 auto-cols-[minmax(250px,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2">
+      <div className="grid min-h-[60vh] flex-1 auto-cols-[minmax(260px,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2">
         {COLUMNS.map((col) => {
           const orders = data.active.filter((o) => o.status === col.status).sort((a, b) => a.created_at.localeCompare(b.created_at));
           return (
-            <section key={col.status} aria-label={col.title} className="flex min-h-0 flex-col rounded-xl bg-muted/50 p-2">
-              <h2 className="mb-2 flex items-center justify-between px-1 text-sm font-semibold">
-                {col.title} <span className="rounded-full bg-card px-2 text-xs">{orders.length}</span>
+            <section key={col.status} aria-label={col.title} className="flex min-h-0 flex-col rounded-2xl bg-muted/60 p-2.5">
+              <h2 className="mb-2.5 flex items-center justify-between px-1.5 text-sm font-medium">
+                {col.title} <span className="rounded-full bg-card px-2 py-0.5 text-xs tabular-nums">{orders.length}</span>
               </h2>
               <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
                 {orders.map((o) => (
-                  <article key={o.id} data-testid="board-order" data-order={o.order_number} className={cn("rounded-lg border bg-card p-2.5 text-sm shadow-sm", col.status === "paid" && "border-primary/60 ring-1 ring-primary/30")}>
+                  <article key={o.id} data-testid="board-order" data-order={o.order_number} className={cn("animate-rise rounded-xl border bg-card p-3 text-sm shadow-sm", col.status === "paid" && "border-primary/60 ring-1 ring-primary/30")}>
                     <div className="flex items-center justify-between">
-                      <span className="text-base font-bold">#{o.order_number.split("-").pop()}</span>
+                      <Link href={`/owner/orders/${o.id}`} className="text-base font-semibold hover:underline">#{o.order_number.split("-").pop()}</Link>
                       <span className={cn("flex items-center gap-1 text-xs", o.minutes_in_status > 20 ? "font-semibold text-destructive" : "text-muted-foreground")}>
                         <Clock className="size-3" /> {o.minutes_in_status}m
                       </span>
@@ -83,17 +84,17 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
                         <li key={k}>
                           <b>{i.qty}×</b> {i.name_snapshot}
                           {(i.variant_snapshot || i.addons_snapshot?.length || i.special_instructions) && (
-                            <span className="block pl-4 text-xs text-amber-700 dark:text-amber-300">{[i.variant_snapshot?.name, ...(i.addons_snapshot ?? []).map((a) => `+${a.name}`), strip(i.special_instructions)].filter(Boolean).join(" · ")}</span>
+                            <span className="block pl-4 text-xs text-warning">{[i.variant_snapshot?.name, ...(i.addons_snapshot ?? []).map((a) => `+${a.name}`), strip(i.special_instructions)].filter(Boolean).join(" · ")}</span>
                           )}
                         </li>
                       ))}
                     </ul>
-                    {o.notes && <p className="mt-1 rounded bg-muted px-1.5 py-0.5 text-xs">📝 {strip(o.notes)}</p>}
+                    {o.notes && <p className="mt-1.5 rounded-lg bg-muted px-2 py-1 text-xs">Note: {strip(o.notes)}</p>}
                     {o.scheduled_for && <p className="mt-1 text-xs text-primary">Scheduled {formatTime(o.scheduled_for)}</p>}
                     {o.estimated_ready_at && col.status !== "paid" && <p className="mt-1 text-xs text-muted-foreground">ETA {formatTime(o.estimated_ready_at)}</p>}
                     <div className="mt-2 flex flex-wrap items-center gap-1.5">
                       {col.status === "paid" && (
-                        <select aria-label="Ready in minutes" className="h-8 rounded-md border bg-card px-1 text-xs" value={eta[o.id] ?? 20} onChange={(e) => setEta({ ...eta, [o.id]: Number(e.target.value) })}>
+                        <select aria-label="Ready in minutes" className="h-8 rounded-full border bg-card px-2 text-xs" value={eta[o.id] ?? 20} onChange={(e) => setEta({ ...eta, [o.id]: Number(e.target.value) })}>
                           {[10, 15, 20, 30, 45].map((m) => <option key={m} value={m}>{m} min</option>)}
                         </select>
                       )}
@@ -110,17 +111,17 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
                     </div>
                   </article>
                 ))}
-                {orders.length === 0 && <p className="px-1 py-4 text-center text-xs text-muted-foreground">Nothing here</p>}
+                {orders.length === 0 && <p className="rounded-xl border border-dashed px-2 py-6 text-center text-xs text-muted-foreground">No orders</p>}
               </div>
             </section>
           );
         })}
       </div>
       {data.recent.length > 0 && (
-        <details className="mt-2 rounded-xl border bg-card px-3 py-2 text-sm">
+        <details className="mt-3 rounded-2xl border bg-card px-4 py-3 text-sm">
           <summary className="cursor-pointer font-medium">Done today ({data.recent.length})</summary>
           <ul className="mt-1 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
-            {data.recent.map((o) => <li key={o.id}>{o.order_number} · {STATUS_LABEL[o.status]} · {formatINR(o.total_paise)}</li>)}
+            {data.recent.map((o) => <li key={o.id}><Link className="hover:underline" href={`/owner/orders/${o.id}`}>{o.order_number}</Link> · {STATUS_LABEL[o.status]} · {formatINR(o.total_paise)}</li>)}
           </ul>
         </details>
       )}
@@ -140,7 +141,7 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
           }}
         >
           <Input aria-label="Reason" required minLength={3} placeholder="Reason (shared with the customer)" value={reason} onChange={(e) => setReason(e.target.value)} />
-          {cancel?.paid_at && <p className="text-xs text-amber-700 dark:text-amber-300">This order is paid. Cancelling doesn&apos;t refund it — ask the assistant to issue a refund after.</p>}
+          {cancel?.paid_at && <p className="text-xs text-warning">This order is paid. Cancelling doesn&apos;t refund it — ask the assistant to issue a refund after.</p>}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setCancel(null)}>Keep order</Button>
             <Button type="submit" variant="destructive" disabled={pending}>Cancel order</Button>

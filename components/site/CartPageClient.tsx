@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { Minus, Plus, Sparkles, Tag, Trash2 } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingBag, Sparkles, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useCart } from "@/components/providers/CartProvider";
 import {
   applyCouponAction,
@@ -27,7 +28,7 @@ import { openChat } from "./chat-events";
 type Coupon = { code: string; description: string | null };
 
 export function CartPageClient({ addresses, coupons, tables }: { addresses: Address[]; coupons: Coupon[]; tables: { number: number; capacity: number }[] }) {
-  const { cart, setCart, loading } = useCart();
+  const { cart, setCart, loading, refresh } = useCart();
   const [pending, start] = useTransition();
   const [coupon, setCoupon] = useState("");
 
@@ -39,20 +40,36 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
       if (success) toast.success(success);
     });
 
-  if (!cart) return loading ? <Skeleton className="h-64 w-full" /> : <p>Couldn&apos;t load your cart.</p>;
+  if (!cart)
+    return loading ? (
+      <div className="grid gap-8 lg:grid-cols-[1fr_380px]" aria-busy="true" aria-label="Loading your cart">
+        <div className="space-y-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex gap-4 rounded-2xl border bg-card p-4">
+              <Skeleton className="size-24 shrink-0" />
+              <div className="flex-1 space-y-3">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-8 w-32 rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <Skeleton className="h-80 rounded-2xl" />
+      </div>
+    ) : (
+      <ErrorState title="We couldn’t load your cart" description="This is usually a brief connection hiccup. Your items are safe — try again in a moment.">
+        <Button onClick={() => void refresh()}>Try again</Button>
+      </ErrorState>
+    );
 
   if (cart.lines.length === 0)
     return (
-      <div className="rounded-2xl border bg-card p-10 text-center">
-        <p className="text-lg font-medium">Your cart is empty</p>
-        <p className="mt-1 text-sm text-muted-foreground">Browse the menu or just tell our AI what you&apos;re craving.</p>
-        <div className="mt-4 flex justify-center gap-3">
-          <Link href="/menu" className={buttonVariants()}>Browse menu</Link>
-          <Button variant="outline" onClick={() => openChat("Suggest something popular")}>
-            <Sparkles /> Ask AI
-          </Button>
-        </div>
-      </div>
+      <EmptyState icon={ShoppingBag} title="Your cart is empty" description="Browse the menu, or just tell our AI host what you’re craving — it’ll fill the cart for you." className="py-20">
+        <Link href="/menu" className={buttonVariants()}>Browse the menu</Link>
+        <Button variant="outline" onClick={() => openChat("Suggest something popular")}>
+          <Sparkles /> Ask our AI
+        </Button>
+      </EmptyState>
     );
 
   const t = cart.totals;
@@ -60,15 +77,23 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
   const minSchedule = new Date(now.getTime() + 30 * 60_000 - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
 
   return (
-    <div className={cn("grid gap-6 lg:grid-cols-[1fr_360px]", pending && "opacity-80")}>
+    <div className={cn("grid items-start gap-8 transition-opacity lg:grid-cols-[1fr_380px]", pending && "opacity-70")} aria-busy={pending}>
       <div className="space-y-3">
+        <Link href="/checkout" className="flex items-center justify-between rounded-2xl bg-foreground px-5 py-3.5 text-sm text-background lg:hidden">
+          <span>
+            Total <span className="font-semibold tabular-nums">{formatINR(t.totalPaise)}</span>
+          </span>
+          <span className="flex items-center gap-1 font-medium">
+            Checkout <ArrowRight className="size-4" />
+          </span>
+        </Link>
         {cart.warnings.map((w, i) => (
-          <p key={i} className="rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-300">{w}</p>
+          <p key={i} className="rounded-xl bg-warning/10 px-4 py-2.5 text-sm text-warning">{w}</p>
         ))}
         {cart.lines.map((l) => (
           <Card key={l.id} data-testid="cart-line" className={cn(!l.available && "border-destructive/40")}>
-            <CardContent className="flex gap-3 p-3">
-              <DishImage src={l.image_url} alt="" className="size-20 shrink-0 rounded-lg" />
+            <CardContent className="flex gap-4 p-3 sm:p-4">
+              <DishImage src={l.image_url} alt="" className="size-20 shrink-0 rounded-xl sm:size-24" />
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <p className="flex items-center gap-2 font-medium">
@@ -78,12 +103,12 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
                 </div>
                 {!l.available && <p className="text-xs text-destructive">{l.unavailable_reason} — please remove it.</p>}
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center rounded-lg border" role="group" aria-label={`Quantity of ${l.name}`}>
-                    <Button variant="ghost" size="icon" className="size-8" aria-label="Decrease" onClick={() => act(() => updateCartItemAction({ cart_item_id: l.id, qty: l.qty - 1 }))}>
+                  <div className="flex items-center rounded-full border bg-background" role="group" aria-label={`Quantity of ${l.name}`}>
+                    <Button variant="ghost" size="icon" className="size-8 rounded-full" aria-label="Decrease" onClick={() => act(() => updateCartItemAction({ cart_item_id: l.id, qty: l.qty - 1 }))}>
                       <Minus />
                     </Button>
-                    <span className="w-8 text-center text-sm" aria-live="polite">{l.qty}</span>
-                    <Button variant="ghost" size="icon" className="size-8" aria-label="Increase" disabled={l.qty >= 20} onClick={() => act(() => updateCartItemAction({ cart_item_id: l.id, qty: l.qty + 1 }))}>
+                    <span className="w-7 text-center text-sm font-medium tabular-nums" aria-live="polite">{l.qty}</span>
+                    <Button variant="ghost" size="icon" className="size-8 rounded-full" aria-label="Increase" disabled={l.qty >= 20} onClick={() => act(() => updateCartItemAction({ cart_item_id: l.id, qty: l.qty + 1 }))}>
                       <Plus />
                     </Button>
                   </div>
@@ -103,7 +128,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
                       ))}
                     </Select>
                   )}
-                  <Button variant="ghost" size="sm" className="ml-auto text-destructive" onClick={() => act(() => removeFromCartAction(l.id), "Removed")}>
+                  <Button variant="ghost" size="sm" className="ml-auto text-muted-foreground hover:text-destructive" onClick={() => act(() => removeFromCartAction(l.id), "Removed")}>
                     <Trash2 /> Remove
                   </Button>
                 </div>
@@ -147,17 +172,17 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
         ))}
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 lg:sticky lg:top-24">
         <Card>
-          <CardHeader><CardTitle>Order type</CardTitle></CardHeader>
+          <CardHeader><CardTitle>How would you like it?</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1" role="radiogroup" aria-label="Order type">
+            <div className="grid grid-cols-3 gap-1 rounded-full bg-muted p-1" role="radiogroup" aria-label="Order type">
               {(["delivery", "pickup", "dine_in"] as const).map((ot) => (
                 <button
                   key={ot}
                   role="radio"
                   aria-checked={cart.order_type === ot}
-                  className={cn("rounded-md py-1.5 capitalize", cart.order_type === ot ? "bg-card font-medium shadow-sm" : "text-muted-foreground")}
+                  className={cn("rounded-full py-2 capitalize transition-colors", cart.order_type === ot ? "bg-card font-medium shadow-sm" : "text-muted-foreground hover:text-foreground")}
                   onClick={() => act(() => setOrderOptionsAction({ order_type: ot }))}
                 >
                   {ot.replace("_", "-")}
@@ -215,7 +240,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
           <CardHeader><CardTitle>Coupon & tip</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
             {cart.coupon_code ? (
-              <div className="flex items-center justify-between rounded-lg bg-success/10 px-3 py-2">
+              <div className="flex items-center justify-between rounded-xl bg-success/10 px-3 py-2 text-success">
                 <span className="flex items-center gap-2"><Tag className="size-4" /> {cart.coupon_code}</span>
                 <Button variant="ghost" size="sm" onClick={() => act(() => removeCouponAction(), "Coupon removed")}>Remove</Button>
               </div>
@@ -255,7 +280,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Bill</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Summary</CardTitle></CardHeader>
           <CardContent>
             <dl className="space-y-1 text-sm">
               <Line k={`Subtotal (${cart.item_count} items)`} v={t.subtotalPaise} />
@@ -264,12 +289,13 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
               {cart.order_type === "delivery" && <Line k="Delivery" v={t.deliveryFeePaise} free={t.deliveryFeePaise === 0} />}
               <Line k="GST" v={t.taxPaise} />
               {t.tipPaise > 0 && <Line k="Tip" v={t.tipPaise} />}
-              <div className="flex justify-between border-t pt-2 text-base font-semibold">
+              <div className="mt-2 flex items-baseline justify-between border-t pt-3 text-base font-semibold">
                 <dt>Total</dt>
-                <dd className="tabular-nums" data-testid="cart-page-total">{formatINR(t.totalPaise)}</dd>
+                <dd className="font-display text-3xl font-normal tabular-nums" data-testid="cart-page-total">{formatINR(t.totalPaise)}</dd>
               </div>
             </dl>
-            <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "mt-4 w-full")}>Proceed to checkout</Link>
+            <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "mt-5 w-full")}>Proceed to checkout <ArrowRight /></Link>
+            <p className="mt-3 text-center text-xs text-muted-foreground">Secure payment via Razorpay on the next step.</p>
           </CardContent>
         </Card>
       </div>

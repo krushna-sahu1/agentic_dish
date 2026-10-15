@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { AskAiButton } from "@/components/site/AskAiButton";
-import { getSettings } from "@/lib/services/settings";
+import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = { title: "About us" };
 
-export default async function AboutPage() {
-  const s = await getSettings();
+export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl py-10">
-      <h1 className="font-display text-4xl font-semibold">About {s.name}</h1>
+      <h1 className="font-display text-5xl">About {BRAND.name}</h1>
       <div className="mt-6 space-y-4 text-muted-foreground">
         <p>
           We started as a tiny tiffin counter in Saheed Nagar, grinding our own dosa batter every night. Today our kitchen brings together two food

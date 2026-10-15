@@ -3,7 +3,8 @@
 import "@copilotkit/react-core/v2/styles.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { MessageCircle, RotateCcw, Sparkles, X } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, RotateCcw, ShoppingBag, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import {
@@ -23,7 +24,9 @@ import { executeCustomerConfirmAction, previewCustomerConfirmAction, rejectCusto
 import { newConversationAction } from "@/app/actions/chat";
 import { formatINR } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { LogoMark } from "@/components/site/Logo";
 import { ChatActionsProvider, useChatActions } from "./chat-actions";
+import { ChatLauncher } from "./ChatLauncher";
 import { ConfirmCard } from "./ConfirmCard";
 import { ErrorNote, LoginPromptCard, parseResult, ToolProgress } from "./shared";
 import {
@@ -233,16 +236,7 @@ export function CustomerChat({
         <CustomerBindings isOpen={isOpen} statusLabel={statusLabel} />
         <PendingPrompt prompt={pending} onSent={() => setPending(null)} />
 
-        {!open && (
-          <button
-            onClick={() => setOpen(true)}
-            className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg transition hover:scale-[1.03] focus-visible:outline-offset-4"
-            aria-label="Open the AI assistant"
-            data-testid="chat-launcher"
-          >
-            <MessageCircle className="size-5" /> <span className="hidden sm:inline">Ask our AI</span>
-          </button>
-        )}
+        {!open && <ChatLauncher onClick={() => setOpen(true)} />}
 
         <div
           ref={panelRef}
@@ -252,15 +246,19 @@ export function CustomerChat({
           hidden={!open}
           data-testid="chat-panel"
           className={cn(
-            "fixed z-50 flex flex-col overflow-hidden border bg-card shadow-2xl",
-            "inset-0 sm:inset-auto sm:bottom-4 sm:right-4 sm:h-[min(720px,calc(100dvh-2rem))] sm:w-[420px] sm:rounded-2xl",
+            "fixed z-50 flex flex-col overflow-hidden bg-card shadow-[0_30px_80px_-20px_rgb(0_0_0/0.35)]",
+            "inset-0 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[min(740px,calc(100dvh-2.5rem))] sm:w-[420px] sm:rounded-3xl sm:border sm:p-0",
+            open && "animate-rise",
           )}
         >
-          <div className="flex items-center gap-2 border-b px-4 py-3">
-            <Sparkles className="size-5 text-primary" aria-hidden />
+          <div className="flex items-center gap-3 border-b px-4 py-3">
+            <span className="relative">
+              <LogoMark className="size-9" />
+              <span className={cn("absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card", isOpen ? "bg-success" : "bg-muted-foreground")} aria-hidden />
+            </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{restaurantName} host</p>
-              <p className="text-xs text-muted-foreground">{session ? "I can order, track and book for you" : "Ask about the menu · log in to order"}</p>
+              <p className="truncate font-display text-xl leading-tight">{restaurantName} host</p>
+              <p className="truncate text-xs text-muted-foreground">{session ? "Orders, tracking and tables — just ask" : "Ask about the menu · log in to order"}</p>
             </div>
             <Button
               variant="ghost"
@@ -278,6 +276,7 @@ export function CustomerChat({
               <X />
             </Button>
           </div>
+          <CartStrip onNavigate={() => setOpen(false)} />
           <div className="relative min-h-0 flex-1 [&_.copilotKitChat]:h-full">
             <CopilotChat
               className="h-full"
@@ -293,5 +292,26 @@ export function CustomerChat({
         </div>
       </ChatActionsProvider>
     </CopilotKitProvider>
+  );
+}
+
+/** Live cart summary under the chat header: one tap to review the cart while chatting. */
+function CartStrip({ onNavigate }: { onNavigate: () => void }) {
+  const { cart, count } = useCart();
+  if (!cart || count === 0) return null;
+  return (
+    <Link
+      href="/cart"
+      onClick={onNavigate}
+      className="flex items-center gap-2 border-b bg-muted/60 px-4 py-2 text-sm transition-colors hover:bg-muted"
+    >
+      <ShoppingBag className="size-4 text-primary" aria-hidden />
+      <span className="flex-1">
+        {count} item{count === 1 ? "" : "s"} · <span className="font-medium tabular-nums">{formatINR(cart.totals.totalPaise)}</span>
+      </span>
+      <span className="flex items-center gap-1 text-xs font-medium">
+        View cart <ArrowRight className="size-3.5" aria-hidden />
+      </span>
+    </Link>
   );
 }

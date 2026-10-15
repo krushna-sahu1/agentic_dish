@@ -5,7 +5,9 @@ import { OWNER_CHANGE_NAMES } from "@/lib/agents/owner/changes";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { zonedDateString, addDays } from "@/lib/time";
 
-export default async function OwnerHome() {
+export const metadata = { title: "AI assistant" };
+
+export default async function OwnerAssistantPage() {
   const user = await requireRole(["owner", "staff"]);
   const role = user.role === "owner" ? "owner" : "staff";
   const allowed = OWNER_CHANGE_NAMES.filter((n) => canUseTool({ agent: "owner", role: user.role, userId: user.userId }, n).ok);
@@ -19,7 +21,7 @@ export default async function OwnerHome() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col px-3 py-4 sm:px-6 lg:px-10 lg:py-8">
       <OwnerChat role={role} allowedChanges={allowed} greeting={greeting} />
     </div>
   );

@@ -2,27 +2,35 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
-  --background: oklch(0.985 0.008 75);
-  --foreground: oklch(0.22 0.02 50);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 50);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 50);
-  --primary: oklch(0.55 0.17 45);
-  --primary-foreground: oklch(0.99 0.01 75);
-  --secondary: oklch(0.95 0.02 80);
-  --secondary-foreground: oklch(0.3 0.03 50);
-  --muted: oklch(0.955 0.012 75);
-  --muted-foreground: oklch(0.47 0.03 55);
-  --accent: oklch(0.93 0.05 85);
-  --accent-foreground: oklch(0.3 0.05 50);
-  --destructive: oklch(0.55 0.21 27);
+/*
+ * Agentic Dish design system — one set of tokens for the site, the chat and the owner dashboard.
+ * Minimal warm palette: cream surfaces, near-black ink, a single paprika accent.
+ * The same tokens are re-declared on [data-copilotkit] so the AI chat (which ships its own neutral theme) stays on-brand.
+ */
+:root,
+html [data-copilotkit] {
+  --background: oklch(0.967 0.013 85);
+  --foreground: oklch(0.2 0.01 60);
+  --card: oklch(0.992 0.006 85);
+  --card-foreground: oklch(0.2 0.01 60);
+  --popover: oklch(0.995 0.004 85);
+  --popover-foreground: oklch(0.2 0.01 60);
+  --primary: oklch(0.56 0.19 37);
+  --primary-foreground: oklch(0.985 0.01 80);
+  --secondary: oklch(0.93 0.018 80);
+  --secondary-foreground: oklch(0.25 0.012 60);
+  --muted: oklch(0.938 0.014 82);
+  --muted-foreground: oklch(0.47 0.016 60);
+  --accent: oklch(0.925 0.02 78);
+  --accent-foreground: oklch(0.2 0.01 60);
+  --destructive: oklch(0.54 0.2 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.52 0.13 150);
-  --border: oklch(0.9 0.015 75);
-  --input: oklch(0.88 0.015 75);
-  --ring: oklch(0.6 0.15 50);
+  --success: oklch(0.5 0.12 150);
+  --warning: oklch(0.53 0.12 62);
+  --info: oklch(0.52 0.12 250);
+  --border: oklch(0.885 0.016 80);
+  --input: oklch(0.86 0.018 80);
+  --ring: oklch(0.56 0.19 37);
   --veg: oklch(0.55 0.16 145);
   --nonveg: oklch(0.52 0.19 27);
   /* Validated categorical palette (dataviz skill; fixed order, never cycled) */
@@ -42,30 +50,34 @@
   --seq-5: #256abf;
   --seq-6: #184f95;
   --seq-7: #0d366b;
-  --radius: 0.75rem;
+  --radius: 0.875rem;
+  --cpk-default-font-family: var(--font-sans);
 }
 
-.dark {
-  --background: oklch(0.17 0.012 50);
-  --foreground: oklch(0.95 0.01 75);
-  --card: oklch(0.21 0.014 50);
-  --card-foreground: oklch(0.95 0.01 75);
-  --popover: oklch(0.21 0.014 50);
-  --popover-foreground: oklch(0.95 0.01 75);
-  --primary: oklch(0.7 0.16 50);
-  --primary-foreground: oklch(0.18 0.02 50);
-  --secondary: oklch(0.27 0.015 50);
-  --secondary-foreground: oklch(0.92 0.01 75);
-  --muted: oklch(0.25 0.012 50);
-  --muted-foreground: oklch(0.72 0.02 70);
-  --accent: oklch(0.3 0.03 60);
-  --accent-foreground: oklch(0.95 0.01 75);
-  --destructive: oklch(0.65 0.2 25);
+.dark,
+html.dark [data-copilotkit] {
+  --background: oklch(0.17 0.008 60);
+  --foreground: oklch(0.95 0.012 85);
+  --card: oklch(0.205 0.009 60);
+  --card-foreground: oklch(0.95 0.012 85);
+  --popover: oklch(0.225 0.01 60);
+  --popover-foreground: oklch(0.95 0.012 85);
+  --primary: oklch(0.69 0.17 42);
+  --primary-foreground: oklch(0.17 0.01 60);
+  --secondary: oklch(0.26 0.01 60);
+  --secondary-foreground: oklch(0.92 0.012 85);
+  --muted: oklch(0.24 0.009 60);
+  --muted-foreground: oklch(0.72 0.015 75);
+  --accent: oklch(0.27 0.012 60);
+  --accent-foreground: oklch(0.95 0.012 85);
+  --destructive: oklch(0.66 0.19 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.7 0.14 150);
-  --border: oklch(0.32 0.015 50);
-  --input: oklch(0.34 0.015 50);
-  --ring: oklch(0.7 0.15 50);
+  --success: oklch(0.72 0.14 150);
+  --warning: oklch(0.78 0.13 75);
+  --info: oklch(0.72 0.11 250);
+  --border: oklch(0.3 0.01 60);
+  --input: oklch(0.33 0.01 60);
+  --ring: oklch(0.69 0.17 42);
   --veg: oklch(0.7 0.16 145);
   --nonveg: oklch(0.68 0.18 27);
   --chart-1: #3987e5;
@@ -96,6 +108,8 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -107,12 +121,13 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-chart-6: var(--chart-6);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: var(--font-sans-family), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-family), ui-serif, Georgia, serif;
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 @layer base {
@@ -120,36 +135,87 @@
     border-color: var(--border);
   }
   html {
-    scroll-padding-top: 7rem;
+    scroll-padding-top: 6rem;
+    scroll-behavior: smooth;
   }
   body {
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* The display serif ships a single weight — never fake-bold it. */
+  .font-display {
+    font-synthesis: none;
+    font-weight: 400;
+    letter-spacing: -0.01em;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+  ::selection {
+    background: color-mix(in oklch, var(--primary) 25%, transparent);
+  }
 }
 
-/* CopilotKit chat theming */
-:root {
-  --copilot-kit-primary-color: var(--primary);
-  --copilot-kit-contrast-color: var(--primary-foreground);
-  --copilot-kit-background-color: var(--card);
-  --copilot-kit-secondary-color: var(--muted);
-  --copilot-kit-secondary-contrast-color: var(--foreground);
-  --copilot-kit-separator-color: var(--border);
-  --copilot-kit-muted-color: var(--muted-foreground);
+/* Motion: subtle entrance + scroll reveal (CSS only; no-ops where unsupported). */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@utility animate-rise {
+  animation: rise 0.7s var(--ease-out-soft) both;
+}
+@utility animate-fade {
+  animation: fade 0.5s ease-out both;
+}
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    animation: rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+}
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* CopilotKit chat: brand font + roomier input. Colors come from the tokens above. */
+[data-copilotkit] {
+  font-family: var(--font-sans);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    animation: none !important;
+  }
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
 }

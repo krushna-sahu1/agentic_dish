@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { getSessionUser } from "@/lib/auth";
+import { BRAND } from "@/lib/brand";
 import { audit } from "@/lib/agents/guard";
 import { getCategoryBreakdown, getOrderTypeSplit, getRatingsSummary, getRevenue, getTopItems } from "@/lib/agents/owner/analytics";
 
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
     text(t, o);
     y -= (o?.size ?? 10) + 6;
   };
-  line("Kalinga Dosa House - Business report", { size: 18, b: true, color: [0.76, 0.25, 0.05] });
+  line(`${BRAND.name} - Business report`, { size: 18, b: true, color: [0.76, 0.25, 0.05] });
   line(rev.range.label.replace(/–/g, "-"), { size: 11 });
   y -= 6;
   line(`Revenue: ${rs(rev.totals.revenue_paise)}   Orders: ${rev.totals.orders}   AOV: ${rs(rev.totals.aov_paise)}`, { b: true });

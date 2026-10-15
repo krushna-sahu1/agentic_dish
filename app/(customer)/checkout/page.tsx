@@ -24,7 +24,7 @@ export default async function CheckoutPage() {
   return (
     <div className="grid gap-6 py-6 lg:grid-cols-[1fr_380px]">
       <div className="space-y-4">
-        <h1 className="font-display text-3xl font-semibold">Checkout</h1>
+        <h1 className="font-display text-4xl sm:text-5xl">Checkout</h1>
         {!v.ok && (
           <div className="space-y-1 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm" role="alert">
             {v.errors.map((e, i) => (

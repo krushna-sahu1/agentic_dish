@@ -32,15 +32,15 @@ export function Dialog({
       onClick={(e) => e.target === ref.current && onClose()}
       aria-label={title}
       className={cn(
-        "m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border bg-card p-0 text-card-foreground shadow-xl backdrop:bg-black/50",
+        "m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md rounded-3xl border bg-card p-0 text-card-foreground shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px] open:animate-rise",
         className,
       )}
     >
       {open && (
-        <div className="p-5">
+        <div className="p-6">
           <div className="mb-3 flex items-start justify-between gap-4">
-            <h2 className="text-lg font-semibold">{title}</h2>
-            <button onClick={onClose} aria-label="Close" className="rounded-md p-1 text-muted-foreground hover:bg-accent">
+            <h2 className="font-display text-2xl leading-tight">{title}</h2>
+            <button onClick={onClose} aria-label="Close" className="-mr-1 -mt-1 rounded-full p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground">
               <X className="size-5" />
             </button>
           </div>

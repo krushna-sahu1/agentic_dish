@@ -15,7 +15,7 @@ export default async function FavoritesPage() {
   const items = ids.map((id) => menu.byId.get(id)).filter((i) => !!i);
   return (
     <div className="py-6">
-      <h1 className="mb-4 font-display text-3xl font-semibold">Your favourites</h1>
+      <h1 className="mb-4 font-display text-4xl sm:text-5xl">Your favourites</h1>
       {items.length === 0 ? (
         <p className="text-muted-foreground">
           Nothing saved yet. Tap the heart on any <Link href="/menu" className="text-primary hover:underline">dish</Link>.

@@ -51,7 +51,7 @@ export default async function DishPage({ params }: Props) {
         <div>
           <div className="flex items-start gap-3">
             <VegMark veg={item.is_veg} className="mt-2" />
-            <h1 className="font-display text-3xl font-semibold">{item.name}</h1>
+            <h1 className="font-display text-4xl sm:text-5xl">{item.name}</h1>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
             {item.tags.map((t) => (
@@ -93,7 +93,7 @@ export default async function DishPage({ params }: Props) {
 
       {pairings.length > 0 && (
         <section className="mt-12" aria-labelledby="pairings">
-          <h2 id="pairings" className="mb-4 font-display text-2xl font-semibold">Goes well with</h2>
+          <h2 id="pairings" className="mb-4 font-display text-2xl">Goes well with</h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             {pairings.slice(0, 4).map((p) => (
               <div key={p.item.id}>
@@ -106,7 +106,7 @@ export default async function DishPage({ params }: Props) {
       )}
 
       <section className="mt-12" aria-labelledby="reviews">
-        <h2 id="reviews" className="mb-4 font-display text-2xl font-semibold">Reviews</h2>
+        <h2 id="reviews" className="mb-4 font-display text-2xl">Reviews</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-muted-foreground">No reviews yet.</p>
         ) : (

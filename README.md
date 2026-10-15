@@ -1,4 +1,4 @@
-# Kalinga Dosa House — agentic restaurant website
+# Agentic Dish — agentic restaurant website
 
 A restaurant site where **conversation replaces clicking**. Customers browse a normal menu *or* tell the AI host
 "add one paneer masala dosa to my cart"; the owner asks "which dish is performing best?" and gets charts, or
@@ -47,7 +47,7 @@ sortable tables with CSV export, comparison cards, reports, alerts). Confirm-gat
 ### Note on CopilotKit / DeepSeek
 CopilotKit 1.79 deprecates the v1 `OpenAIAdapter` runtime; this build uses the v2 runtime (`BuiltInAgent`) with
 the AI SDK OpenAI provider pointed at `DEEPSEEK_BASE_URL` — the same OpenAI-compatible setup, non-deprecated.
-The model id comes from `DEEPSEEK_MODEL` (default `deepseek-v4.1-flash`).
+The model id comes from `DEEPSEEK_MODEL` (default `deepseek-flash`).
 
 ## Setup
 

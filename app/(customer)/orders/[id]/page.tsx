@@ -25,7 +25,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   return (
     <div className="mx-auto max-w-3xl space-y-6 py-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-display text-3xl font-semibold">{o.order_number}</h1>
+        <h1 className="font-display text-4xl sm:text-5xl">{o.order_number}</h1>
         <ReorderButton orderId={o.id} />
       </div>
       <OrderTracker orderId={o.id} orderType={o.order_type} initialStatus={o.status} initialEta={o.estimated_ready_at} initialEvents={d.events.map((e) => ({ status: e.status, at: e.created_at, note: e.note }))} />

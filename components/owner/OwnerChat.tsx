@@ -186,19 +186,22 @@ export function OwnerChat({ role, allowedChanges, greeting }: { role: "owner" | 
       <ChatActionsProvider>
         <Bindings role={role} />
         <div className="flex h-full min-h-0 flex-col">
-          <div className="flex items-center justify-between gap-2 pb-2">
-            <p className="flex items-center gap-2 text-sm text-muted-foreground"><Sparkles className="size-4 text-primary" /> Ask anything about sales, dishes, orders or settings.</p>
-            <Button variant="ghost" size="sm" onClick={async () => { await newConversationAction("owner"); setResetKey((k) => k + 1); }}>
+          <div className="flex flex-wrap items-end justify-between gap-3 pb-4">
+            <div>
+              <h1 className="font-display text-4xl leading-none sm:text-5xl">AI assistant</h1>
+              <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"><Sparkles className="size-4 text-primary" /> Ask anything about sales, dishes, orders or settings.</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={async () => { await newConversationAction("owner"); setResetKey((k) => k + 1); }}>
               <RotateCcw /> New chat
             </Button>
           </div>
           {greeting && (
-            <details className="mb-2 rounded-xl border bg-accent/40 px-3 py-2 text-sm" open>
+            <details className="mb-3 rounded-2xl border bg-card px-4 py-3 text-sm" open>
               <summary className="cursor-pointer font-medium">{greeting.title}</summary>
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted-foreground">{greeting.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
             </details>
           )}
-          <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border bg-card">
+          <div className="min-h-[420px] flex-1 overflow-hidden rounded-3xl border bg-card">
             <CopilotChat
               className="h-full"
               labels={{
