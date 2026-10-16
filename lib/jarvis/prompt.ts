@@ -72,7 +72,7 @@ export function jarvisSettings(opts: { restaurantName: string; ownerName: string
         },
       },
       think: {
-        provider: { type: env("DEEPGRAM_THINK_PROVIDER", "open_ai"), model: env("DEEPGRAM_THINK_MODEL", "gpt-5.6-luna"), temperature: 0.3 },
+        provider: { type: env("DEEPGRAM_THINK_PROVIDER", "open_ai"), model: env("DEEPGRAM_THINK_MODEL", "gpt-4o-mini"), temperature: 0.3 },
         prompt: jarvisPrompt(opts),
         functions: jarvisFunctions(),
       },
