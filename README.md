@@ -5,7 +5,7 @@ A restaurant site where **conversation replaces clicking**. Customers browse a n
 "mark idli out of stock" and gets a Confirm card.
 
 Built from `specs.md`: Next.js 15 (App Router) · Tailwind v4 · CopilotKit (AG-UI, v2 API) · DeepSeek · Supabase
-(Postgres, Auth, Realtime, Storage, RLS) · Razorpay · Recharts · Zod · Resend · Vercel Cron · Vitest · Playwright.
+(Postgres, Auth, Realtime, Storage, RLS) · Razorpay · Recharts · Zod · Resend · Supabase pg_cron · Vitest · Playwright.
 
 ## Golden rules → where they're enforced
 
@@ -79,8 +79,10 @@ The model id comes from `DEEPSEEK_MODEL` (default `deepseek-flash`).
    `<site>/api/payments/webhook` and put its secret in `RAZORPAY_WEBHOOK_SECRET`. Locally, expose the dev server
    with a tunnel (`cloudflared tunnel --url http://localhost:3000` or ngrok) so webhooks arrive. If a webhook is
    missed, the `expire-unpaid` cron reconciles with Razorpay's API before expiring an order.
-7. **Optional** — `RESEND_API_KEY` + `OWNER_ALERT_EMAIL` for emails (otherwise logged), `CRON_SECRET` for crons,
-   a public Storage bucket named `dishes` is created on first image upload.
+7. **Cron + optional extras** — `CRON_SECRET` is **required**: every `/api/cron/*` route returns 401 without it, and
+   it must equal the `cron_secret` stored in Supabase Vault (see [Deploying](#deploying-vercel)). Optional:
+   `RESEND_API_KEY` + `OWNER_ALERT_EMAIL` for emails (otherwise logged). A public Storage bucket named `dishes` is
+   created on first image upload.
 8. **Run**
    ```bash
    npm run dev
@@ -98,9 +100,20 @@ The model id comes from `DEEPSEEK_MODEL` (default `deepseek-flash`).
 | `db:verify` | Run migrations + seed + payment-safety assertions offline on PGlite (no Supabase needed) |
 
 ## Deploying (Vercel)
-Set the env vars, deploy, and the crons in `vercel.json` run daily summary (08:00 IST), hourly alerts and
-10-minute unpaid-order expiry (Vercel Hobby allows daily crons only — use Pro or an external scheduler hitting the
-endpoints with `Authorization: Bearer $CRON_SECRET`).
+Scheduling is done by **Supabase pg_cron** (via `pg_net`, calling the `/api/cron/*` routes over HTTP), not Vercel
+Cron — `vercel.json` has no crons, so the deploy stays within the Hobby plan. The jobs are daily summary (02:30 UTC
+= 08:00 IST), hourly alerts, and unpaid-order expiry every 10 minutes.
+
+1. In Vercel, set the env vars from `.env.example` including `CRON_SECRET` and `NEXT_PUBLIC_SITE_URL` (your deployed
+   URL, no trailing slash). Recommended: also set `EMAIL_UNSUBSCRIBE_SECRET` — `lib/bulk-email/unsubscribe.ts` falls
+   back to `CRON_SECRET`, so giving it its own value keeps unsubscribe links working when `CRON_SECRET` is rotated.
+2. In `supabase/cron-setup.sql`, replace the `REPLACE_WITH_YOUR_SITE_URL` and `REPLACE_WITH_YOUR_CRON_SECRET`
+   placeholders, then run the file once in the Supabase SQL Editor. `cron_secret` must equal the `CRON_SECRET` set in
+   Vercel.
+3. Verify with the queries at the bottom of `supabase/cron-setup.sql`: `select * from cron.job;`,
+   `select * from cron.job_run_details order by start_time desc limit 20;` and
+   `select id, status_code, error_msg, created from net._http_response order by created desc limit 20;`.
+   To remove the schedules, run the commented "undo" block at the end of that file.
 
 ## Voice-ready seams (§14)
 All capabilities are tools; `useChatActions().submitUserMessage(text)` is the single entry point for any input

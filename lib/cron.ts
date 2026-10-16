@@ -1,4 +1,4 @@
-/** Scheduled jobs (Vercel Cron → app/api/cron/*). All idempotent via owner_alerts.dedupe_key. */
+/** Scheduled jobs (Supabase pg_cron → app/api/cron/*). All idempotent via owner_alerts.dedupe_key. */
 import { createAdminClient } from "@/lib/supabase/admin";
 import { dailySummaryEmail, sendEmail } from "@/lib/email";
 import { formatINR } from "@/lib/format";
