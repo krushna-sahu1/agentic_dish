@@ -139,7 +139,7 @@ function Particles({ status, levels }: { status: JarvisStatus; levels: () => { m
 
 export default function JarvisOrb({ status, levels }: { status: JarvisStatus; levels: () => { mic: number; out: number } }) {
   return (
-    <Canvas camera={{ position: [0, 0, 3.4], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}>
+    <Canvas className="pointer-events-none" camera={{ position: [0, 0, 3.4], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}>
       <Particles status={status} levels={levels} />
     </Canvas>
   );

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { EmailDraftCard, type EmailOutcome } from "@/components/owner/EmailDraftCard";
 import type { Panel } from "./useJarvis";
 
-const glass = "relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-4 text-white shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl";
+const glass = "relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-4 text-white shadow-[0_8px_40px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-5";
 
 function CountUp({ to, money = true, className }: { to: number; money?: boolean; className?: string }) {
   const mv = useMotionValue(0);
@@ -42,8 +42,8 @@ function Header({ title, period, onDismiss }: { title: string; period?: string; 
         {period && <p className="truncate text-xs text-white/35">{period}</p>}
       </div>
       {onDismiss && (
-        <button onClick={onDismiss} aria-label={`Dismiss ${title}`} className="-m-1 rounded-full p-1 text-white/40 transition hover:bg-white/10 hover:text-white">
-          <X className="size-3.5" />
+        <button onClick={onDismiss} aria-label={`Dismiss ${title}`} className="-m-2 flex size-11 shrink-0 items-center justify-center rounded-full text-white/40 transition hover:bg-white/10 hover:text-white active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40">
+          <X className="size-4" />
         </button>
       )}
     </div>
@@ -119,7 +119,7 @@ function DataPanel({ spec, onDismiss }: { spec: PanelSpec; onDismiss: () => void
               {spec.bars.map((b, i) => (
                 <li key={b.label}>
                   <div className="mb-1 flex items-baseline justify-between gap-2 text-xs">
-                    <span className="truncate text-white/85">{b.label}</span>
+                    <span className="min-w-0 truncate text-white/85">{b.label}</span>
                     <span className="shrink-0 tabular-nums text-white/55">
                       {spec.unit === "paise" ? formatINR(b.value) : `${b.value} sold`}
                       {b.sub ? ` · ${b.sub}` : ""}
@@ -218,28 +218,32 @@ function DataPanel({ spec, onDismiss }: { spec: PanelSpec; onDismiss: () => void
       return (
         <div className={glass}>
           <Header title={spec.title} onDismiss={onDismiss} />
-          <div className="mb-2 grid grid-cols-[1fr_auto_auto_auto] gap-x-3 text-[10px] uppercase tracking-wider text-white/40">
-            <span />
-            <span className="max-w-[7rem] truncate text-right" title={spec.b_label}>
-              Before
-            </span>
-            <span className="max-w-[7rem] truncate text-right" title={spec.a_label}>
-              Now
-            </span>
-            <span className="w-12 text-right">Δ</span>
-          </div>
-          <ul className="space-y-1.5">
-            {spec.metrics.map((m, i) => (
-              <motion.li key={m.metric} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="grid grid-cols-[1fr_auto_auto_auto] items-baseline gap-x-3 text-sm">
-                <span className="text-white/70">{m.label}</span>
-                <span className="text-right tabular-nums text-white/45">{fmtMetric(m.b, m.money)}</span>
-                <span className="text-right font-semibold tabular-nums">{fmtMetric(m.a, m.money)}</span>
-                <span className="w-12 text-right">
-                  <Change pct={m.change_percent} />
+          <div className="overflow-x-auto overscroll-contain pb-0.5">
+            <div className="min-w-[16rem]">
+              <div className="mb-2 grid grid-cols-[1fr_auto_auto_auto] gap-x-3 text-[10px] uppercase tracking-wider text-white/40">
+                <span />
+                <span className="max-w-[7rem] truncate text-right" title={spec.b_label}>
+                  Before
                 </span>
-              </motion.li>
-            ))}
-          </ul>
+                <span className="max-w-[7rem] truncate text-right" title={spec.a_label}>
+                  Now
+                </span>
+                <span className="w-12 text-right">Δ</span>
+              </div>
+              <ul className="space-y-1.5">
+                {spec.metrics.map((m, i) => (
+                  <motion.li key={m.metric} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="grid grid-cols-[1fr_auto_auto_auto] items-baseline gap-x-3 text-sm">
+                    <span className="min-w-0 truncate text-white/70">{m.label}</span>
+                    <span className="text-right tabular-nums text-white/45">{fmtMetric(m.b, m.money)}</span>
+                    <span className="text-right font-semibold tabular-nums">{fmtMetric(m.a, m.money)}</span>
+                    <span className="w-12 text-right">
+                      <Change pct={m.change_percent} />
+                    </span>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </div>
           <p className="mt-3 text-[11px] text-white/35">
             {spec.a_label} vs {spec.b_label}
           </p>
@@ -252,7 +256,7 @@ function DataPanel({ spec, onDismiss }: { spec: PanelSpec; onDismiss: () => void
           <ul className="divide-y divide-white/5 text-sm">
             {spec.rows.map((r, i) => (
               <li key={`${r.label}-${i}`} className="flex justify-between gap-3 py-1.5">
-                <span className="truncate text-white/75">{r.label}</span>
+                <span className="min-w-0 truncate text-white/75">{r.label}</span>
                 <span className="shrink-0 tabular-nums text-white/50">{r.value}</span>
               </li>
             ))}
@@ -291,7 +295,7 @@ function ConfirmPanel({ panel, onConfirm, onCancel, onDismiss }: { panel: Extrac
         </ul>
       )}
       {p.table && (
-        <div className="mt-3 max-h-32 overflow-auto rounded-lg bg-white/5 p-2 text-xs">
+        <div className="mt-3 max-h-40 w-full overflow-auto overscroll-contain rounded-lg bg-white/5 p-2 text-xs sm:max-h-48">
           {p.table.rows.slice(0, 8).map((r, i) => (
             <div key={i} className="flex justify-between gap-2 py-0.5 text-white/70">
               {r.map((c, j) => (
@@ -318,7 +322,7 @@ function ConfirmPanel({ panel, onConfirm, onCancel, onDismiss }: { panel: Extrac
           <button
             onClick={onCancel}
             disabled={panel.state === "running"}
-            className="rounded-xl border border-white/15 px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:opacity-40"
+            className="min-h-11 rounded-xl border border-white/15 px-3 py-2.5 text-sm font-medium text-white/80 transition hover:bg-white/10 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40 disabled:opacity-40"
           >
             Cancel
           </button>
@@ -326,7 +330,7 @@ function ConfirmPanel({ panel, onConfirm, onCancel, onDismiss }: { panel: Extrac
             onClick={onConfirm}
             disabled={panel.state === "running"}
             className={cn(
-              "inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-black transition disabled:opacity-60",
+              "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-black transition active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40 disabled:opacity-60",
               p.destructive ? "bg-rose-400 hover:bg-rose-300" : "bg-orange-400 hover:bg-orange-300",
             )}
           >
@@ -358,16 +362,16 @@ export function JarvisPanels({
   onEmailOutcome: (id: string, o: EmailOutcome) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3" aria-live="polite">
+    <div className="flex w-full flex-col gap-3 sm:gap-4 [&_button]:min-h-11 [&_button]:focus-visible:ring-2 [&_button]:focus-visible:ring-white/40" aria-live="polite">
       <AnimatePresence initial={false} mode="popLayout">
         {panels.map((p) => (
           <motion.div
             key={p.id}
             layout
-            initial={{ opacity: 0, x: 40, scale: 0.96, filter: "blur(6px)" }}
-            animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, x: 24, scale: 0.96, filter: "blur(6px)", transition: { duration: 0.35 } }}
-            transition={{ type: "spring", stiffness: 260, damping: 28 }}
+            initial={{ opacity: 0, y: 10, scale: 0.98, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: 6, scale: 0.98, filter: "blur(4px)", transition: { duration: 0.28 } }}
+            transition={{ type: "spring", stiffness: 280, damping: 30 }}
           >
             {p.type === "email" ? (
               <EmailDraftCard variant="jarvis" draft={p.draft} onOutcome={(o) => onEmailOutcome(p.id, o)} onDismiss={() => onDismiss(p.id)} />

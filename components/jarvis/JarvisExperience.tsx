@@ -32,7 +32,7 @@ function HudItem({ label, value, className }: { label: string; value: React.Reac
   return (
     <div className={cn("min-w-0", className)}>
       <p className="text-[9px] uppercase tracking-[0.2em] text-white/35">{label}</p>
-      <p className="truncate font-mono text-sm tabular-nums text-white/85">{value}</p>
+      <p className="truncate font-mono text-[13px] tabular-nums text-white/85 sm:text-sm">{value}</p>
     </div>
   );
 }
@@ -77,9 +77,9 @@ export function JarvisExperience() {
   const lastJarvis = [...j.captions].reverse().find((c) => c.role === "assistant");
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-y-auto overflow-x-hidden bg-[#03050b] text-white lg:overflow-hidden" style={{ colorScheme: "dark" }}>
+    <div className="fixed inset-0 z-[60] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#03050b] text-white" style={{ colorScheme: "dark" }}>
       {/* Ambient glow follows the orb's state colour */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 transition-[background] duration-1000" style={{ background: `radial-gradient(60% 55% at 40% 48%, ${ui.glow}, transparent 70%)` }} />
+      <div aria-hidden className="pointer-events-none fixed inset-0 transition-[background] duration-1000" style={{ background: `radial-gradient(65% 50% at 50% 40%, ${ui.glow}, transparent 70%)` }} />
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 opacity-[0.07]"
@@ -87,10 +87,10 @@ export function JarvisExperience() {
       />
 
       {/* HUD */}
-      <header className="sticky top-0 z-10 border-b border-white/[0.06] bg-[#03050b]/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+      <header className="z-10 shrink-0 border-b border-white/[0.06] bg-[#03050b]/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1500px] flex-col gap-2 px-4 py-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 sm:py-3">
           <div className="flex items-center gap-3">
-            <Link href="/owner" aria-label="Back to dashboard" className="rounded-full p-1.5 text-white/50 transition hover:bg-white/10 hover:text-white">
+            <Link href="/owner" aria-label="Back to dashboard" className="-ml-2 flex size-11 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40">
               <ArrowLeft className="size-4" />
             </Link>
             <span className="font-mono text-sm font-semibold tracking-[0.35em]">JARVIS</span>
@@ -100,7 +100,7 @@ export function JarvisExperience() {
               {j.muted && j.active ? " · muted" : ""}
             </span>
           </div>
-          <div className="ml-auto grid w-full grid-cols-3 gap-x-5 gap-y-2 sm:flex sm:w-auto sm:items-center">
+          <div className="grid w-full grid-cols-3 gap-x-4 gap-y-1.5 sm:ml-auto sm:flex sm:w-auto sm:items-center sm:gap-x-5 sm:gap-y-2">
             <HudItem label="Today" value={kpis ? formatINR(kpis.revenue_today_paise) : "—"} />
             <HudItem label="Active orders" value={kpis?.active_orders ?? "—"} />
             <HudItem label="Time" value={now ? new Date(now).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" }) : "—"} />
@@ -110,16 +110,16 @@ export function JarvisExperience() {
         </div>
       </header>
 
-      <div className="relative mx-auto grid max-w-[1500px] gap-6 px-4 pb-10 lg:h-[calc(100dvh-57px)] lg:grid-cols-[minmax(0,1fr)_400px] lg:pb-0">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain lg:mx-auto lg:grid lg:h-full lg:w-full lg:max-w-[1500px] lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-6 lg:overflow-hidden lg:px-4">
         {/* Orb column */}
-        <section className="flex min-h-0 flex-col items-center justify-center pt-4 lg:pt-0">
+        <section className="flex min-h-0 w-full flex-1 flex-col items-center px-4 pb-3 pt-4 [justify-content:safe_center] lg:px-0 lg:pb-0 lg:pt-0">
           <div
             role="button"
             tabIndex={0}
             aria-label={j.active ? "End Jarvis session" : "Start Jarvis"}
             onClick={toggle}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggle())}
-            className="relative aspect-square w-[min(86vw,46vh)] cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-white/40 lg:w-[min(52vh,560px)]"
+            className="relative aspect-square w-[clamp(10rem,min(78vw,44dvh),30rem)] cursor-pointer touch-manipulation rounded-full outline-none focus-visible:ring-2 focus-visible:ring-white/40 lg:w-[min(52dvh,560px)]"
           >
             <JarvisOrb status={j.status} levels={j.levels} />
             {!j.active && !j.error && (
@@ -128,69 +128,71 @@ export function JarvisExperience() {
           </div>
 
           {/* Live captions */}
-          <div className="mt-2 flex min-h-[5.5rem] w-full max-w-2xl flex-col items-center justify-start gap-1.5 px-2 text-center" aria-live="polite">
+          <div className="mt-2 flex min-h-[4.5rem] max-h-[24dvh] w-full max-w-2xl flex-col items-center justify-start gap-1.5 overflow-y-auto overscroll-contain px-2 text-center [scrollbar-width:thin] lg:max-h-[32dvh]" aria-live="polite">
             <AnimatePresence mode="popLayout" initial={false}>
               {lastUser && (
-                <motion.p key={lastUser.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-sm text-white/45 sm:text-base">
+                <motion.p key={lastUser.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-base leading-snug text-white/50 sm:text-[17px]">
                   {lastUser.text}
                 </motion.p>
               )}
               {lastJarvis && (
-                <motion.p key={lastJarvis.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-base font-medium text-white sm:text-lg">
+                <motion.p key={lastJarvis.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-lg font-medium leading-snug text-white sm:text-xl">
                   {lastJarvis.text}
                 </motion.p>
               )}
             </AnimatePresence>
             {!j.captions.length && !j.error && (
-              <p className="text-sm text-white/35">{j.status === "connecting" ? "Waking up Jarvis…" : j.active ? "Ask anything — “How are we doing today?”" : (j.notice ?? "Your voice assistant for the restaurant.")}</p>
+              <p className="max-w-md text-base leading-snug text-white/40">{j.status === "connecting" ? "Waking up Jarvis…" : j.active ? "Ask anything — “How are we doing today?”" : (j.notice ?? "Your voice assistant for the restaurant.")}</p>
             )}
           </div>
 
           {/* Errors / reconnect */}
           {j.error && (
-            <div role="alert" className="mt-2 w-full max-w-md rounded-2xl border border-rose-300/25 bg-rose-500/10 p-4 text-center backdrop-blur-xl">
-              <p className="text-sm text-rose-100">{j.error.message}</p>
+            <div role="alert" className="mt-3 w-full max-w-md rounded-2xl border border-rose-300/25 bg-rose-500/10 p-4 text-center backdrop-blur-xl">
+              <p className="text-sm text-rose-100 [overflow-wrap:anywhere] sm:text-base">{j.error.message}</p>
               {j.error.kind !== "auth" && j.error.kind !== "config" && (
-                <button onClick={() => void j.start()} className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/85">
+                <button onClick={() => void j.start()} className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/85 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40">
                   <RotateCcw className="size-4" aria-hidden /> Reconnect
                 </button>
               )}
             </div>
           )}
-          {j.notice && j.captions.length > 0 && !j.error && <p className="mt-1 text-xs text-white/40">{j.notice}</p>}
-
-          {/* Controls */}
-          <div className="mt-4 flex items-center gap-3">
-            <button
-              onClick={j.toggleMute}
-              disabled={!j.active}
-              aria-pressed={j.muted}
-              aria-label={j.muted ? "Unmute microphone" : "Mute microphone"}
-              className={cn(
-                "flex size-12 items-center justify-center rounded-full border transition disabled:opacity-30",
-                j.muted ? "border-amber-300/40 bg-amber-400/15 text-amber-200" : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
-              )}
-            >
-              {j.muted ? <MicOff className="size-5" /> : <Mic className="size-5" />}
-            </button>
-            <button
-              onClick={() => (j.active ? j.end() : void j.start())}
-              aria-label={j.active ? "End session" : "Start session"}
-              className={cn(
-                "flex h-12 items-center gap-2 rounded-full px-5 text-sm font-semibold transition",
-                j.active ? "bg-rose-500/90 text-white hover:bg-rose-500" : "bg-white text-black hover:bg-white/85",
-              )}
-            >
-              {j.active ? <PhoneOff className="size-4" /> : <Mic className="size-4" />}
-              {j.active ? "End" : "Start"}
-            </button>
-          </div>
+          {j.notice && j.captions.length > 0 && !j.error && <p className="mt-2 w-full max-w-md px-1 text-center text-sm text-white/45 [overflow-wrap:anywhere]">{j.notice}</p>}
         </section>
 
         {/* Floating panels: beside the orb on desktop, below it on mobile */}
-        <aside className="min-h-0 lg:overflow-y-auto lg:py-6 lg:pr-1 [scrollbar-width:thin]" aria-label="Jarvis results">
+        <aside className="w-full px-4 pb-4 lg:min-h-0 lg:overflow-y-auto lg:px-0 lg:py-6 lg:pr-1 [scrollbar-width:thin]" aria-label="Jarvis results">
           <JarvisPanels panels={j.panels} onConfirm={j.confirm} onCancel={j.cancel} onDismiss={j.dismiss} onEmailOutcome={j.emailOutcome} />
         </aside>
+      </div>
+
+      {/* Controls — pinned within thumb reach, safe-area aware */}
+      <div className="z-10 shrink-0 border-t border-white/[0.06] bg-[#03050b]/85 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1500px] items-center justify-center gap-3">
+          <button
+            onClick={j.toggleMute}
+            disabled={!j.active}
+            aria-pressed={j.muted}
+            aria-label={j.muted ? "Unmute microphone" : "Mute microphone"}
+            className={cn(
+              "flex size-12 items-center justify-center rounded-full border transition active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40 disabled:opacity-30",
+              j.muted ? "border-amber-300/40 bg-amber-400/15 text-amber-200" : "border-white/15 bg-white/5 text-white/80 hover:bg-white/10",
+            )}
+          >
+            {j.muted ? <MicOff className="size-5" /> : <Mic className="size-5" />}
+          </button>
+          <button
+            onClick={() => (j.active ? j.end() : void j.start())}
+            aria-label={j.active ? "End session" : "Start session"}
+            className={cn(
+              "flex h-12 min-w-[7.5rem] items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold transition active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40",
+              j.active ? "bg-rose-500/90 text-white hover:bg-rose-500" : "bg-white text-black hover:bg-white/85",
+            )}
+          >
+            {j.active ? <PhoneOff className="size-4" /> : <Mic className="size-4" />}
+            {j.active ? "End" : "Start"}
+          </button>
+        </div>
       </div>
     </div>
   );
