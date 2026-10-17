@@ -17,7 +17,8 @@ const csvCell = (v: unknown) => {
 /** Owner-only report download (CSV or PDF) for a date range. */
 export async function GET(req: NextRequest) {
   const user = await getSessionUser();
-  if (!user || user.role !== "owner") return NextResponse.json({ error: "Owner only" }, { status: 403 });
+  if (!user) return NextResponse.json({ error: "Please log in." }, { status: 401 });
+  if (user.role !== "owner") return NextResponse.json({ error: "Owner only" }, { status: 403 });
   const url = new URL(req.url);
   const from = url.searchParams.get("from");
   const to = url.searchParams.get("to") ?? from;

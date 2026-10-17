@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
+import { resolvePostAuthPath } from "@/app/actions/auth";
 
 function safeNext(next: string | null) {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
@@ -49,8 +50,10 @@ export function LoginForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(params.get("error"));
 
-  const done = () => {
-    router.replace(next);
+  const done = async () => {
+    // Role is resolved server-side; the client never decides where owners go.
+    const dest = await resolvePostAuthPath(params.get("next"));
+    router.replace(dest);
     router.refresh();
   };
 
@@ -61,7 +64,7 @@ export function LoginForm() {
     const { error } = await createClient().auth.signInWithPassword({ email, password });
     setBusy(false);
     if (error) setError(error.message);
-    else done();
+    else await done();
   };
 
   const phoneLogin = async (e: React.FormEvent) => {
@@ -80,7 +83,7 @@ export function LoginForm() {
     const { error } = await supabase.auth.verifyOtp({ phone: formatted, token: otp, type: "sms" });
     setBusy(false);
     if (error) setError(error.message);
-    else done();
+    else await done();
   };
 
   return (
@@ -162,7 +165,8 @@ export function SignupForm() {
     setBusy(false);
     if (error) return setError(error.message);
     if (data.session) {
-      router.replace(next);
+      const dest = await resolvePostAuthPath(params.get("next"));
+      router.replace(dest);
       router.refresh();
     } else setCheckEmail(true);
   };

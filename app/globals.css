@@ -219,3 +219,185 @@ html.dark [data-copilotkit] {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Landing page theme — "AI" (scoped to [data-theme="ai"] on the home route)
+
+   White / cool-grey surfaces, near-black blue-tinted ink, a single electric
+   blue accent (#2F6BFF) and an aurora glow. This ONLY remaps the design tokens
+   inside the landing subtree, so the owner dashboard and every other page keep
+   the warm paprik palette defined above. The `[data-copilotkit]` mirror keeps
+   the AI chat panel + launcher on the same theme.
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-theme="ai"],
+[data-theme="ai"] [data-copilotkit],
+[data-chat-theme="ai"] [data-copilotkit] {
+  --background: #ffffff;
+  --foreground: #111528;
+  --card: #f6f8fc;
+  --card-foreground: #111528;
+  --popover: #ffffff;
+  --popover-foreground: #111528;
+  --primary: #2f6bff;
+  --primary-foreground: #ffffff;
+  --secondary: #eef1f9;
+  --secondary-foreground: #1a2140;
+  --muted: #f1f4fa;
+  --muted-foreground: #586180;
+  --accent: #e8eeff;
+  --accent-foreground: #14204d;
+  --border: #e5e8f2;
+  --input: #dde2ef;
+  --ring: #2f6bff;
+  --success: #0f9d63;
+  --warning: #b0741a;
+  --info: #2f6bff;
+  --destructive: #e5484d;
+  --veg: #16a34a;
+  --nonveg: #dc2626;
+  color-scheme: light;
+}
+
+html.dark [data-theme="ai"],
+html.dark [data-theme="ai"] [data-copilotkit],
+html.dark [data-chat-theme="ai"] [data-copilotkit] {
+  --background: #06070d;
+  --foreground: #e9ecf7;
+  --card: #0d1018;
+  --card-foreground: #e9ecf7;
+  --popover: #10131d;
+  --popover-foreground: #e9ecf7;
+  --primary: #5b8cff;
+  --primary-foreground: #071127;
+  --secondary: #171b28;
+  --secondary-foreground: #dfe4f5;
+  --muted: #12151f;
+  --muted-foreground: #9aa4bd;
+  --accent: #1a2136;
+  --accent-foreground: #e7ecfb;
+  --border: #1e2433;
+  --input: #232a3b;
+  --ring: #5b8cff;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --info: #5b8cff;
+  --destructive: #f87171;
+  color-scheme: dark;
+}
+
+/* Cool footer inside the landing scope (the shared footer is warm elsewhere). */
+[data-theme="ai"] footer {
+  background-color: #080a12;
+  color: #e7ebf7;
+}
+
+/* ── Aurora glow: hero background + a single headline word ─────────────────── */
+@keyframes ai-aurora-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(0, -3%, 0) scale(1.08);
+  }
+}
+
+.ai-aurora {
+  background:
+    radial-gradient(38% 46% at 18% 22%, rgb(47 107 255 / 0.3), transparent 70%),
+    radial-gradient(34% 42% at 82% 16%, rgb(139 92 246 / 0.26), transparent 72%),
+    radial-gradient(40% 50% at 78% 74%, rgb(34 211 238 / 0.22), transparent 70%),
+    radial-gradient(32% 40% at 26% 84%, rgb(255 180 138 / 0.24), transparent 70%);
+  filter: saturate(115%);
+  animation: ai-aurora-drift 16s ease-in-out infinite alternate;
+}
+
+html.dark .ai-aurora {
+  opacity: 0.7;
+}
+
+.ai-gradient-text {
+  background-image: linear-gradient(98deg, #2f6bff 0%, #7c5cff 44%, #22c8e6 74%, #ffb98c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Animated conic border (hero chat card only) ──────────────────────────── */
+@property --ai-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes ai-ring-spin {
+  to {
+    --ai-angle: 360deg;
+  }
+}
+
+.ai-ring {
+  position: relative;
+  background: var(--card);
+}
+
+.ai-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--ai-angle), #2f6bff, #7c5cff, #22d3ee, #ffb98c, #2f6bff);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: ai-ring-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Tiny CSS-only motion for the chat demo ───────────────────────────────── */
+@keyframes ai-blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+.ai-dot {
+  animation: ai-blink 1.3s infinite;
+}
+.ai-dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.ai-dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes ai-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.ai-float {
+  animation: ai-float 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-aurora,
+  .ai-ring::before,
+  .ai-float,
+  .ai-dot {
+    animation: none !important;
+  }
+}

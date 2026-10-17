@@ -104,6 +104,9 @@ export function createAgentRouteHandler(agent: AgentKind, basePath: string) {
 
   return async function route(request: Request): Promise<Response> {
     const ctx = await contextFromRequest(request, agent);
+    if (agent === "customer" && !ctx.userId) {
+      return json(401, { error: "Please log in to chat with our AI host." });
+    }
     if (agent === "owner" && !(ctx.role === "owner" || ctx.role === "staff")) {
       return json(ctx.userId ? 403 : 401, { error: "This assistant is only available to restaurant staff." });
     }

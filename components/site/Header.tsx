@@ -20,7 +20,7 @@ const NAV = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Header({ statusLabel, isOpen }: { statusLabel: string; isOpen: boolean }) {
+export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: string; isOpen: boolean; showChat?: boolean }) {
   const { count } = useCart();
   const session = useSession();
   const pathname = usePathname();
@@ -95,9 +95,15 @@ export function Header({ statusLabel, isOpen }: { statusLabel: string; isOpen: b
             </span>
             {statusLabel}
           </span>
-          <Button variant="ghost" size="sm" className="hidden h-9 sm:inline-flex" onClick={() => openChat()}>
-            <Sparkles className="text-primary" /> Ask AI
-          </Button>
+          {showChat ? (
+            <Button variant="ghost" size="sm" className="hidden h-9 sm:inline-flex" onClick={() => openChat()}>
+              <Sparkles className="text-primary" /> Ask AI
+            </Button>
+          ) : (
+            <Link href={session ? "/menu" : "/signup"} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden h-9 sm:inline-flex")}>
+              {session ? "Order now" : "Sign up"}
+            </Link>
+          )}
           <ThemeToggle />
           <Link
             href="/cart"
@@ -170,15 +176,21 @@ export function Header({ statusLabel, isOpen }: { statusLabel: string; isOpen: b
             </Link>
           ))}
           <div className="mt-8 grid gap-3">
-            <Button
-              size="lg"
-              onClick={() => {
-                setMobileOpen(false);
-                openChat();
-              }}
-            >
-              <Sparkles /> Order with our AI host
-            </Button>
+            {showChat ? (
+              <Button
+                size="lg"
+                onClick={() => {
+                  setMobileOpen(false);
+                  openChat();
+                }}
+              >
+                <Sparkles /> Order with our AI host
+              </Button>
+            ) : (
+              <Link href={session ? "/menu" : "/signup"} className={buttonVariants({ size: "lg" })}>
+                {session ? "Order now" : "Sign up"}
+              </Link>
+            )}
             {!session && (
               <Link href={`/login?next=${encodeURIComponent(pathname)}`} className={buttonVariants({ variant: "outline", size: "lg" })}>
                 Log in

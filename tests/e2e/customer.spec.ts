@@ -104,9 +104,15 @@ test.describe("customer agent", () => {
   });
 });
 
-test("logged-out visitors can ask menu questions but get a login card for cart actions @mobile", async ({ page }) => {
+test("the landing page has no chat, and logged-out visitors get a login card elsewhere @mobile", async ({ page }) => {
   requireDb();
   await page.goto("/");
-  const panel = await askCustomer(page, "add one idli to my cart");
-  await expect(panel.getByRole("link", { name: /Log in/ })).toBeVisible();
+  await expect(page.getByTestId("chat-launcher")).toHaveCount(0);
+  await page.goto("/menu");
+  await page.getByTestId("chat-launcher").click();
+  const card = page.getByTestId("chat-login-card");
+  await expect(card).toContainText("Log in to chat with our AI host");
+  await expect(card.getByRole("link", { name: /Log in/ })).toBeVisible();
+  await expect(card.getByRole("link", { name: /Sign up/ })).toBeVisible();
+  await expect(page.getByTestId("chat-panel")).toHaveCount(0);
 });

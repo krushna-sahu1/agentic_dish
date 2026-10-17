@@ -50,3 +50,20 @@ export async function requireRole(roles: Role[]): Promise<SessionUser> {
   if (!roles.includes(u.role)) throw new AuthError("You don't have access to this.", "forbidden");
   return u;
 }
+
+/** A safe in-app path from a `next` param — blocks open redirects (no `//` host). */
+export function safeNextPath(next: string | null | undefined): string {
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+}
+
+/**
+ * Where to send someone after auth. An explicit safe `next` wins; otherwise the
+ * owner/staff dashboard or the menu, using the server-verified role (never the
+ * client). Server-only — it reads the request's auth cookies.
+ */
+export async function postAuthPath(next?: string | null): Promise<string> {
+  const safe = safeNextPath(next);
+  if (safe !== "/") return safe;
+  const user = await getSessionUser();
+  return user && (user.role === "owner" || user.role === "staff") ? "/owner" : "/menu";
+}

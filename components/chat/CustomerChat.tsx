@@ -205,6 +205,15 @@ export function CustomerChat({
   const renderers = useMemo(() => buildRenderers(restaurantName), [restaurantName]);
   const hitl = useMemo(() => buildHitl(), []);
 
+  // The customer chat uses the AI tokens on every route, not the page's palette.
+  // The panel/launcher carry data-theme="ai"; this marker also covers CopilotKit
+  // content that gets portaled to <body> (tooltips, dropdowns, image lightbox).
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute("data-chat-theme", "ai");
+    return () => root.removeAttribute("data-chat-theme");
+  }, []);
+
   useEffect(() => {
     const onOpen = (e: Event) => {
       setOpen(true);
@@ -248,6 +257,7 @@ export function CustomerChat({
           aria-modal="false"
           aria-label={`${restaurantName} AI assistant`}
           hidden={!open}
+          data-theme="ai"
           data-testid="chat-panel"
           className={cn(
             "fixed z-50 flex flex-col overflow-hidden bg-card shadow-[0_30px_80px_-20px_rgb(0_0_0/0.35)]",
