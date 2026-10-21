@@ -1,14 +1,16 @@
 "use client";
 
 import "@copilotkit/react-core/v2/styles.css";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, RotateCcw, ShoppingBag, X } from "lucide-react";
+import { ArrowRight, ChevronDown, RotateCcw, ShoppingBag, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import {
   CopilotChat,
+  CopilotChatAssistantMessage,
+  CopilotChatMessageView,
   CopilotKitProvider,
   useAgent,
   useAgentContext,
@@ -16,13 +18,12 @@ import {
   type ReactHumanInTheLoop,
   type ReactToolCallRenderer,
 } from "@copilotkit/react-core/v2";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/components/providers/CartProvider";
 import { useSession } from "@/components/providers/SessionProvider";
 import { CUSTOMER_CONFIRM_SCHEMAS, type CustomerConfirmSchemaName } from "@/lib/agents/customer/confirm-schemas";
 import { executeCustomerConfirmAction, previewCustomerConfirmAction, rejectCustomerConfirmAction } from "@/app/actions/customer";
 import { newConversationAction } from "@/app/actions/chat";
-import { formatINR } from "@/lib/format";
+import { formatINR, formatINRExact } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { LogoMark } from "@/components/site/Logo";
 import { ChatActionsProvider, useChatActions } from "./chat-actions";
@@ -45,6 +46,7 @@ import {
   type CompactCart,
   type OrderStatusData,
 } from "./CustomerCards";
+import { CHAT_SUGGESTIONS, ChatUiProvider, useChatUi } from "./chat-ui";
 import { useChatPersistence } from "./useChatPersistence";
 import { VoiceChatView } from "./VoiceInput";
 
@@ -139,12 +141,7 @@ function buildHitl(): ReactHumanInTheLoop[] {
   });
 }
 
-const SUGGESTIONS = [
-  { title: "What's spicy?", message: "Which dishes are spicy?" },
-  { title: "Veg meal under ₹300", message: "Suggest a veg meal under ₹300" },
-  { title: "Add my usual", message: "Add my usual to the cart" },
-  { title: "Track my order", message: "Where's my food?" },
-];
+const SUGGESTIONS = CHAT_SUGGESTIONS;
 
 function CustomerBindings({ isOpen, statusLabel, menuItemNames }: { isOpen: boolean; statusLabel: string; menuItemNames: string[] }) {
   const pathname = usePathname();
@@ -182,6 +179,79 @@ function PendingPrompt({ prompt, onSent }: { prompt: string | null; onSent: () =
   return null;
 }
 
+/**
+ * The visible area of the browser, in CSS pixels.
+ *
+ * `100dvh` and `position: fixed; inset-0` both ignore the on-screen keyboard on
+ * mobile, which is what used to push the composer behind the keyboard and hide
+ * the last messages. `visualViewport` is the only reliable source of truth:
+ * on iOS Safari it shrinks when the keyboard opens (and reports how far the
+ * visual viewport was scrolled), on Android Chrome it shrinks too — with
+ * `interactiveWidget: "resizes-content"` in the viewport export.
+ */
+function useVisualViewport(): { top: number; height: number } {
+  const [vp, setVp] = useState({ top: 0, height: 0 });
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setVp({ top: Math.round(vv.offsetTop), height: Math.round(vv.height) });
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, []);
+  return vp;
+}
+
+/** Assistant reply with a small avatar — plain text, no heavy bubble. */
+function AssistantReply(props: React.ComponentProps<typeof CopilotChatAssistantMessage>) {
+  return (
+    <div className="chat-assistant">
+      <span className="chat-assistant__avatar" aria-hidden>
+        <Sparkles />
+      </span>
+      <div className="chat-assistant__body">
+        <CopilotChatAssistantMessage {...props} />
+      </div>
+    </div>
+  );
+}
+
+/** Animated "the assistant is thinking" dots, shown while the agent runs. */
+function TypingDots() {
+  return (
+    <div className="chat-typing" aria-hidden>
+      <span />
+      <span />
+      <span />
+    </div>
+  );
+}
+
+/** Message list with the assistant avatar and the typing indicator. */
+function ChatMessageView(props: React.ComponentProps<typeof CopilotChatMessageView>) {
+  return <CopilotChatMessageView {...props} assistantMessage={AssistantReply as never} cursor={TypingDots} />;
+}
+
+/** Small pill that floats just above the composer. */
+function ScrollToBottomPill({ onClick, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Scroll to the latest message"
+      className={cn("chat-scroll-bottom", className)}
+      {...props}
+    >
+      <ChevronDown aria-hidden />
+      Latest
+    </button>
+  );
+}
+
 export function CustomerChat({
   restaurantName,
   isOpen,
@@ -202,8 +272,10 @@ export function CustomerChat({
   const [resetKey, setResetKey] = useState(0);
   const session = useSession();
   const panelRef = useRef<HTMLDivElement>(null);
+  const viewport = useVisualViewport();
   const renderers = useMemo(() => buildRenderers(restaurantName), [restaurantName]);
   const hitl = useMemo(() => buildHitl(), []);
+  const scrollView = useMemo(() => ({ scrollToBottomButton: ScrollToBottomPill }), []);
 
   // The customer chat uses the AI tokens on every route, not the page's palette.
   // The panel/launcher carry data-theme="ai"; this marker also covers CopilotKit
@@ -228,9 +300,53 @@ export function CustomerChat({
     if (!open) return;
     const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", esc);
-    panelRef.current?.querySelector("textarea")?.focus();
+    // Never auto-focus on touch devices: the keyboard would cover half the sheet
+    // the moment it opens. Desktop users still get the caret.
+    const coarse = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+    if (!coarse) {
+      const id = window.setTimeout(() => panelRef.current?.querySelector("textarea")?.focus({ preventScroll: true }), 120);
+      return () => {
+        window.clearTimeout(id);
+        window.removeEventListener("keydown", esc);
+      };
+    }
     return () => window.removeEventListener("keydown", esc);
   }, [open]);
+
+  const startNewChat = useCallback(async () => {
+    await newConversationAction("customer");
+    setResetKey((k) => k + 1);
+  }, []);
+
+  const welcomeScreen = useMemo(
+    () =>
+      function Welcome({ input }: { input: React.ReactElement }) {
+        const { sendSuggestion } = useChatUi();
+        return (
+          <div className="chat-welcome">
+            <div className="chat-welcome__scroll">
+              <span className="chat-welcome__badge" aria-hidden>
+                <Sparkles />
+              </span>
+              <h2 className="chat-welcome__title">Hi! I&apos;m the {restaurantName} host.</h2>
+              <p className="chat-welcome__sub">Ask me about dishes, or tell me what to add to your cart.</p>
+              <ul className="chat-welcome__cards">
+                {CHAT_SUGGESTIONS.map((s) => (
+                  <li key={s.title}>
+                    <button type="button" className="chat-suggestion-card" onClick={() => sendSuggestion(s.message)}>
+                      <span>{s.title}</span>
+                      <ArrowRight aria-hidden />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {input}
+          </div>
+        );
+      },
+    [restaurantName],
+  );
 
   return (
     <CopilotKitProvider
@@ -246,85 +362,125 @@ export function CustomerChat({
       }}
     >
       <ChatActionsProvider>
-        <CustomerBindings isOpen={isOpen} statusLabel={statusLabel} menuItemNames={menuItemNames} />
-        <PendingPrompt prompt={pending} onSent={() => setPending(null)} />
+        <ChatUiProvider>
+          <CustomerBindings isOpen={isOpen} statusLabel={statusLabel} menuItemNames={menuItemNames} />
+          <PendingPrompt prompt={pending} onSent={() => setPending(null)} />
 
-        {!open && <ChatLauncher onClick={() => setOpen(true)} />}
+          {!open && <ChatLauncher onClick={() => setOpen(true)} />}
 
-        <div
-          ref={panelRef}
-          role="dialog"
-          aria-modal="false"
-          aria-label={`${restaurantName} AI assistant`}
-          hidden={!open}
-          data-theme="ai"
-          data-testid="chat-panel"
-          className={cn(
-            "fixed z-50 flex flex-col overflow-hidden bg-card shadow-[0_30px_80px_-20px_rgb(0_0_0/0.35)]",
-            "inset-0 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[min(740px,calc(100dvh-2.5rem))] sm:w-[420px] sm:rounded-3xl sm:border sm:p-0",
-            open && "animate-rise",
-          )}
-        >
-          <div className="flex items-center gap-3 border-b px-4 py-3">
-            <span className="relative">
-              <LogoMark className="size-9" />
-              <span className={cn("absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card", isOpen ? "bg-success" : "bg-muted-foreground")} aria-hidden />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-display text-xl leading-tight">{restaurantName} host</p>
-              <p className="truncate text-xs text-muted-foreground">{session ? "Orders, tracking and tables — just ask" : "Ask about the menu · log in to order"}</p>
+          <div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="false"
+            aria-label={`${restaurantName} AI assistant`}
+            data-theme="ai"
+            data-open={open ? "true" : "false"}
+            data-testid="chat-panel"
+            className="chat-panel"
+            style={
+              {
+                "--chat-vv-top": `${viewport.top}px`,
+                "--chat-vv-height": viewport.height ? `${viewport.height}px` : undefined,
+              } as CSSProperties
+            }
+          >
+            <div className="chat-sheet">
+              <div className="chat-drag-handle" aria-hidden />
+              <header className="chat-header">
+                <span className="relative shrink-0">
+                  <LogoMark className="size-8" />
+                  <span
+                    className={cn("absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background", isOpen ? "bg-success" : "bg-muted-foreground")}
+                    aria-hidden
+                  />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-display text-[17px] leading-tight">{restaurantName} host</p>
+                  <p className="truncate text-[11px] text-muted-foreground">
+                    {session ? "Orders, tracking and tables — just ask" : "Ask about the menu · log in to order"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="chat-icon-btn"
+                  aria-label="Start a new conversation"
+                  title="New conversation"
+                  onClick={() => void startNewChat()}
+                >
+                  <RotateCcw aria-hidden />
+                </button>
+                <button type="button" className="chat-icon-btn" aria-label="Close assistant" title="Close" onClick={() => setOpen(false)}>
+                  <X aria-hidden />
+                </button>
+              </header>
+              <CartStrip onNavigate={() => setOpen(false)} />
+              <div className="chat-body">
+                <CopilotChat
+                  className="h-full"
+                  chatView={VoiceChatView}
+                  messageView={ChatMessageView as never}
+                  scrollView={scrollView}
+                  welcomeScreen={welcomeScreen}
+                  labels={{
+                    chatInputPlaceholder: "e.g. add one masala dosa",
+                    welcomeMessageText: `Hi! I'm the ${restaurantName} host. Ask me about dishes, or tell me what to add to your cart.`,
+                    chatDisclaimerText: "AI can make mistakes. Prices are always calculated by our server. Only you can pay.",
+                  }}
+                />
+                <LiveRegion />
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Start a new conversation"
-              title="New conversation"
-              onClick={async () => {
-                await newConversationAction("customer");
-                setResetKey((k) => k + 1);
-              }}
-            >
-              <RotateCcw />
-            </Button>
-            <Button variant="ghost" size="icon" aria-label="Close assistant" onClick={() => setOpen(false)}>
-              <X />
-            </Button>
           </div>
-          <CartStrip onNavigate={() => setOpen(false)} />
-          <div className="relative min-h-0 flex-1 [&_.copilotKitChat]:h-full">
-            <CopilotChat
-              className="h-full"
-              chatView={VoiceChatView}
-              labels={{
-                chatInputPlaceholder: "e.g. add one paneer masala dosa to my cart",
-                welcomeMessageText: `Hi! I'm the ${restaurantName} host. Ask me about dishes, or tell me what to add to your cart.`,
-                chatDisclaimerText: "AI can make mistakes. Prices are always calculated by our server. Only you can pay.",
-              }}
-            />
-          </div>
-        </div>
+        </ChatUiProvider>
       </ChatActionsProvider>
     </CopilotKitProvider>
+  );
+}
+
+/** Announces new assistant replies to screen readers. */
+function LiveRegion() {
+  const { lastAssistantText } = useChatUi();
+  return (
+    <p className="sr-only" role="status" aria-live="polite">
+      {lastAssistantText}
+    </p>
   );
 }
 
 /** Live cart summary under the chat header: one tap to review the cart while chatting. */
 function CartStrip({ onNavigate }: { onNavigate: () => void }) {
   const { cart, count } = useCart();
+  const total = cart?.totals.totalPaise ?? 0;
+  const [flash, setFlash] = useState(false);
+  const previous = useRef(total);
+
+  useEffect(() => {
+    if (previous.current === total) return;
+    previous.current = total;
+    setFlash(true);
+    const t = window.setTimeout(() => setFlash(false), 700);
+    return () => window.clearTimeout(t);
+  }, [total]);
+
   if (!cart || count === 0) return null;
   return (
-    <Link
-      href="/cart"
-      onClick={onNavigate}
-      className="flex items-center gap-2 border-b bg-muted/60 px-4 py-2 text-sm transition-colors hover:bg-muted"
-    >
-      <ShoppingBag className="size-4 text-primary" aria-hidden />
-      <span className="flex-1">
-        {count} item{count === 1 ? "" : "s"} · <span className="font-medium tabular-nums">{formatINR(cart.totals.totalPaise)}</span>
-      </span>
-      <span className="flex items-center gap-1 text-xs font-medium">
-        View cart <ArrowRight className="size-3.5" aria-hidden />
-      </span>
-    </Link>
+    <div className="chat-cart-wrap">
+      <Link
+        href="/cart"
+        onClick={onNavigate}
+        data-testid="cart-strip"
+        className={cn("chat-cart-strip", flash && "chat-cart-strip--flash")}
+      >
+        <ShoppingBag className="size-3.5 text-primary" aria-hidden />
+        <span>
+          {count} item{count === 1 ? "" : "s"}
+        </span>
+        <span aria-hidden>·</span>
+        <span className="font-semibold tabular-nums">{formatINRExact(total)}</span>
+        <span className="ml-auto inline-flex items-center gap-1 font-medium">
+          View cart <ArrowRight className="size-3.5" aria-hidden />
+        </span>
+      </Link>
+    </div>
   );
 }

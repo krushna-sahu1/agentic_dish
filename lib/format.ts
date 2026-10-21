@@ -1,11 +1,18 @@
 /** Formatting helpers shared by UI, agents and emails. */
 
 const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+const inrExact = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 
 /** 12345600 paise → "₹1,23,456" (Indian grouping). */
 export function formatINR(paise: number | null | undefined): string {
   const v = (paise ?? 0) / 100;
   return `₹${inr.format(Math.round(v * 100) / 100)}`;
+}
+
+/** 82350 paise → "₹823.50" — always two decimals (chat cards + cart strip). */
+export function formatINRExact(paise: number | null | undefined): string {
+  const v = (paise ?? 0) / 100;
+  return `₹${inrExact.format(Math.round(v * 100) / 100)}`;
 }
 
 export function rupeesToPaise(rupees: number): number {

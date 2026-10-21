@@ -1,11 +1,12 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { Mic } from "lucide-react";
+import { ArrowUp, Mic } from "lucide-react";
 import { toast } from "sonner";
-import { CopilotChatInput, CopilotChatView, type CopilotChatViewProps } from "@copilotkit/react-core/v2";
+import { CopilotChatView, type CopilotChatViewProps } from "@copilotkit/react-core/v2";
 import { cn } from "@/lib/utils";
 import { useChatActions } from "./chat-actions";
+import { CHAT_SUGGESTIONS, useChatUi } from "./chat-ui";
 import { speechErrorMessage, useSpeechInput, type SpeechInput } from "./useSpeechInput";
 
 const VoiceCtx = createContext<SpeechInput | null>(null);
@@ -13,6 +14,10 @@ const VoiceCtx = createContext<SpeechInput | null>(null);
 /**
  * `chatView` slot for CopilotChat: shows the live transcript in the input while
  * listening and sends the final text through submitUserMessage (§14 voice seam).
+ *
+ * It also swaps CopilotKit's default input for our own composer (a floating
+ * pill with a growing textarea, a mic button and a round send button) so the
+ * keyboard, the suggestion chips and the 16px type all stay under our control.
  */
 export function VoiceChatView(props: CopilotChatViewProps) {
   const { submitUserMessage } = useChatActions();
@@ -26,25 +31,73 @@ export function VoiceChatView(props: CopilotChatViewProps) {
   });
   return (
     <VoiceCtx.Provider value={speech}>
-      <CopilotChatView {...props} inputValue={speech.listening ? speech.transcript : props.inputValue} input={{ sendButton: SendWithMic }} />
+      <CopilotChatView
+        {...props}
+        inputValue={speech.listening ? speech.transcript : props.inputValue}
+        input={{ children: Composer, sendButton: ComposerSendButton }}
+      />
     </VoiceCtx.Provider>
   );
 }
 
-function SendWithMic(props: React.ComponentProps<typeof CopilotChatInput.SendButton>) {
+type ComposerProps = {
+  textArea: React.ReactElement;
+  sendButton: React.ReactElement;
+  disclaimer: React.ReactElement;
+  containerRef?: React.Ref<HTMLDivElement>;
+};
+
+/** The docked composer: suggestion chips, the input pill and the disclaimer. */
+function Composer({ textArea, sendButton, disclaimer, containerRef }: ComposerProps) {
+  const { hasMessages } = useChatUi();
   return (
-    <>
-      <MicButton />
-      <CopilotChatInput.SendButton {...props} />
-    </>
+    <div className="chat-composer" ref={containerRef}>
+      {hasMessages ? <SuggestionChips /> : null}
+      <div className="chat-composer__pill">
+        <MicButton />
+        <div className="chat-composer__field">{textArea}</div>
+        {sendButton}
+      </div>
+      <div className="chat-composer__disclaimer">{disclaimer}</div>
+    </div>
   );
 }
 
-// CopilotKit resets `[data-copilotkit] button` (background, color, radius) with higher
-// specificity than utilities, so the button stays bare and the inner span draws the circle.
-const button = "group inline-flex shrink-0 rounded-full focus-visible:outline-none";
-const circle = "inline-flex size-9 items-center justify-center rounded-full transition-colors group-focus-visible:ring-2 group-focus-visible:ring-ring";
+/** Horizontally scrollable shortcuts — the welcome cards, once the chat starts. */
+function SuggestionChips() {
+  const { sendSuggestion } = useChatUi();
+  return (
+    <div className="chat-chips" role="group" aria-label="Suggested questions">
+      {CHAT_SUGGESTIONS.map((s) => (
+        <button key={s.title} type="button" className="chat-chip" onClick={() => sendSuggestion(s.message)}>
+          {s.title}
+        </button>
+      ))}
+    </div>
+  );
+}
 
+/** Round accent send button (becomes a stop button while the agent runs). */
+function ComposerSendButton({ onClick, disabled, children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const isStop = children !== undefined && children !== null;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={isStop ? "Stop generating" : "Send message"}
+      title={isStop ? "Stop" : "Send"}
+      data-testid="copilot-send-button"
+      className={cn("chat-send", className)}
+      {...props}
+    >
+      {children ?? <ArrowUp aria-hidden />}
+    </button>
+  );
+}
+
+// CopilotKit resets `[data-copilotkit] button` (background, color, radius), so the
+// mic uses its own `.chat-mic` class, which out-specifies that reset.
 function MicButton() {
   const speech = useContext(VoiceCtx);
   if (!speech) return null;
@@ -54,10 +107,8 @@ function MicButton() {
     return (
       // Disabled buttons don't fire hover events, so the tooltip lives on the wrapper.
       <span title={why} className="inline-flex">
-        <button type="button" disabled aria-label={why} data-testid="chat-mic" className={cn(button, "cursor-not-allowed")}>
-          <span className={cn(circle, "text-muted-foreground opacity-50")}>
-            <Mic className="size-[18px]" aria-hidden />
-          </span>
+        <button type="button" disabled aria-label={why} data-testid="chat-mic" className="chat-mic">
+          <Mic aria-hidden />
         </button>
       </span>
     );
@@ -73,16 +124,10 @@ function MicButton() {
         aria-label={speech.listening ? "Stop voice input" : "Start voice input"}
         title={speech.listening ? "Stop listening" : "Speak your message"}
         data-testid="chat-mic"
-        className={button}
+        data-listening={speech.listening ? "true" : "false"}
+        className="chat-mic"
       >
-        <span
-          className={cn(
-            circle,
-            speech.listening ? "animate-pulse bg-destructive text-destructive-foreground" : "text-muted-foreground group-hover:bg-muted group-hover:text-foreground",
-          )}
-        >
-          <Mic className="size-[18px]" aria-hidden />
-        </span>
+        <Mic aria-hidden />
       </button>
       <span className="sr-only" aria-live="polite">
         {speech.listening ? "Listening…" : ""}

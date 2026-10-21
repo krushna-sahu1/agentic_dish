@@ -18,6 +18,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Let the browser shrink the layout viewport when the on-screen keyboard opens
+  // (Android Chrome). iOS Safari ignores this, so the chat panel also measures
+  // window.visualViewport — see components/chat/CustomerChat.tsx.
+  interactiveWidget: "resizes-content",
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f6f1e7" },
     { media: "(prefers-color-scheme: dark)", color: "#171310" },

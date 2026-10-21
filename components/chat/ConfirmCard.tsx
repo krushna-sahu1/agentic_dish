@@ -87,18 +87,18 @@ export function ConfirmCard({ args: rawArgs, status, result, respond, preview, e
 
   return (
     <CardShell
-      className={cn(p?.destructive && "border-destructive/40")}
+      tone={p?.destructive ? "danger" : "action"}
       title={p?.title ?? "Please confirm"}
       footer={
         <>
-          <Button size="sm" variant={p?.destructive ? "destructive" : "default"} disabled={!p || busy || blocking} onClick={onConfirm} data-testid="confirm-button">
+          <Button size="sm" className="h-9" variant={p?.destructive ? "destructive" : "default"} disabled={!p || busy || blocking} onClick={onConfirm} data-testid="confirm-button">
             {busy ? <Loader2 className="animate-spin" /> : <Check />} {confirmLabel}
           </Button>
-          <Button size="sm" variant="outline" disabled={busy} onClick={onCancel} data-testid="cancel-button">
+          <Button size="sm" className="h-9" variant="outline" disabled={busy} onClick={onCancel} data-testid="cancel-button">
             <X /> Cancel
           </Button>
           {p?.editable?.length ? (
-            <Button size="sm" variant="ghost" onClick={() => setEditing((e) => !e)} aria-expanded={editing}>
+            <Button size="sm" className="h-9" variant="ghost" onClick={() => setEditing((e) => !e)} aria-expanded={editing}>
               <Pencil /> Edit
             </Button>
           ) : null}

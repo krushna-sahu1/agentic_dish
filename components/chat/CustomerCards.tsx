@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { AlertTriangle, Check, Clock, ShoppingBag, Star, Utensils } from "lucide-react";
 import { toast } from "sonner";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DishImage } from "@/components/site/DishImage";
 import { SpiceLevel, VegMark } from "@/components/site/Markers";
@@ -12,7 +12,7 @@ import { AddToCartButton } from "@/components/site/AddToCartButton";
 import { useCart } from "@/components/providers/CartProvider";
 import { addManyToCartAction, addToCartAction } from "@/app/actions/customer";
 import { createClient } from "@/lib/supabase/client";
-import { formatINR, STATUS_LABEL } from "@/lib/format";
+import { formatINRExact, STATUS_LABEL } from "@/lib/format";
 import { formatDateTime, formatTime } from "@/lib/time";
 import type { AddToCartInput } from "@/lib/services/cart";
 import type { ItemSummary } from "@/lib/services/menu";
@@ -41,7 +41,7 @@ export function DishCarousel({ title, items, notes }: { title?: string; items: D
 
 function MiniDish({ d }: { d: Dish }) {
   return (
-    <article className="flex w-44 shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-card shadow-sm" data-testid="mini-dish" data-dish={d.slug}>
+    <article className="flex w-44 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card shadow-[0_1px_2px_rgb(0_0_0/0.04),0_14px_30px_-26px_rgb(0_0_0/0.55)]" data-testid="mini-dish" data-dish={d.slug}>
       <Link href={`/menu/${d.slug}`} className="relative">
         <DishImage src={d.image_url} alt="" className={cn("aspect-[4/3]", !d.available && "grayscale")} />
         {!d.available && <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs font-semibold text-white">SOLD OUT</span>}
@@ -62,7 +62,7 @@ function MiniDish({ d }: { d: Dish }) {
         </div>
         {d.reason && <p className="line-clamp-2 text-[11px] text-muted-foreground">{d.reason}</p>}
         <div className="mt-auto flex items-center justify-between pt-1">
-          <span className="text-sm font-semibold">{formatINR(d.price_paise)}</span>
+          <span className="text-sm font-semibold">{formatINRExact(d.price_paise)}</span>
           <AddToCartButton item={d} className="h-7 px-2.5 text-xs" />
         </div>
       </div>
@@ -100,11 +100,11 @@ export function ComboSuggestionCard({ combo }: { combo: Combo }) {
       title={<span className="flex items-center gap-2"><Utensils className="size-4 text-primary" /> {combo.title}</span>}
       footer={
         <>
-          <Button size="sm" onClick={addAll} disabled={pending || added} data-testid="add-all">
+          <Button size="sm" className="h-9" onClick={addAll} disabled={pending || added} data-testid="add-all">
             {added ? <Check /> : <ShoppingBag />} {added ? "Added" : "Add all"}
           </Button>
           <span className="ml-auto text-sm">
-            ≈ <b>{formatINR(combo.estimated_total_paise)}</b> <span className="text-xs text-muted-foreground">incl. GST</span>
+            ≈ <b>{formatINRExact(combo.estimated_total_paise)}</b> <span className="text-xs text-muted-foreground">incl. GST</span>
           </span>
         </>
       }
@@ -116,13 +116,13 @@ export function ComboSuggestionCard({ combo }: { combo: Combo }) {
             <span className="flex-1">
               {i.qty ?? 1} × {i.name}
             </span>
-            <span className="tabular-nums">{formatINR(i.line_total_paise ?? i.price_paise)}</span>
+            <span className="tabular-nums">{formatINRExact(i.line_total_paise ?? i.price_paise)}</span>
           </li>
         ))}
       </ul>
       {combo.budget_paise ? (
         <p className={cn("mt-2 text-xs", combo.estimated_total_paise <= combo.budget_paise ? "text-success" : "text-destructive")}>
-          Budget {formatINR(combo.budget_paise)} · {combo.estimated_total_paise <= combo.budget_paise ? "within budget" : "over budget"}
+          Budget {formatINRExact(combo.budget_paise)} · {combo.estimated_total_paise <= combo.budget_paise ? "within budget" : "over budget"}
         </p>
       ) : null}
       {combo.notes?.length ? <p className="mt-1 text-xs text-muted-foreground">{combo.notes.join(" ")}</p> : null}
@@ -139,7 +139,7 @@ export function ItemOptionsCard({ message, options, qty = 1 }: { message: string
           <li key={o.id} className="flex items-center justify-between gap-2 text-sm">
             <span>{o.name}</span>
             <span className="flex items-center gap-2">
-              <span className="text-muted-foreground">{formatINR(o.price_paise)}</span>
+              <span className="text-muted-foreground">{formatINRExact(o.price_paise)}</span>
               <AddToCartButton item={{ id: o.id, name: o.name, price_paise: o.price_paise, available: true, has_options: false }} qty={qty} className="h-7 px-2.5 text-xs" />
             </span>
           </li>
@@ -214,9 +214,9 @@ export function CartSummaryCard({ cart, headline }: { cart: CompactCart; headlin
       title={headline ?? `Your cart · ${cart.item_count} item${cart.item_count === 1 ? "" : "s"}`}
       footer={
         <>
-          <Link href="/cart" className={buttonVariants({ size: "sm", variant: "outline" })}>View cart</Link>
+          <Link href="/cart" className="chat-card__action chat-card__action--ghost">View cart</Link>
           <span className="ml-auto text-sm">
-            Total <b data-testid="cart-total">{formatINR(t.totalPaise)}</b>
+            Total <b data-testid="cart-total">{formatINRExact(t.totalPaise)}</b>
           </span>
         </>
       }
@@ -230,7 +230,7 @@ export function CartSummaryCard({ cart, headline }: { cart: CompactCart; headlin
                 <span className="block text-xs text-muted-foreground">{[l.variant, ...l.addons.map((a) => `+ ${a}`), stripTags(l.special_instructions)].filter(Boolean).join(" · ")}</span>
               )}
             </span>
-            <span className="tabular-nums">{formatINR(l.line_total_paise)}</span>
+            <span className="tabular-nums">{formatINRExact(l.line_total_paise)}</span>
           </li>
         ))}
       </ul>
@@ -253,7 +253,7 @@ function Row({ k, v }: { k: string; v: number }) {
   return (
     <div className="flex justify-between">
       <dt>{k}</dt>
-      <dd className="tabular-nums">{v < 0 ? `−${formatINR(-v)}` : formatINR(v)}</dd>
+      <dd className="tabular-nums">{v < 0 ? `−${formatINRExact(-v)}` : formatINRExact(v)}</dd>
     </div>
   );
 }
@@ -276,7 +276,7 @@ export function CheckoutCard({ data, restaurantName }: { data: CheckoutData; res
   const { refresh } = useCart();
   const b = data.breakdown;
   return (
-    <CardShell title={`Checkout · ${data.order_number}`} className="border-primary/40" footer={
+    <CardShell title={`Checkout · ${data.order_number}`} tone="action" footer={
       <PayButton
         orderId={data.order_id}
         orderNumber={data.order_number}
@@ -298,7 +298,7 @@ export function CheckoutCard({ data, restaurantName }: { data: CheckoutData; res
               {l.qty} × {l.name}
               {l.details && <span className="block text-xs text-muted-foreground">{stripTags(l.details)}</span>}
             </span>
-            <span className="tabular-nums">{formatINR(l.line_total_paise)}</span>
+            <span className="tabular-nums">{formatINRExact(l.line_total_paise)}</span>
           </li>
         ))}
       </ul>
@@ -311,7 +311,7 @@ export function CheckoutCard({ data, restaurantName }: { data: CheckoutData; res
         {b.tip_paise > 0 && <Row k="Tip" v={b.tip_paise} />}
         <div className="flex justify-between pt-1 text-sm font-semibold text-foreground">
           <dt>Total</dt>
-          <dd className="tabular-nums">{formatINR(b.total_paise)}</dd>
+          <dd className="tabular-nums">{formatINRExact(b.total_paise)}</dd>
         </div>
       </dl>
       <p className="mt-2 text-xs text-muted-foreground">{data.order_type.replace("_", "-")} · Prices calculated by our server. You pay only when you press Pay.</p>
@@ -367,7 +367,7 @@ export function OrderStatusCard({ data }: { data: OrderStatusData }) {
           <Badge variant={terminal ? "destructive" : status === "completed" ? "success" : "default"} data-testid="order-status">{STATUS_LABEL[status] ?? status}</Badge>
         </span>
       }
-      footer={<Link href={`/orders/${data.order_id}`} className={buttonVariants({ size: "sm", variant: "outline" })}>Order details</Link>}
+      footer={<Link href={`/orders/${data.order_id}`} className="chat-card__action chat-card__action--ghost">Order details</Link>}
     >
       {!terminal && (
         <ol className="mb-2 flex items-center gap-1" aria-label="Order progress">
@@ -410,7 +410,7 @@ export function OrdersListCard({ orders }: { orders: { id: string; order_number:
           <li key={o.id} className="py-1.5">
             <Link href={`/orders/${o.id}`} className="flex justify-between gap-2 hover:underline">
               <span>{o.order_number}</span>
-              <span>{formatINR(o.total_paise)}</span>
+              <span>{formatINRExact(o.total_paise)}</span>
             </Link>
             <p className="text-xs text-muted-foreground">{STATUS_LABEL[o.status]} · {formatDateTime(o.created_at)} · {o.items.join(", ")}</p>
           </li>
@@ -439,7 +439,7 @@ export function CouponsCard({ coupons }: { coupons: { code: string; description:
 export function ReservationsCard({ reservations }: { reservations: { id: string; party_size: number; reserved_for: string; status: string; table_number: number | null }[] }) {
   if (!reservations.length) return <CardShell><p className="text-sm text-muted-foreground">No reservations yet.</p></CardShell>;
   return (
-    <CardShell title="Your reservations" footer={<Link href="/reservations" className={buttonVariants({ size: "sm", variant: "outline" })}>Manage</Link>}>
+    <CardShell title="Your reservations" footer={<Link href="/reservations" className="chat-card__action chat-card__action--ghost">Manage</Link>}>
       <ul className="space-y-1 text-sm">
         {reservations.map((r) => (
           <li key={r.id} className="flex justify-between gap-2">

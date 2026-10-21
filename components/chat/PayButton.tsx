@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CreditCard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatINR } from "@/lib/format";
+import { formatINRExact } from "@/lib/format";
 import { createClient } from "@/lib/supabase/client";
 
 declare global {
@@ -111,7 +111,7 @@ export function PayButton(p: PayButtonProps) {
     <div className="w-full space-y-1">
       <Button size="lg" className="w-full" onClick={pay} disabled={state === "opening" || state === "verifying"} data-testid="pay-button">
         {state === "verifying" ? <Loader2 className="animate-spin" /> : <CreditCard />}
-        {state === "verifying" ? "Confirming payment…" : `Pay ${formatINR(p.amountPaise)}`}
+        {state === "verifying" ? "Confirming payment…" : `Pay ${formatINRExact(p.amountPaise)}`}
       </Button>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <p className="text-center text-[11px] text-muted-foreground">Secure payment by Razorpay · UPI, cards, netbanking, wallets</p>

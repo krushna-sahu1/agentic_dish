@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogIn, Sparkles, X } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
@@ -21,27 +20,24 @@ export function LoginToChatCard({ onClose, className }: { onClose?: () => void; 
       aria-label="Log in to chat with our AI host"
       data-testid="chat-login-card"
       data-theme="ai"
-      className={cn(
-        "fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-50 w-[min(20rem,calc(100vw-2rem))] animate-rise rounded-2xl border bg-card p-4 text-card-foreground shadow-[0_18px_40px_-12px_rgb(0_0_0/0.35)] sm:right-6",
-        className,
-      )}
+      className={cn("chat-login-card", className)}
     >
       {onClose && (
-        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-          <X className="size-4" />
+        <button type="button" onClick={onClose} aria-label="Close" className="chat-login-card__close">
+          <X aria-hidden />
         </button>
       )}
-      <p className="flex items-center gap-2 pr-6 text-sm font-medium">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-          <Sparkles className="size-3.5" aria-hidden />
+      <p className="chat-login-card__title">
+        <span className="chat-login-card__icon" aria-hidden>
+          <Sparkles />
         </span>
         Log in to chat with our AI host
       </p>
-      <div className="mt-3 flex gap-2">
-        <Link href={`/login?next=${next}`} className={buttonVariants({ size: "sm" })}>
+      <div className="chat-login-card__actions">
+        <Link href={`/login?next=${next}`} className="chat-login-card__primary">
           <LogIn aria-hidden /> Log in
         </Link>
-        <Link href={`/signup?next=${next}`} className={buttonVariants({ size: "sm", variant: "outline" })}>
+        <Link href={`/signup?next=${next}`} className="chat-login-card__secondary">
           Sign up
         </Link>
       </div>

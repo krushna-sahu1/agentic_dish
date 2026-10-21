@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CheckCircle2, Loader2, LogIn, XCircle } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export type ParsedResult<T> = { ok: true; data: T } | { ok: false; error: string; code?: string; data?: Record<string, unknown> };
@@ -31,6 +30,7 @@ const PROGRESS: Record<string, string> = {
   view_cart: "Checking your cart…",
   set_order_options: "Updating order options…",
   apply_coupon: "Applying coupon…",
+  remove_coupon: "Removing coupon…",
   prepare_checkout: "Preparing your checkout…",
   get_order_status: "Checking your order…",
   reorder: "Adding your previous order…",
@@ -45,7 +45,13 @@ const PROGRESS: Record<string, string> = {
 export function ToolProgress({ name, done, error }: { name: string; done?: boolean; error?: string | null }) {
   const label = PROGRESS[name] ?? `${name.replace(/_/g, " ")}…`;
   return (
-    <div className={cn("my-1 inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground", error && "border-destructive/40 text-destructive")} role="status">
+    <div
+      className={cn(
+        "my-1 inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1 text-xs text-muted-foreground",
+        error && "border-destructive/40 text-destructive",
+      )}
+      role="status"
+    >
       {error ? <XCircle className="size-3.5" /> : done ? <CheckCircle2 className="size-3.5 text-success" /> : <Loader2 className="size-3.5 animate-spin" />}
       {error ?? (done ? label.replace("…", "").replace(/ing\b/, "ed") : label)}
     </div>
@@ -53,32 +59,60 @@ export function ToolProgress({ name, done, error }: { name: string; done?: boole
 }
 
 export function ErrorNote({ message }: { message: string }) {
-  return <p className="my-1 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">{message}</p>;
+  return (
+    <p className="my-2 rounded-xl border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">
+      {message}
+    </p>
+  );
 }
 
 export function LoginPromptCard({ message = "Log in to manage your cart, orders and bookings." }: { message?: string }) {
   const pathname = usePathname();
   return (
-    <div className="my-2 rounded-xl border bg-card p-3 text-sm shadow-sm">
-      <p>{message}</p>
-      <div className="mt-2 flex gap-2">
-        <Link href={`/login?next=${encodeURIComponent(pathname)}`} className={buttonVariants({ size: "sm" })}>
-          <LogIn /> Log in
+    <CardShell>
+      <p className="text-sm">{message}</p>
+      <div className="mt-3 flex gap-2">
+        <Link href={`/login?next=${encodeURIComponent(pathname)}`} className="chat-card__action">
+          <LogIn aria-hidden /> Log in
         </Link>
-        <Link href={`/signup?next=${encodeURIComponent(pathname)}`} className={buttonVariants({ size: "sm", variant: "outline" })}>
+        <Link href={`/signup?next=${encodeURIComponent(pathname)}`} className="chat-card__action chat-card__action--ghost">
           Sign up
         </Link>
       </div>
-    </div>
+    </CardShell>
   );
 }
 
-export function CardShell({ title, children, className, footer }: { title?: React.ReactNode; children: React.ReactNode; className?: string; footer?: React.ReactNode }) {
+/**
+ * The one card shell every tool result uses: rounded corners, light elevation
+ * and (optionally) a header/footer. `tone="action"` marks the cards the user
+ * has to act on (confirm, pay) so they read differently from pure information.
+ */
+export function CardShell({
+  title,
+  children,
+  className,
+  footer,
+  tone = "info",
+}: {
+  title?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  footer?: React.ReactNode;
+  tone?: "info" | "action" | "danger";
+}) {
   return (
-    <div className={cn("my-2 w-full overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm", className)}>
-      {title && <div className="border-b px-3 py-2 text-sm font-semibold">{title}</div>}
-      <div className="p-3">{children}</div>
-      {footer && <div className="flex flex-wrap items-center gap-2 border-t px-3 py-2">{footer}</div>}
+    <div
+      className={cn(
+        "chat-card my-2 w-full",
+        tone === "action" && "chat-card--action",
+        tone === "danger" && "chat-card--danger",
+        className,
+      )}
+    >
+      {title && <div className="chat-card__title">{title}</div>}
+      <div className="chat-card__body">{children}</div>
+      {footer && <div className="chat-card__footer">{footer}</div>}
     </div>
   );
 }
