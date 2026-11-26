@@ -1,10 +1,10 @@
-# Agentic Dish — agentic restaurant website
+# Agentic Dish
 
 A restaurant site where **conversation replaces clicking**. Customers browse a normal menu *or* tell the AI host
 "add one paneer masala dosa to my cart"; the owner asks "which dish is performing best?" and gets charts, or
 "mark idli out of stock" and gets a Confirm card.
 
-Built from `specs.md`: Next.js 15 (App Router) · Tailwind v4 · CopilotKit (AG-UI, v2 API) · DeepSeek · Supabase
+Built with Next.js 15 (App Router) · Tailwind v4 · CopilotKit (AG-UI, v2 API) · DeepSeek · Supabase
 (Postgres, Auth, Realtime, Storage, RLS) · Razorpay · Recharts · Zod · Resend · Supabase pg_cron · Vitest · Playwright.
 
 ## Golden rules → where they're enforced
@@ -20,14 +20,17 @@ Built from `specs.md`: Next.js 15 (App Router) · Tailwind v4 · CopilotKit (AG-
 ## Architecture
 
 ```
-app/(public)     home, /menu, /menu/[slug], /about, /contact
+app/(home)       /  the restaurant's home page
+app/(landing)    /landing  the page that sells the product to owners (copy in lib/landing.ts)
+app/(public)     /menu, /menu/[slug], /about, /contact
 app/(auth)       /login (email+password, phone OTP, Google), /signup, /reset-password, /update-password
 app/(customer)   /cart /checkout /orders /orders/[id] /reservations /profile /favorites   (login required)
-app/(owner)      /owner (chat-first + KPI strip + alerts bell), /owner/orders (live kanban), /owner/menu, /owner/settings
+app/(owner)      /owner (overview), /owner/orders (list + live board), /owner/menu, /owner/assistant, /owner/jarvis, /owner/settings
 app/api/copilot/{customer,owner}/[[...path]]   CopilotKit v2 runtime (per-request BuiltInAgent bound to the verified user)
 app/api/payments/{create-order,verify,webhook} Razorpay
 app/api/cron/{daily-summary,alerts,expire-unpaid}
 app/api/owner/report                           CSV / PDF reports
+lib/business.ts  every word that describes this business: name, cuisine, city, chat examples, search synonyms
 lib/services/*   the single service layer used by BOTH the manual UI (server actions) and agent tools
 lib/agents/*     tools, prompts, guard, runtime, mock model
 supabase/        migrations (schema, RLS, analytics RPCs) + seed (59 dishes, 90 days of orders)
@@ -106,7 +109,7 @@ Cron — `vercel.json` has no crons, so the deploy stays within the Hobby plan. 
 
 1. In Vercel, set the env vars from `.env.example` including `CRON_SECRET` and `NEXT_PUBLIC_SITE_URL` (your deployed
    URL, no trailing slash). Recommended: also set `EMAIL_UNSUBSCRIBE_SECRET` — `lib/bulk-email/unsubscribe.ts` falls
-   back to `CRON_SECRET`, so giving it its own value keeps unsubscribe links working when `CRON_SECRET` is rotated.
+   back to `SUPABASE_SERVICE_ROLE_KEY`, so giving it its own value keeps unsubscribe links working when keys are rotated.
 2. In `supabase/cron-setup.sql`, replace the `REPLACE_WITH_YOUR_SITE_URL` and `REPLACE_WITH_YOUR_CRON_SECRET`
    placeholders, then run the file once in the Supabase SQL Editor. `cron_secret` must equal the `CRON_SECRET` set in
    Vercel.
@@ -115,7 +118,7 @@ Cron — `vercel.json` has no crons, so the deploy stays within the Hobby plan. 
    `select id, status_code, error_msg, created from net._http_response order by created desc limit 20;`.
    To remove the schedules, run the commented "undo" block at the end of that file.
 
-## Voice-ready seams (§14)
-All capabilities are tools; `useChatActions().submitUserMessage(text)` is the single entry point for any input
-source; the chat panel has an empty `data-slot="mic"` and CopilotKit's input exposes a `startTranscribeButton`
-slot; agent replies are plain text + cards.
+## Using it for another restaurant
+1. Edit `lib/business.ts` (and `lib/landing.ts` for the sales page).
+2. Change the colour tokens at the top of `app/globals.css` and the mark in `components/site/Logo.tsx`.
+3. Replace the menu, tables and `restaurant_settings` rows in `supabase/seed.sql`, then run `npm run db:setup` on a new Supabase project.

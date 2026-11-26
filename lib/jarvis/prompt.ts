@@ -81,5 +81,3 @@ export function jarvisSettings(opts: { restaurantName: string; ownerName: string
     },
   };
 }
-
-export type JarvisSettings = ReturnType<typeof jarvisSettings>;

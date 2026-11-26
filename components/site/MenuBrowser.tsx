@@ -5,7 +5,8 @@ import { Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import { Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { ALLERGENS, ITEM_TAGS } from "@/lib/types";
+import { ALLERGENS, ITEM_TAGS, TAG_LABEL } from "@/lib/types";
+import { BUSINESS } from "@/lib/business";
 import { cn } from "@/lib/utils";
 import { DishCard, type DishCardItem } from "./DishCard";
 import { openChat } from "./chat-events";
@@ -92,7 +93,7 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
             <Input
               type="search"
               aria-label="Search the menu"
-              placeholder="Search dosa, biryani, chhena poda…"
+              placeholder={BUSINESS.searchPlaceholder}
               className="h-12 rounded-[14px] pl-10"
               value={f.q}
               onChange={(e) => setF({ ...f, q: e.target.value })}
@@ -128,7 +129,7 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
                 <option value="">Any</option>
                 {ITEM_TAGS.map((t) => (
                   <option key={t} value={t}>
-                    {t.replace("_", " ")}
+                    {TAG_LABEL[t]}
                   </option>
                 ))}
               </Select>

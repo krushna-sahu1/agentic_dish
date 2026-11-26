@@ -261,7 +261,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
             ))}
           </div>
         ) : (
-          <EmptyState icon={Package} title="No ingredients tracked" description="Ask the assistant to start tracking stock for key ingredients." />
+          <EmptyState icon={Package} title="No ingredients tracked" description="Ingredients added to your database show up here." />
         )}
       </section>
 

@@ -2,15 +2,11 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useAgent } from "@copilotkit/react-core/v2";
+import { BUSINESS } from "@/lib/business";
 import { useChatActions } from "./chat-actions";
 
-/** The four starter prompts — welcome cards before the first message, chips after it. */
-export const CHAT_SUGGESTIONS = [
-  { title: "What's spicy?", message: "Which dishes are spicy?" },
-  { title: "Veg meal under ₹300", message: "Suggest a veg meal under ₹300" },
-  { title: "Add my usual", message: "Add my usual to the cart" },
-  { title: "Track my order", message: "Where's my food?" },
-];
+/** Starter prompts: welcome cards before the first message, chips after it. */
+export const CHAT_SUGGESTIONS = BUSINESS.chatSuggestions;
 
 interface ChatUi {
   /** True once the conversation has at least one message. */

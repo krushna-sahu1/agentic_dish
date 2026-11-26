@@ -1,25 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { Sparkles } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
-import { useSession } from "@/components/providers/SessionProvider";
-import { LoginToChatCard } from "@/components/chat/LoginToChatCard";
 import { openChat } from "./chat-events";
 
-/**
- * Opens the AI host. The chat now requires a session, so logged-out visitors get
- * a "log in to chat" card instead of starting the assistant.
- */
-export function AskAiButton({ prompt, label = "Ask our AI", ...props }: { prompt?: string; label?: string } & ButtonProps) {
-  const session = useSession();
-  const [loginCard, setLoginCard] = useState(false);
+/** Opens the AI host, optionally with a first message. Logged-out visitors get the log-in card (LazyCustomerChat). */
+export function AskAiButton({ prompt, label = "Ask our AI", plain = false, ...props }: { prompt?: string; label?: string; plain?: boolean } & ButtonProps) {
   return (
-    <>
-      <Button {...props} variant={props.variant ?? "iris-soft"} onClick={() => (session ? openChat(prompt) : setLoginCard(true))}>
-        <Sparkles /> {label}
-      </Button>
-      {!session && loginCard && <LoginToChatCard onClose={() => setLoginCard(false)} />}
-    </>
+    <Button {...props} variant={props.variant ?? "iris-soft"} onClick={() => openChat(prompt)}>
+      {!plain && <Sparkles />} {label}
+    </Button>
   );
 }

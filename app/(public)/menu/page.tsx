@@ -3,10 +3,11 @@ import { MenuBrowser } from "@/components/site/MenuBrowser";
 import { AskAiButton } from "@/components/site/AskAiButton";
 import { CouponFromLink } from "@/components/site/CouponFromLink";
 import { toCardItem } from "@/components/site/to-card";
+import { BUSINESS } from "@/lib/business";
 import { getMenu } from "@/lib/services/menu";
 import { SpiceLevel, VegMark } from "@/components/site/Markers";
 
-export const metadata: Metadata = { title: "Menu", description: "Dosas, idli, uttapam, rice, Odia specials, snacks, drinks and desserts." };
+export const metadata: Metadata = { title: "Menu", description: BUSINESS.menuDescription };
 
 export default async function MenuPage({ searchParams }: { searchParams: Promise<{ coupon?: string }> }) {
   const [menu, { coupon }] = await Promise.all([getMenu(), searchParams]);

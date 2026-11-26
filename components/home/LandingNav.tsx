@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu as MenuIcon, X } from "lucide-react";
 import { LogoMark } from "@/components/site/Logo";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 
 const LINKS = [

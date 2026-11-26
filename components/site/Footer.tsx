@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import type { Settings } from "@/lib/types";
 import { LogoMark } from "./Logo";
 

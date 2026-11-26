@@ -1,4 +1,4 @@
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 
 /**

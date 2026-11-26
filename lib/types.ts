@@ -20,6 +20,7 @@ export const DIETARY_PREFS = ["veg", "vegan", "jain", "gluten_free", "no_onion_g
 export type DietaryPref = (typeof DIETARY_PREFS)[number];
 export const ITEM_TAGS = ["bestseller", "chef_special", "new", "healthy", "kids"] as const;
 export type ItemTag = (typeof ITEM_TAGS)[number];
+export const TAG_LABEL: Record<string, string> = { bestseller: "Bestseller", chef_special: "Chef's special", new: "New", healthy: "Healthy", kids: "Kids" };
 
 export interface Profile {
   id: string;

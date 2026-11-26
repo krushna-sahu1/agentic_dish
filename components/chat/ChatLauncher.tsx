@@ -9,7 +9,6 @@ export function ChatLauncher({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="chat-launcher"
       aria-label="Open the AI assistant"
-      data-theme="ai"
       data-testid="chat-launcher"
     >
       <span className="chat-launcher__icon" aria-hidden>

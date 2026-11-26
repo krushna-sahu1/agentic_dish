@@ -8,6 +8,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useCart } from "@/components/providers/CartProvider";
 import { useSession } from "@/components/providers/SessionProvider";
 import { signOutAction } from "@/app/actions/auth";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./Logo";
@@ -67,7 +68,7 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:h-[72px] sm:px-6">
-        <Link href="/" className="min-w-0" aria-label="Agentic Dish — home">
+        <Link href="/" className="min-w-0" aria-label={`${BRAND.name} home`}>
           <Logo markClassName="size-7 sm:size-8" />
         </Link>
 

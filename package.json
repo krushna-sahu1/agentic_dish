@@ -19,7 +19,6 @@
   "dependencies": {
     "@ai-sdk/openai": "^3.0.127",
     "@copilotkit/react-core": "^1.79.0",
-    "@copilotkit/react-ui": "^1.79.0",
     "@copilotkit/runtime": "^1.79.0",
     "@react-three/fiber": "^9.8.2",
     "@supabase/ssr": "^0.12.7",

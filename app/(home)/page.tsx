@@ -5,7 +5,7 @@ import { AskShowcase } from "@/components/home/AskShowcase";
 import { LandingNav } from "@/components/home/LandingNav";
 import { LogoMark } from "@/components/site/Logo";
 import { getSessionUser } from "@/lib/auth";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";

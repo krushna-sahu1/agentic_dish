@@ -4,14 +4,14 @@ import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 import type { ClientSession } from "@/components/providers/SessionProvider";
 import { getSessionUser } from "@/lib/auth";
-import { BRAND } from "@/lib/brand";
+import { BRAND, BUSINESS } from "@/lib/business";
 
 const sans = Geist({ subsets: ["latin"], variable: "--font-sans-family", display: "swap" });
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display-family", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono-family", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: `${BRAND.name} — South Indian & Odia kitchen`, template: `%s · ${BRAND.name}` },
+  title: { default: `${BRAND.name} · ${BUSINESS.cuisine} kitchen`, template: `%s · ${BRAND.name}` },
   description: BRAND.description,
   applicationName: BRAND.name,
   openGraph: { siteName: BRAND.name, title: BRAND.name, description: BRAND.description, type: "website" },

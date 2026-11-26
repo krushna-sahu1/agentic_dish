@@ -15,17 +15,22 @@ export interface CouponRow {
   is_active: boolean;
   /** Coupon attached to an unsent email draft — unusable until the owner taps Send. */
   is_draft?: boolean;
+  /** Campaign coupon — only usable by people the email was sent to. */
+  is_private?: boolean;
 }
 
 export interface CouponUsage {
   totalRedemptions: number;
   userRedemptions: number;
+  /** This user received the campaign a private coupon belongs to. */
+  invited?: boolean;
 }
 
 export type CouponCheck = { ok: true } | { ok: false; reason: string };
 
 export function checkCouponEligibility(c: CouponRow | null, usage: CouponUsage, now = new Date()): CouponCheck {
   if (!c) return { ok: false, reason: "That coupon code doesn't exist." };
+  if (c.is_private && !usage.invited) return { ok: false, reason: `${c.code} isn't available on your account.` };
   if (c.is_draft) return { ok: false, reason: `${c.code} isn't available yet.` };
   if (!c.is_active) return { ok: false, reason: `${c.code} is no longer active.` };
   if (c.valid_from && new Date(c.valid_from) > now) return { ok: false, reason: `${c.code} isn't valid yet.` };

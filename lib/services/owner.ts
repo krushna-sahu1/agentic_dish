@@ -1,7 +1,7 @@
 /** Read-side operations for the owner/staff area (orders board, menu, inventory, customers, …). */
 import { createAdminClient } from "@/lib/supabase/admin";
 import { maskEmail, maskPhone } from "@/lib/format";
-import { resolveRange, zonedDateString, startOfZonedDay, addDays, DEFAULT_TZ } from "@/lib/time";
+import { zonedDateString, startOfZonedDay, addDays, DEFAULT_TZ } from "@/lib/time";
 import type { Order, OrderItem, OrderStatus, OrderStatusEvent, Reservation } from "@/lib/types";
 import { getMenu, type MenuItemFull } from "./menu";
 import { ServiceError } from "./errors";
@@ -49,33 +49,34 @@ export interface OwnerOrderView extends Order {
   minutes_in_status: number;
 }
 
-async function decorate(orders: Order[], withEvents = false): Promise<OwnerOrderView[]> {
-  if (!orders.length) return [];
-  const ids = orders.map((o) => o.id);
-  const userIds = [...new Set(orders.map((o) => o.user_id))];
-  const [items, profiles, events] = await Promise.all([
-    db().from("order_items").select("order_id, name_snapshot, qty, line_total_paise, special_instructions, variant_snapshot, addons_snapshot").in("order_id", ids),
-    db().from("profiles").select("user_id, full_name, phone").in("user_id", userIds),
-    db().from("order_status_events").select("*").in("order_id", ids).order("created_at"),
-  ]);
-  const prof = new Map((profiles.data ?? []).map((p) => [p.user_id as string, p]));
-  return orders.map((o) => {
-    const ev = ((events.data ?? []) as OrderStatusEvent[]).filter((e) => e.order_id === o.id);
-    const last = ev.filter((e) => e.status === o.status).at(-1);
-    return {
-      ...o,
-      customer_name: (prof.get(o.user_id)?.full_name as string) ?? null,
-      customer_phone_masked: maskPhone(prof.get(o.user_id)?.phone as string),
-      items: ((items.data ?? []) as (OrderItem & { order_id: string })[]).filter((i) => i.order_id === o.id),
-      events: withEvents ? ev : undefined,
-      next_statuses: OWNER_NEXT_STATUS[o.status] ?? [],
-      minutes_in_status: Math.round((Date.now() - new Date(last?.created_at ?? o.updated_at ?? o.created_at).getTime()) / 60_000),
-    };
-  });
+/** Everything an order row needs in one joined query (long id lists in a URL get rejected). */
+const ORDER_VIEW = `*,
+  customer:profiles(full_name, phone),
+  order_items(name_snapshot, qty, line_total_paise, special_instructions, variant_snapshot, addons_snapshot),
+  order_status_events(id, order_id, status, note, created_at)`;
+
+type OrderRow = Order & {
+  customer: { full_name: string | null; phone: string | null } | null;
+  order_items: OwnerOrderView["items"];
+  order_status_events: OrderStatusEvent[];
+};
+
+function toView({ customer, order_items, order_status_events, ...o }: OrderRow, withEvents = false): OwnerOrderView {
+  const events = [...order_status_events].sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const last = events.filter((e) => e.status === o.status).at(-1);
+  return {
+    ...o,
+    customer_name: customer?.full_name ?? null,
+    customer_phone_masked: maskPhone(customer?.phone),
+    items: order_items,
+    events: withEvents ? events : undefined,
+    next_statuses: OWNER_NEXT_STATUS[o.status] ?? [],
+    minutes_in_status: Math.round((Date.now() - new Date(last?.created_at ?? o.updated_at ?? o.created_at).getTime()) / 60_000),
+  };
 }
 
 export async function listOrders(input: { status?: OrderStatus[] | OrderStatus; range?: RangeInput; limit?: number; active_only?: boolean }) {
-  let q = db().from("orders").select("*").order("created_at", { ascending: false }).limit(Math.min(input.limit ?? 50, 200));
+  let q = db().from("orders").select(ORDER_VIEW).order("created_at", { ascending: false }).limit(Math.min(input.limit ?? 50, 200));
   const statuses = input.active_only
     ? (["paid", "accepted", "preparing", "ready", "out_for_delivery"] as OrderStatus[])
     : input.status
@@ -92,15 +93,18 @@ export async function listOrders(input: { status?: OrderStatus[] | OrderStatus; 
   }
   const { data, error } = await q;
   if (error) throw new Error(error.message);
-  return { range_label: label, orders: await decorate((data ?? []) as Order[]) };
+  return { range_label: label, orders: (data as unknown as OrderRow[]).map((o) => toView(o)) };
 }
 
 export async function getOrderOwner(ref: string) {
   const o = await resolveOrder(ref);
-  const [view] = await decorate([o], true);
-  const { data: payments } = await db().from("payments").select("razorpay_payment_id, amount_paise, status, method, created_at").eq("order_id", o.id);
-  const { data: refunds } = await db().from("refunds").select("razorpay_refund_id, amount_paise, status, reason, created_at").eq("order_id", o.id);
-  return { ...view, payments: payments ?? [], refunds: refunds ?? [] };
+  const [order, { data: payments }, { data: refunds }] = await Promise.all([
+    db().from("orders").select(ORDER_VIEW).eq("id", o.id).single(),
+    db().from("payments").select("razorpay_payment_id, amount_paise, status, method, created_at").eq("order_id", o.id),
+    db().from("refunds").select("razorpay_refund_id, amount_paise, status, reason, created_at").eq("order_id", o.id),
+  ]);
+  if (order.error) throw new Error(order.error.message);
+  return { ...toView(order.data as unknown as OrderRow, true), payments: payments ?? [], refunds: refunds ?? [] };
 }
 
 export async function findMenuItems(input: { query?: string; category?: string; include_unavailable?: boolean }) {
@@ -269,8 +273,4 @@ export async function markAlertsRead(ids?: string[]) {
 export async function getSettingsForOwner() {
   const { data } = await db().from("restaurant_settings").select("*").single();
   return data;
-}
-
-export function todayRange() {
-  return resolveRange("today");
 }

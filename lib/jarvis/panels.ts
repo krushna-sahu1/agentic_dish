@@ -3,8 +3,6 @@
  * Pure + client-safe so it can be unit-tested.
  */
 
-export type RangeLike = { label?: string } | string | null | undefined;
-
 export type PanelSpec =
   | { kind: "kpis"; title: string; period: string; revenue_paise: number; orders: number; active_orders: number; waiting: number; avg_rating: number | null }
   | { kind: "revenue"; title: string; period: string; revenue_paise: number; orders: number; change_percent: number | null; previous_label: string | null; series: { label: string; value: number }[] }

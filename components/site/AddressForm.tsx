@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { BUSINESS } from "@/lib/business";
 import { addAddressAction } from "@/app/actions/customer";
 
 export function AddressForm({ onSaved }: { onSaved?: () => void }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [f, setF] = useState({ label: "Home", line1: "", line2: "", city: "Bhubaneswar", pincode: "" });
+  const [f, setF] = useState({ label: "Home", line1: "", line2: "", city: BUSINESS.city as string, pincode: "" });
   return (
     <form
       className="grid gap-2 sm:grid-cols-2"
@@ -20,7 +21,7 @@ export function AddressForm({ onSaved }: { onSaved?: () => void }) {
           const r = await addAddressAction({ ...f, line2: f.line2 || null, is_default: true });
           if (!r.ok) return void toast.error(r.error);
           toast.success("Address saved");
-          setF({ label: "Home", line1: "", line2: "", city: "Bhubaneswar", pincode: "" });
+          setF({ label: "Home", line1: "", line2: "", city: BUSINESS.city, pincode: "" });
           onSaved?.();
           router.refresh();
         });

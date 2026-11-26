@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LogoMark } from "@/components/site/Logo";
 import { alertsAction, liveKpisAction, markAlertsReadAction } from "@/app/actions/owner";
 import { createClient } from "@/lib/supabase/client";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 import { AlertCard, AlertsBellIcon } from "./OwnerCards";
 

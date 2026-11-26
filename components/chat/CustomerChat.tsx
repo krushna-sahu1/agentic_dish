@@ -23,6 +23,7 @@ import { useSession } from "@/components/providers/SessionProvider";
 import { CUSTOMER_CONFIRM_SCHEMAS, type CustomerConfirmSchemaName } from "@/lib/agents/customer/confirm-schemas";
 import { executeCustomerConfirmAction, previewCustomerConfirmAction, rejectCustomerConfirmAction } from "@/app/actions/customer";
 import { newConversationAction } from "@/app/actions/chat";
+import { BUSINESS } from "@/lib/business";
 import { formatINR, formatINRExact } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { ChatActionsProvider, useChatActions } from "./chat-actions";
@@ -140,8 +141,6 @@ function buildHitl(): ReactHumanInTheLoop[] {
   });
 }
 
-const SUGGESTIONS = CHAT_SUGGESTIONS;
-
 function CustomerBindings({ isOpen, statusLabel, menuItemNames }: { isOpen: boolean; statusLabel: string; menuItemNames: string[] }) {
   const pathname = usePathname();
   const session = useSession();
@@ -162,7 +161,7 @@ function CustomerBindings({ isOpen, statusLabel, menuItemNames }: { isOpen: bool
   });
   useAgentContext({ description: "Restaurant open status right now", value: { open: isOpen, label: statusLabel } });
   useAgentContext({ description: "Every dish name on the menu (use to match misheard or misspelled dish names)", value: menuItemNames });
-  useConfigureSuggestions({ suggestions: SUGGESTIONS, available: "before-first-message" });
+  useConfigureSuggestions({ suggestions: CHAT_SUGGESTIONS.map((s) => ({ ...s })), available: "before-first-message" });
   useChatPersistence("customer", !!session);
   return null;
 }
@@ -276,23 +275,14 @@ export function CustomerChat({
   const hitl = useMemo(() => buildHitl(), []);
   const scrollView = useMemo(() => ({ scrollToBottomButton: ScrollToBottomPill }), []);
 
-  // The customer chat uses the AI tokens on every route, not the page's palette.
-  // The panel/launcher carry data-theme="ai"; this marker also covers CopilotKit
-  // content that gets portaled to <body> (tooltips, dropdowns, image lightbox).
-  useEffect(() => {
-    const root = document.documentElement;
-    root.setAttribute("data-chat-theme", "ai");
-    return () => root.removeAttribute("data-chat-theme");
-  }, []);
-
   useEffect(() => {
     const onOpen = (e: Event) => {
       setOpen(true);
       const p = (e as CustomEvent<{ prompt?: string }>).detail?.prompt;
       if (p) setPending(p);
     };
-    window.addEventListener("agentic:open-chat", onOpen);
-    return () => window.removeEventListener("agentic:open-chat", onOpen);
+    window.addEventListener("open-chat", onOpen);
+    return () => window.removeEventListener("open-chat", onOpen);
   }, []);
 
   useEffect(() => {
@@ -372,7 +362,6 @@ export function CustomerChat({
             role="dialog"
             aria-modal="false"
             aria-label={`${restaurantName} AI assistant`}
-            data-theme="ai"
             data-open={open ? "true" : "false"}
             data-testid="chat-panel"
             className="chat-panel"
@@ -423,7 +412,7 @@ export function CustomerChat({
                   scrollView={scrollView}
                   welcomeScreen={welcomeScreen}
                   labels={{
-                    chatInputPlaceholder: "e.g. add one masala dosa",
+                    chatInputPlaceholder: BUSINESS.chatPlaceholder,
                     welcomeMessageText: `Hi! I'm the ${restaurantName} host. Ask me about dishes, or tell me what to add to your cart.`,
                     chatDisclaimerText: "AI can make mistakes. Prices are always calculated by our server. Only you can pay.",
                   }}

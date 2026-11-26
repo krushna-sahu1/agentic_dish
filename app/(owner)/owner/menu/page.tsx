@@ -19,7 +19,7 @@ export default async function OwnerMenuPage() {
       category: i.category_name,
       category_slug: i.category_slug,
       description: i.description,
-      image_url: i.image_url && !i.image_url.endsWith("/placeholder.svg") ? i.image_url : null,
+      image_url: i.image_url,
       price_paise: i.price_paise,
       is_veg: i.is_veg,
       spice_level: i.spice_level,

@@ -143,7 +143,7 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
           }}
         >
           <Input aria-label="Reason" required minLength={3} placeholder="Reason (shared with the customer)" value={reason} onChange={(e) => setReason(e.target.value)} />
-          {cancel?.paid_at && <p className="text-xs text-warning">This order is paid. Cancelling doesn&apos;t refund it — ask the assistant to issue a refund after.</p>}
+          {cancel?.paid_at && <p className="text-xs text-warning">This order is paid. Cancelling doesn&apos;t refund it. Open the order afterwards to issue a refund.</p>}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setCancel(null)}>Keep order</Button>
             <Button type="submit" variant="destructive" disabled={pending}>Cancel order</Button>

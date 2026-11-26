@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowDownRight, ArrowUpRight, BarChart3, Bell, Download,
 import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { formatINR, formatNumber, STATUS_LABEL } from "@/lib/format";
+import { formatINR, formatINRShort, formatNumber, STATUS_LABEL } from "@/lib/format";
 import { formatDateTime } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
@@ -16,14 +16,6 @@ const strip = (s: unknown) => (typeof s === "string" ? s.replace(/<\/?user_text>
 export type Fmt = "inr" | "num" | "pct" | "text";
 export const fmtValue = (v: unknown, f: Fmt = "text") =>
   v == null ? "—" : f === "inr" ? formatINR(Number(v)) : f === "num" ? formatNumber(Number(v)) : f === "pct" ? `${v}%` : String(strip(v));
-
-/** Compact ₹ for axes: ₹12.3k, ₹1.2L. */
-const shortINR = (paise: number) => {
-  const r = paise / 100;
-  if (r >= 100000) return `₹${(r / 100000).toFixed(1)}L`;
-  if (r >= 1000) return `₹${(r / 1000).toFixed(1)}k`;
-  return `₹${Math.round(r)}`;
-};
 
 function toCsv(columns: { key: string; label: string }[], rows: Record<string, unknown>[]) {
   const esc = (v: unknown) => {
@@ -195,7 +187,7 @@ export function LineChartCard({ title, subtitle, insight, data, xLabel, yKey, yF
           <LineChart data={rows} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="0" />
             <XAxis dataKey="__x" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} minTickGap={16} />
-            <YAxis tickLine={false} axisLine={false} width={48} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickFormatter={(v) => (yFmt === "inr" ? shortINR(v) : formatNumber(v))} />
+            <YAxis tickLine={false} axisLine={false} width={48} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickFormatter={(v) => (yFmt === "inr" ? formatINRShort(v) : formatNumber(v))} />
             <Tooltip cursor={{ stroke: "var(--muted-foreground)", strokeWidth: 1 }} content={({ active, payload, label }) => (active && payload?.length ? <TipBox label={String(label)} value={fmtValue(payload[0].value, yFmt)} /> : null)} />
             <Line type="monotone" dataKey={yKey} stroke="var(--chart-1)" strokeWidth={2} dot={rows.length <= 14 ? { r: 3, strokeWidth: 2, stroke: "var(--card)", fill: "var(--chart-1)" } : false} activeDot={{ r: 5, stroke: "var(--card)", strokeWidth: 2 }} isAnimationActive={false} />
           </LineChart>
@@ -216,7 +208,7 @@ export function BarChartCard({ title, subtitle, insight, data, labelKey, valueKe
             <XAxis type="number" hide />
             <YAxis type="category" dataKey={labelKey} tickLine={false} axisLine={false} width={130} tick={{ fontSize: 11, fill: "var(--foreground)" }} />
             <Tooltip cursor={{ fill: "var(--muted)" }} content={({ active, payload }) => (active && payload?.length ? <TipBox label={String(payload[0].payload[labelKey])} value={fmtValue(payload[0].value, valueFmt)} /> : null)} />
-            <Bar dataKey={valueKey} fill={color} radius={[0, 4, 4, 0]} isAnimationActive={false} label={{ position: "right", fontSize: 10, fill: "var(--muted-foreground)", formatter: (v: unknown) => (valueFmt === "inr" ? shortINR(Number(v)) : formatNumber(Number(v))) }} />
+            <Bar dataKey={valueKey} fill={color} radius={[0, 4, 4, 0]} isAnimationActive={false} label={{ position: "right", fontSize: 10, fill: "var(--muted-foreground)", formatter: (v: unknown) => (valueFmt === "inr" ? formatINRShort(Number(v)) : formatNumber(Number(v))) }} />
           </BarChart>
         </ResponsiveContainer>
       </div>

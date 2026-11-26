@@ -19,7 +19,6 @@ export function LoginToChatCard({ onClose, className }: { onClose?: () => void; 
       role="dialog"
       aria-label="Log in to chat with our AI host"
       data-testid="chat-login-card"
-      data-theme="ai"
       className={cn("chat-login-card", className)}
     >
       {onClose && (

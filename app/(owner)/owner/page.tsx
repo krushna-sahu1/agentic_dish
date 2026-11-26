@@ -5,10 +5,10 @@ import { EmptyState, ErrorState } from "@/components/ui/states";
 import { DashboardPage, PageHeader, Panel, StatCard } from "@/components/owner/Page";
 import { OrdersTable } from "@/components/owner/OrdersTable";
 import { RevenueChart } from "@/components/owner/RevenueChart";
-import { Change } from "@/components/owner/OwnerCards";
+import { AlertCard, Change } from "@/components/owner/OwnerCards";
 import { requireRole } from "@/lib/auth";
 import { getLiveKpis, getRevenue, getTopItems } from "@/lib/agents/owner/analytics";
-import { listOrders } from "@/lib/services/owner";
+import { listAlerts, listOrders } from "@/lib/services/owner";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatINR, formatNumber } from "@/lib/format";
 import { addDays, zonedDateString } from "@/lib/time";
@@ -28,17 +28,20 @@ export default async function OwnerOverviewPage() {
   const isOwner = user.role === "owner";
   const yesterday = addDays(zonedDateString(new Date()), -1);
 
-  const [kpisR, revenueR, topR, recentR, summaryR] = await Promise.allSettled([
+  const [kpisR, revenueR, topR, recentR, summaryR, alertsR] = await Promise.allSettled([
     getLiveKpis(),
     isOwner ? getRevenue({ range: { preset: "last_7_days" }, granularity: "day" }) : Promise.resolve(null),
     getTopItems({ range: { preset: "last_7_days" }, limit: 5, order_by: isOwner ? "revenue" : "qty" }),
     listOrders({ limit: 8 }),
     isOwner ? createAdminClient().from("owner_alerts").select("title, data").eq("dedupe_key", `daily-summary-${yesterday}`).maybeSingle() : Promise.resolve(null),
+    listAlerts({ unread_only: true, limit: 12 }),
   ]);
   const kpis = settled(kpisR);
   const revenue = settled(revenueR);
   const top = settled(topR);
   const recent = settled(recentR);
+  // Things that need a person: not greetings, internal markers or ordinary new-order notices.
+  const attention = (settled(alertsR) ?? []).filter((a) => a.severity !== "info").slice(0, 4);
   const summary = settled(summaryR)?.data as { title: string; data: { lines?: string[] } } | null | undefined;
 
   const firstName = user.profile?.full_name?.split(" ")[0];
@@ -103,6 +106,14 @@ export default async function OwnerOverviewPage() {
         </div>
       ) : (
         <ErrorState title="Live numbers are unavailable" description="We couldn’t reach the database just now. The rest of the dashboard may still work — refresh in a moment." className="py-8" />
+      )}
+
+      {attention.length > 0 && (
+        <Panel title="Needs attention" description="Unread alerts that need a person" className="mt-6 border-saffron/40">
+          <div className="px-3 pb-3">
+            <AlertCard alerts={attention as never} />
+          </div>
+        </Panel>
       )}
 
       <div className={cn("mt-6 grid gap-6", isOwner && "lg:grid-cols-[1.6fr_1fr]")}>

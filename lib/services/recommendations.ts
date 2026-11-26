@@ -3,6 +3,7 @@
  * user's own history. Combos are priced through lib/pricing (never by the LLM).
  */
 import { createAdminClient } from "@/lib/supabase/admin";
+import { BUSINESS } from "@/lib/business";
 import { computeCartTotals } from "@/lib/pricing";
 import type { Allergen, Profile } from "@/lib/types";
 import { applyFilters, getMenu, getPairings, itemSummary, resolveItem, type MenuItemFull, type MenuFilters } from "./menu";
@@ -20,7 +21,8 @@ export interface RecommendationInput {
   preferences?: { veg?: boolean; vegan?: boolean; jain?: boolean; exclude_allergens?: Allergen[]; max_spice?: number; meal?: "breakfast" | "lunch" | "dinner" | "snack" };
 }
 
-const MAIN_CATS = ["dosa", "uttapam", "rice", "odia-specials", "idli-vada"];
+const COMBO = BUSINESS.comboCategories;
+const inCats = (cats: readonly string[]) => (i: MenuItemFull) => cats.includes(i.category_slug);
 const popularity = (i: MenuItemFull) => i.sold_30d * 1 + i.avg_rating * 10 + (i.tags.includes("bestseller") ? 30 : 0) + (i.tags.includes("chef_special") ? 10 : 0);
 
 function profileFilters(profile: Profile | null, prefs: RecommendationInput["preferences"] = {}): MenuFilters {
@@ -63,22 +65,19 @@ export async function getRecommendations(input: RecommendationInput, ctx: { user
     case "pairing": {
       if (!input.item_id) {
         // "What goes well with spicy food?" → cooling sides
-        const cooling = rank(pool.filter((i) => i.spice_level <= 1 && (["beverages", "desserts"].includes(i.category_slug) || i.slug === "curd-rice" || i.allergens.includes("dairy"))));
-        const preferred = ["neer-mor", "curd-rice", "sweet-lassi", "mango-lassi", "tender-coconut-water", "dahi-vada"];
+        const preferred = Object.keys(BUSINESS.coolingPicks);
+        const cooling = rank(pool.filter((i) => i.spice_level <= 1 && (preferred.includes(i.slug) || inCats([...COMBO.drinks, ...COMBO.desserts])(i) || i.allergens.includes("dairy"))));
         const sorted = [...cooling].sort((a, b) => (preferred.indexOf(a.slug) + 1 || 99) - (preferred.indexOf(b.slug) + 1 || 99));
         return {
           kind: "items" as const,
           title: "Cooling picks for spicy food",
-          items: pack(sorted, (i) =>
-            i.slug === "neer-mor" ? "Spiced buttermilk cools the palate instantly" :
-            i.slug === "curd-rice" ? "Curd rice is the classic South Indian cool-down" :
-            i.allergens.includes("dairy") ? "Dairy calms chilli heat" : "Refreshing and mild"),
+          items: pack(sorted, (i) => BUSINESS.coolingPicks[i.slug] ?? (i.allergens.includes("dairy") ? "Dairy calms chilli heat" : "Refreshing and mild")),
           notes,
         };
       }
       const base = await resolveItem(input.item_id);
       const curated = (await getPairings(base.id)).filter((p) => pool.some((x) => x.id === p.item.id));
-      const extra = base.spice_level >= 3 ? [] : rank(pool.filter((i) => i.category_slug === "beverages" && !curated.some((c) => c.item.id === i.id))).slice(0, 2);
+      const extra = base.spice_level >= 3 ? [] : rank(pool.filter((i) => inCats(COMBO.drinks)(i) && !curated.some((c) => c.item.id === i.id))).slice(0, 2);
       return {
         kind: "items" as const,
         title: `Goes well with ${base.name}`,
@@ -133,10 +132,10 @@ async function buildCombo(
   const budget = input.budget_paise ?? null;
   const settings = await getSettings();
   const meal = input.preferences?.meal;
-  const mainsAll = rank(pool.filter((i) => MAIN_CATS.includes(i.category_slug) && (meal !== "breakfast" || ["dosa", "idli-vada", "uttapam"].includes(i.category_slug))));
-  const snacks = rank(pool.filter((i) => i.category_slug === "snacks"));
-  const drinks = rank(pool.filter((i) => i.category_slug === "beverages"));
-  const desserts = rank(pool.filter((i) => i.category_slug === "desserts"));
+  const mainsAll = rank(pool.filter(inCats(meal === "breakfast" ? COMBO.breakfast : COMBO.mains)));
+  const snacks = rank(pool.filter(inCats(COMBO.sides)));
+  const drinks = rank(pool.filter(inCats(COMBO.drinks)));
+  const desserts = rank(pool.filter(inCats(COMBO.desserts)));
   const gst = 1 + settings.gst_percent / 100;
   const cost = (subtotal: number) => Math.round(subtotal * gst); // budget compares against food + GST
 

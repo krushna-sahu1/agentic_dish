@@ -117,6 +117,7 @@ export function offerToCoupon(offer: EmailOffer, subject: string, now = new Date
     per_user_limit: 1,
     is_active: false,
     is_draft: true,
+    is_private: true,
   };
 }
 
@@ -177,10 +178,6 @@ async function toView(d: DraftRow): Promise<EmailDraftView> {
           ? "Nothing to send: no one matches. Suggest a different group."
           : `NOTHING HAS BEEN SENT. Tell the owner briefly: "Ready to email ${people}. Tap Send to confirm." Never say it was sent.`,
   };
-}
-
-export async function getDraftView(id: string) {
-  return toView(await loadDraft(id));
 }
 
 // ---------------------------------------------------------------- draft (AI tool)

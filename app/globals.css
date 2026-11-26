@@ -169,6 +169,10 @@ html.dark [data-copilotkit] {
   --color-iris-soft: var(--iris-soft);
   --color-iris-ink: var(--iris-ink);
   --color-iris-line: var(--iris-line);
+  /* Aliases kept for the /landing page: leaf = the dark ink panel, turmeric = saffron. */
+  --color-leaf: var(--sidebar);
+  --color-leaf-foreground: var(--sidebar-foreground);
+  --color-turmeric: var(--saffron);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-muted: var(--sidebar-muted);
@@ -267,6 +271,17 @@ html.dark [data-copilotkit] {
 }
 @utility animate-rise {
   animation: rise 0.7s var(--ease-out-soft) both;
+}
+@keyframes print {
+  from {
+    transform: translateY(-10px);
+  }
+  to {
+    transform: none;
+  }
+}
+@utility animate-print {
+  animation: print 0.35s var(--ease-out-soft);
 }
 @utility animate-fade {
   animation: fade 0.5s ease-out both;

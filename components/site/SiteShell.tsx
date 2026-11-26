@@ -2,14 +2,17 @@ import { Megaphone } from "lucide-react";
 import { getSettings, openStatus } from "@/lib/services/settings";
 import { getMenu } from "@/lib/services/menu";
 import { LazyCustomerChat } from "@/components/chat/LazyCustomerChat";
-import { BRAND } from "@/lib/brand";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { SetupNotice } from "./SetupNotice";
 
 /** Shared chrome for public, auth and customer pages: header, announcement, footer and the AI host. */
-export async function SiteShell({ children, bleed = false, showChat = true }: { children: React.ReactNode; bleed?: boolean; showChat?: boolean }) {
+export async function SiteShell({ children, bleed = false }: { children: React.ReactNode; bleed?: boolean }) {
   let settings;
+  // Dish names help the assistant match misheard voice input; a menu failure must not break the shell.
+  const names = getMenu()
+    .then((m) => m.items.map((i) => i.name))
+    .catch(() => []);
   try {
     settings = await getSettings();
   } catch (e) {
@@ -18,12 +21,7 @@ export async function SiteShell({ children, bleed = false, showChat = true }: { 
   const status = openStatus(settings);
   const isOpen = status.isOpen && settings.accepting_orders;
   const label = !settings.accepting_orders ? "Online orders paused" : status.label;
-  // Dish names help the assistant match misheard voice input; a menu failure must not break the shell.
-  const menuItemNames = showChat
-    ? await getMenu()
-        .then((m) => m.items.map((i) => i.name))
-        .catch(() => [])
-    : [];
+  const menuItemNames = await names;
   return (
     <>
       {settings.announcement && (
@@ -33,13 +31,13 @@ export async function SiteShell({ children, bleed = false, showChat = true }: { 
           </p>
         </div>
       )}
-      <Header statusLabel={label} isOpen={isOpen} showChat={showChat} />
+      <Header statusLabel={label} isOpen={isOpen} />
       {/* `bleed` pages (the landing page) manage their own full-width sections. */}
       <main id="main" className={bleed ? "w-full" : "mx-auto w-full max-w-7xl px-4 sm:px-6"}>
         {children}
       </main>
       <Footer settings={settings} />
-      {showChat && <LazyCustomerChat restaurantName={BRAND.name} isOpen={isOpen} statusLabel={label} menuItemNames={menuItemNames} />}
+      <LazyCustomerChat restaurantName={settings.name} isOpen={isOpen} statusLabel={label} menuItemNames={menuItemNames} />
     </>
   );
 }

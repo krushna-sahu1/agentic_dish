@@ -12,9 +12,8 @@ import { describeCoupon } from "@/lib/coupons";
 import { orderStatusEmail, sendEmail } from "@/lib/email";
 import { ServiceError } from "@/lib/services/errors";
 import { getMenu, resolveItem, type MenuItemFull } from "@/lib/services/menu";
-import { getOrderOwner, resolveOrder, OWNER_NEXT_STATUS } from "@/lib/services/owner";
+import { resolveOrder, OWNER_NEXT_STATUS } from "@/lib/services/owner";
 import { issueRefund, refundableAmount } from "@/lib/services/refunds";
-import { resolveRange } from "@/lib/time";
 import type { Order, OrderStatus } from "@/lib/types";
 import { OWNER_CHANGE_SCHEMAS as S } from "./change-schemas";
 
@@ -291,7 +290,7 @@ export const OWNER_CHANGES = {
       if (exists) slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
       const { data, error } = await db()
         .from("menu_items")
-        .insert({ ...rest, category_id: c.id, slug, image_url: a.image_url ?? "/dishes/placeholder.svg", sort_order: 99 })
+        .insert({ ...rest, category_id: c.id, slug, image_url: a.image_url ?? null, sort_order: 99 })
         .select("id, name")
         .single();
       if (error) throw new ServiceError(error.message, "create_failed");
@@ -497,6 +496,7 @@ export const OWNER_CHANGES = {
       const patch: Record<string, unknown> = { status: a.status };
       if (a.table_number) patch.table_number = a.table_number;
       const { error } = await db().from("reservations").update(patch).eq("id", a.id);
+      if (error?.code === "23P01") throw new ServiceError("That table is already booked around that time.", "unavailable");
       if (error) throw new ServiceError(error.message, "update_failed");
       return { message: `Reservation updated to ${a.status}.` };
     },
@@ -550,7 +550,3 @@ export const OWNER_CHANGES = {
 
 export type OwnerChangeName = keyof typeof OWNER_CHANGES;
 export const OWNER_CHANGE_NAMES = Object.keys(OWNER_CHANGES) as OwnerChangeName[];
-
-/** Today's range helper re-exported for the report route. */
-export const todayLabel = () => resolveRange("today").label;
-export { getOrderOwner };

@@ -83,7 +83,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
       <PageHeader title="Orders" description="Search, filter and open any order." actions={tabs} />
       <Panel
         className="overflow-hidden"
-        title={orders ? `${orders.length} order${orders.length === 1 ? "" : "s"}` : "Orders"}
+        title={orders ? `${orders.length === 200 ? "Latest " : ""}${orders.length} order${orders.length === 1 ? "" : "s"}` : "Orders"}
         description={RANGE_FILTERS.find((r) => r.value === range)?.label}
       >
         <OrdersFilters />
