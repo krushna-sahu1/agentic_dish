@@ -1,16 +1,11 @@
-import { SiteShell } from "@/components/site/SiteShell";
-
-// Live menu/availability and per-user session: never prerender.
+// Session-aware CTAs: never prerender.
 export const dynamic = "force-dynamic";
 
 /**
- * The home page gets full-bleed sections. `data-theme="ai"` only scopes the
- * shared chat-surface styles; colours come from the global design tokens.
+ * The home page is the owner-facing product landing page. It brings its own
+ * floating nav and one-line footer, so it does not use the restaurant SiteShell
+ * (no announcement bar, no site footer, no customer chat launcher).
  */
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div data-theme="ai">
-      <SiteShell bleed showChat={false}>{children}</SiteShell>
-    </div>
-  );
+  return <main id="main">{children}</main>;
 }
