@@ -99,7 +99,7 @@ export function AddToCartButton({
 
   return (
     <>
-      <Button size="sm" {...btn} disabled={!item.available || pending || btn.disabled} onClick={onClick} aria-label={`${label} ${item.name}`}>
+      <Button size="sm" {...btn} variant={btn.variant ?? "saffron"} disabled={!item.available || pending || btn.disabled} onClick={onClick} aria-label={`${label} ${item.name}`}>
         {!item.available ? "Sold out" : pending ? "Adding…" : label}
       </Button>
 
@@ -117,7 +117,7 @@ export function AddToCartButton({
                 <legend className="mb-2 text-sm font-medium">Size</legend>
                 <div className="flex flex-wrap gap-2">
                   {options.variants.map((v) => (
-                    <label key={v.id} className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                    <label key={v.id} className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-[:checked]:border-foreground has-[:checked]:bg-foreground/[0.04]">
                       <input type="radio" name="variant" className="accent-[var(--primary)]" checked={variant === v.id} onChange={() => setVariant(v.id)} />
                       {v.name}
                       {v.price_delta_paise !== 0 && <span className="text-muted-foreground">{v.price_delta_paise > 0 ? "+" : "−"}{formatINR(Math.abs(v.price_delta_paise))}</span>}
@@ -131,7 +131,7 @@ export function AddToCartButton({
                 <legend className="mb-2 text-sm font-medium">Add-ons</legend>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {options.addons.map((a) => (
-                    <label key={a.id} className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                    <label key={a.id} className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-[:checked]:border-foreground has-[:checked]:bg-foreground/[0.04]">
                       <input
                         type="checkbox"
                         className="accent-[var(--primary)]"
@@ -161,7 +161,7 @@ export function AddToCartButton({
                   <Plus />
                 </Button>
               </div>
-              <Button type="submit" disabled={pending}>
+              <Button type="submit" variant="saffron" disabled={pending}>
                 Add · {formatINR(unit * qty)}
               </Button>
             </div>

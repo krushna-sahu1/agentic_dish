@@ -32,7 +32,7 @@ export function Dialog({
       onClick={(e) => e.target === ref.current && onClose()}
       aria-label={title}
       className={cn(
-        "m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md rounded-3xl border bg-card p-0 text-card-foreground shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-[2px] open:animate-rise",
+        "m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md rounded-[24px] border bg-card p-0 text-card-foreground shadow-2xl backdrop:bg-[#14130f]/45 backdrop:backdrop-blur-[2px] open:animate-rise",
         className,
       )}
     >

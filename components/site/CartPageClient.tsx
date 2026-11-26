@@ -117,7 +117,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
         {cart.lines.map((l) => (
           <Card key={l.id} data-testid="cart-line" className={cn(!l.available && "border-destructive/40")}>
             <CardContent className="flex gap-4 p-3 sm:p-4">
-              <DishImage src={l.image_url} alt="" className="size-20 shrink-0 rounded-xl sm:size-24" />
+              <DishImage src={l.image_url} fallbackHint={l.name} alt="" className="size-20 shrink-0 rounded-xl sm:size-24" />
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <p className="flex items-center gap-2 font-medium">
@@ -224,7 +224,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
                     ))}
                   </Select>
                 ) : (
-                  <p className="text-muted-foreground">No saved addresses. <Link className="text-primary hover:underline" href="/profile#addresses">Add one</Link></p>
+                  <p className="text-muted-foreground">No saved addresses. <Link className="font-medium text-foreground underline underline-offset-4" href="/profile#addresses">Add one</Link></p>
                 )}
               </div>
             )}
@@ -280,13 +280,13 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
                 <Button type="submit" variant="outline">Apply</Button>
               </form>
             )}
-            {cart.coupon_message && <p className="text-xs text-amber-700 dark:text-amber-300">{cart.coupon_message}</p>}
-            {!cart.coupon_code && linkCouponNote && <p className="text-xs text-amber-700 dark:text-amber-300">{linkCouponNote}</p>}
+            {cart.coupon_message && <p className="text-xs text-warning">{cart.coupon_message}</p>}
+            {!cart.coupon_code && linkCouponNote && <p className="text-xs text-warning">{linkCouponNote}</p>}
             {!cart.coupon_code && coupons.length > 0 && (
               <ul className="space-y-1 text-xs text-muted-foreground">
                 {coupons.slice(0, 4).map((c) => (
                   <li key={c.code}>
-                    <button className="font-mono text-primary hover:underline" onClick={() => act(() => applyCouponAction(c.code), "Coupon applied")}>{c.code}</button> — {c.description}
+                    <button className="font-mono font-medium text-saffron-ink hover:underline" onClick={() => act(() => applyCouponAction(c.code), "Coupon applied")}>{c.code}</button> — {c.description}
                   </li>
                 ))}
               </ul>
@@ -316,7 +316,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
               {t.tipPaise > 0 && <Line k="Tip" v={t.tipPaise} />}
               <div className="mt-2 flex items-baseline justify-between border-t pt-3 text-base font-semibold">
                 <dt>Total</dt>
-                <dd className="font-display text-3xl font-normal tabular-nums" data-testid="cart-page-total">{formatINR(t.totalPaise)}</dd>
+                <dd className="font-display text-4xl tabular-nums" data-testid="cart-page-total">{formatINR(t.totalPaise)}</dd>
               </div>
             </dl>
             <Link href="/checkout" className={cn(buttonVariants({ size: "lg" }), "mt-5 w-full")}>Proceed to checkout <ArrowRight /></Link>

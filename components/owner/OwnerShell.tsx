@@ -112,7 +112,7 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
         <AlertsBellIcon count={unread.length} />
       </Button>
       {bellOpen && (
-        <div className="absolute right-0 z-50 mt-2 max-h-[70vh] w-[min(92vw,380px)] animate-rise overflow-auto rounded-2xl border bg-popover p-2 shadow-xl">
+        <div className="absolute right-0 z-50 mt-2 max-h-[70vh] w-[min(92vw,380px)] animate-rise overflow-auto rounded-[18px] border bg-popover p-2 shadow-[0_24px_48px_-20px_rgb(20_19_15/0.35)]">
           <div className="flex items-center justify-between px-2 py-1">
             <p className="text-sm font-semibold">Alerts</p>
             <Button
@@ -138,11 +138,11 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
 
   const sidebar = (
     <div className="flex h-full flex-col">
-      <Link href="/owner" className="flex items-center gap-2.5 px-3 pb-6 pt-1">
-        <LogoMark className="size-8" />
+      <Link href="/owner" className="flex items-center gap-2.5 px-2 pb-7 pt-1">
+        <LogoMark className="size-8" inverted />
         <span className="min-w-0">
-          <span className="block font-display text-2xl leading-none">{BRAND.name}</span>
-          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Dashboard</span>
+          <span className="block font-display text-lg leading-none">{BRAND.name}</span>
+          <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.16em] text-sidebar-muted">Kitchen OS</span>
         </span>
       </Link>
       <nav aria-label="Dashboard" className="grid gap-0.5">
@@ -154,14 +154,14 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
               href={n.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-                active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                "flex h-10 items-center gap-3 rounded-[10px] px-3 text-sm transition-colors",
+                active ? "bg-sidebar-foreground font-medium text-sidebar" : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground",
               )}
             >
               <n.icon className="size-4" aria-hidden />
               <span className="flex-1">{n.label}</span>
               {!!n.count && (
-                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums", active ? "bg-primary text-primary-foreground" : "bg-primary/12 text-primary")}>
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-saffron px-1.5 font-mono text-[11px] font-semibold tabular-nums text-saffron-foreground">
                   {n.count}
                 </span>
               )}
@@ -171,28 +171,28 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
       </nav>
       <div className="mt-auto space-y-3 pt-6">
         {kpis && (
-          <div className="rounded-2xl border bg-background/60 p-3 text-xs" aria-live="polite">
+          <div className="rounded-[14px] border border-sidebar-border bg-sidebar-accent p-3.5 text-xs" aria-live="polite">
             <p className="flex items-center gap-2 font-medium">
               <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-success" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#3fcb7e] opacity-60" />
+                <span className="relative inline-flex size-2 rounded-full bg-[#3fcb7e]" />
               </span>
               Live
             </p>
-            <p className="mt-1 text-muted-foreground">
+            <p className="mt-1.5 font-mono text-sidebar-muted">
               {kpis.active_orders} active · {kpis.orders_today} today
             </p>
           </div>
         )}
-        <div className="flex items-center gap-2 border-t px-1 pt-3">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold uppercase">{(name ?? role).slice(0, 1)}</span>
+        <div className="flex items-center gap-2 border-t border-sidebar-border px-1 pt-3">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold uppercase">{(name ?? role).slice(0, 1)}</span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-medium">{name ?? "Team member"}</span>
-            <span className="block text-xs capitalize text-muted-foreground">{role}</span>
+            <span className="block text-xs capitalize text-sidebar-muted">{role}</span>
           </span>
-          <ThemeToggle />
+          <ThemeToggle className="text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground" />
         </div>
-        <Link href="/" className="flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground">
+        <Link href="/" className="flex items-center justify-center gap-1.5 rounded-[10px] px-3 py-2 text-xs text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground">
           View website <ExternalLink className="size-3" aria-hidden />
         </Link>
       </div>
@@ -202,14 +202,14 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
   return (
     <div className="flex h-dvh bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r bg-card/50 p-4 lg:block">{sidebar}</aside>
+      <aside className="hidden w-[248px] shrink-0 bg-sidebar p-4 text-sidebar-foreground lg:block">{sidebar}</aside>
 
       {/* Mobile drawer */}
       {navOpen && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Dashboard navigation">
           <button className="absolute inset-0 animate-fade bg-black/40" aria-label="Close navigation" onClick={() => setNavOpen(false)} />
-          <aside className="relative h-full w-72 max-w-[85vw] animate-rise border-r bg-background p-4 shadow-2xl">
-            <Button variant="ghost" size="icon" className="absolute right-3 top-3" aria-label="Close navigation" onClick={() => setNavOpen(false)}>
+          <aside className="relative h-full w-72 max-w-[85vw] animate-rise bg-sidebar p-4 text-sidebar-foreground shadow-2xl">
+            <Button variant="ghost" size="icon" className="absolute right-3 top-3 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground" aria-label="Close navigation" onClick={() => setNavOpen(false)}>
               <X />
             </Button>
             {sidebar}
@@ -218,12 +218,26 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur sm:px-6 lg:h-16">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-card px-3 sm:px-6 lg:h-16">
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={() => setNavOpen(true)}>
             <MenuIcon />
           </Button>
-          <p className="text-sm font-medium">{current?.label ?? "Dashboard"}</p>
-          <div className="ml-auto flex items-center gap-1">{bell}</div>
+          <p className="text-sm text-muted-foreground">
+            <span className="hidden sm:inline">Dashboard <span className="text-input">/</span> </span>
+            <span className="font-medium text-foreground">{current?.label ?? "Dashboard"}</span>
+          </p>
+          <div className="ml-auto flex items-center gap-2">
+            {current?.href !== "/owner/assistant" && (
+              <Link
+                href="/owner/assistant"
+                className="hidden h-10 w-72 items-center gap-2.5 rounded-xl border bg-background px-3.5 text-sm text-muted-foreground transition-colors hover:border-iris/40 md:flex"
+              >
+                <Sparkles className="size-4 text-iris" aria-hidden />
+                <span className="flex-1 truncate">Ask the assistant…</span>
+              </Link>
+            )}
+            {bell}
+          </div>
         </header>
         <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           <p className="sr-only">

@@ -63,7 +63,7 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
     <header
       className={cn(
         "sticky top-0 z-40 transition-[background-color,border-color,box-shadow] duration-300",
-        scrolled || mobileOpen ? "border-b bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70" : "border-b border-transparent",
+        scrolled || mobileOpen ? "border-b bg-background/85 backdrop-blur-xl supports-[backdrop-filter]:bg-background/75" : "border-b border-transparent bg-background/0",
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:h-[72px] sm:px-6">
@@ -96,23 +96,23 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
             {statusLabel}
           </span>
           {showChat ? (
-            <Button variant="ghost" size="sm" className="hidden h-9 sm:inline-flex" onClick={() => openChat()}>
-              <Sparkles className="text-primary" /> Ask AI
+            <Button variant="iris-soft" size="sm" className="hidden sm:inline-flex" onClick={() => openChat()}>
+              <Sparkles /> Ask AI
             </Button>
           ) : (
-            <Link href={session ? "/menu" : "/signup"} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden h-9 sm:inline-flex")}>
+            <Link href={session ? "/menu" : "/signup"} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}>
               {session ? "Order now" : "Sign up"}
             </Link>
           )}
           <ThemeToggle />
           <Link
             href="/cart"
-            className={cn(buttonVariants({ variant: count > 0 ? "dark" : "ghost", size: count > 0 ? "sm" : "icon" }), count > 0 && "h-9 gap-1.5 px-3")}
+            className={cn(buttonVariants({ variant: count > 0 ? "dark" : "ghost", size: count > 0 ? "sm" : "icon" }), count > 0 && "gap-1.5 px-3")}
             aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
           >
             <ShoppingBag />
             {count > 0 && (
-              <span data-testid="cart-count" className="tabular-nums">
+              <span data-testid="cart-count" className="font-mono tabular-nums">
                 {count}
               </span>
             )}
@@ -123,11 +123,11 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
                 <User />
               </Button>
               {userOpen && (
-                <div role="menu" className="absolute right-0 mt-2 w-60 animate-rise rounded-2xl border bg-popover p-1.5 shadow-xl" onClick={() => setUserOpen(false)}>
+                <div role="menu" className="absolute right-0 mt-2 w-60 animate-rise rounded-[18px] border bg-popover p-1.5 shadow-[0_24px_48px_-20px_rgb(20_19_15/0.35)]" onClick={() => setUserOpen(false)}>
                   <p className="truncate px-3 pb-2 pt-1.5 text-xs text-muted-foreground">{session.name ?? session.email}</p>
                   {(session.role === "owner" || session.role === "staff") && (
                     <Link role="menuitem" href="/owner" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium hover:bg-accent">
-                      <LayoutDashboard className="size-4 text-primary" /> Dashboard
+                      <LayoutDashboard className="size-4" /> Dashboard
                     </Link>
                   )}
                   {[
@@ -150,7 +150,7 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
               )}
             </div>
           ) : (
-            <Link href={`/login?next=${encodeURIComponent(pathname)}`} className={cn(buttonVariants({ size: "sm" }), "ml-1 hidden h-9 sm:inline-flex")}>
+            <Link href={`/login?next=${encodeURIComponent(pathname)}`} className={cn(buttonVariants({ size: "sm" }), "ml-1 hidden sm:inline-flex")}>
               Log in
             </Link>
           )}
@@ -179,6 +179,7 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
             {showChat ? (
               <Button
                 size="lg"
+                variant="iris"
                 onClick={() => {
                   setMobileOpen(false);
                   openChat();

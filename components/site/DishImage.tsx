@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { dishArt } from "./dish-art";
 
-/** Dish photo with a graceful fallback to the placeholder illustration. */
-export function DishImage({ src, alt, className, priority }: { src: string | null; alt: string; className?: string; priority?: boolean }) {
+/** Dish photo with a graceful fallback: the dish's category illustration, then the placeholder. */
+export function DishImage({ src, alt, className, priority, fallbackHint }: { src: string | null; alt: string; className?: string; priority?: boolean; fallbackHint?: string | null }) {
   const [failed, setFailed] = useState(false);
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={!src || failed ? "/dishes/placeholder.svg" : src}
+      src={!src || failed ? dishArt(fallbackHint) : src}
       alt={alt}
       loading={priority ? "eager" : "lazy"}
       decoding="async"

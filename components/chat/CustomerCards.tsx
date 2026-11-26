@@ -43,7 +43,7 @@ function MiniDish({ d }: { d: Dish }) {
   return (
     <article className="flex w-44 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card shadow-[0_1px_2px_rgb(0_0_0/0.04),0_14px_30px_-26px_rgb(0_0_0/0.55)]" data-testid="mini-dish" data-dish={d.slug}>
       <Link href={`/menu/${d.slug}`} className="relative">
-        <DishImage src={d.image_url} alt="" className={cn("aspect-[4/3]", !d.available && "grayscale")} />
+        <DishImage src={d.image_url} fallbackHint={d.name} alt="" className={cn("aspect-[4/3]", !d.available && "grayscale")} />
         {!d.available && <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs font-semibold text-white">SOLD OUT</span>}
       </Link>
       <div className="flex flex-1 flex-col gap-1 p-2">
@@ -55,7 +55,7 @@ function MiniDish({ d }: { d: Dish }) {
           <SpiceLevel level={d.spice_level} />
           {d.rating ? (
             <span className="flex items-center gap-0.5">
-              <Star className="size-3 fill-amber-400 text-amber-400" />
+              <Star className="size-3 fill-saffron text-saffron" />
               {Number(d.rating).toFixed(1)}
             </span>
           ) : null}
@@ -97,7 +97,7 @@ export function ComboSuggestionCard({ combo }: { combo: Combo }) {
     });
   return (
     <CardShell
-      title={<span className="flex items-center gap-2"><Utensils className="size-4 text-primary" /> {combo.title}</span>}
+      title={<span className="flex items-center gap-2"><Utensils className="size-4 text-saffron-ink" /> {combo.title}</span>}
       footer={
         <>
           <Button size="sm" className="h-9" onClick={addAll} disabled={pending || added} data-testid="add-all">
@@ -243,7 +243,7 @@ export function CartSummaryCard({ cart, headline }: { cart: CompactCart; headlin
         {t.tipPaise > 0 && <Row k="Tip" v={t.tipPaise} />}
       </dl>
       {[...cart.warnings, ...(cart.coupon_message ? [cart.coupon_message] : [])].map((w, i) => (
-        <p key={i} className="mt-1 text-xs text-amber-700 dark:text-amber-300">{w}</p>
+        <p key={i} className="mt-1 text-xs text-warning">{w}</p>
       ))}
     </CardShell>
   );
@@ -373,7 +373,7 @@ export function OrderStatusCard({ data }: { data: OrderStatusData }) {
         <ol className="mb-2 flex items-center gap-1" aria-label="Order progress">
           {steps.map((s, i) => (
             <li key={s} className="flex flex-1 flex-col items-center gap-1">
-              <span className={cn("h-1.5 w-full rounded-full", i <= idx ? "bg-primary" : "bg-muted")} />
+              <span className={cn("h-1.5 w-full rounded-full", i <= idx ? "bg-saffron" : "bg-muted")} />
               <span className={cn("text-[10px] capitalize", i === idx ? "font-semibold text-foreground" : "text-muted-foreground")}>{s.replace(/_/g, " ")}</span>
             </li>
           ))}
@@ -381,7 +381,7 @@ export function OrderStatusCard({ data }: { data: OrderStatusData }) {
       )}
       {eta && !terminal && status !== "completed" && (
         <p className="flex items-center gap-1.5 text-sm">
-          <Clock className="size-4 text-primary" /> Ready around <b>{formatTime(eta)}</b>
+          <Clock className="size-4 text-saffron-ink" /> Ready around <b>{formatTime(eta)}</b>
         </p>
       )}
       <p className="mt-1 text-xs text-muted-foreground">{data.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}</p>

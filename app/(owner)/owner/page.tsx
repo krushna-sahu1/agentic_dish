@@ -55,7 +55,7 @@ export default async function OwnerOverviewPage() {
             <Link href="/owner/orders?view=board" className={buttonVariants({ variant: "outline" })}>
               Live board
             </Link>
-            <Link href="/owner/assistant" className={buttonVariants()}>
+            <Link href="/owner/assistant" className={buttonVariants({ variant: "iris" })}>
               <Sparkles /> Ask the assistant
             </Link>
           </>
@@ -63,9 +63,15 @@ export default async function OwnerOverviewPage() {
       />
 
       {summary && (
-        <details className="mb-6 rounded-2xl border bg-card px-5 py-4 text-sm" open>
-          <summary className="cursor-pointer font-medium">{summary.title}</summary>
-          <ul className="mt-2 list-disc space-y-0.5 pl-5 text-muted-foreground">
+        <details className="group mb-6 rounded-[18px] border border-iris-line bg-iris-soft px-5 py-4 text-sm" open>
+          <summary className="flex cursor-pointer list-none items-center gap-3 font-semibold text-iris-ink [&::-webkit-details-marker]:hidden">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-iris text-iris-foreground">
+              <Sparkles className="size-4" aria-hidden />
+            </span>
+            <span className="flex-1">{summary.title}</span>
+            <span className="font-mono text-xs font-normal opacity-70 group-open:hidden">Show</span>
+          </summary>
+          <ul className="mt-3 list-disc space-y-1 pl-16 text-iris-ink/90 marker:text-iris/60">
             {(summary.data?.lines ?? []).map((l, i) => (
               <li key={i}>{l}</li>
             ))}
@@ -85,7 +91,7 @@ export default async function OwnerOverviewPage() {
             highlight={kpis.new_orders_waiting > 0}
             hint={
               kpis.new_orders_waiting > 0 ? (
-                <Link href="/owner/orders?view=board" className="font-medium text-primary hover:underline">
+                <Link href="/owner/orders?view=board" className="font-medium text-saffron-ink hover:underline">
                   {kpis.new_orders_waiting} waiting to be accepted →
                 </Link>
               ) : (
@@ -131,7 +137,7 @@ export default async function OwnerOverviewPage() {
           </Panel>
         )}
 
-        <Panel title="Top dishes" description={`Last 7 days · by ${isOwner ? "revenue" : "portions sold"}`} action={<Link href="/owner/menu" className="text-xs font-medium text-primary hover:underline">Menu →</Link>}>
+        <Panel title="Top dishes" description={`Last 7 days · by ${isOwner ? "revenue" : "portions sold"}`} action={<Link href="/owner/menu" className="text-[13px] text-muted-foreground hover:text-foreground hover:underline">Menu →</Link>}>
           {top ? (
             top.items.length ? (
               <ol className="space-y-4 px-5 pb-5 pt-1">
@@ -140,12 +146,12 @@ export default async function OwnerOverviewPage() {
                   return (
                     <li key={i.menu_item_id}>
                       <div className="flex items-baseline gap-3 text-sm">
-                        <span className="w-4 font-display text-lg text-muted-foreground">{idx + 1}</span>
+                        <span className="w-4 font-mono text-xs text-muted-foreground">{idx + 1}</span>
                         <span className="min-w-0 flex-1 truncate font-medium">{i.name}</span>
-                        <span className="tabular-nums text-muted-foreground">{isOwner ? formatINR(i.revenue_paise) : `${formatNumber(i.qty)} sold`}</span>
+                        <span className="font-mono text-[13px] tabular-nums text-muted-foreground">{isOwner ? formatINR(i.revenue_paise) : `${formatNumber(i.qty)} sold`}</span>
                       </div>
                       <div className="ml-7 mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted" aria-hidden>
-                        <div className="h-full rounded-full bg-chart-1" style={{ width: `${Math.max(4, (v / maxTop) * 100)}%` }} />
+                        <div className="h-full rounded-full bg-saffron" style={{ width: `${Math.max(4, (v / maxTop) * 100)}%` }} />
                       </div>
                     </li>
                   );

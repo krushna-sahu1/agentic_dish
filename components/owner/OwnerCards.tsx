@@ -381,7 +381,7 @@ export function OrderListCard({ title, orders }: { title: string; orders: OwnerO
     <figure className="my-2 w-full rounded-xl border bg-card p-3 shadow-sm">
       <figcaption className="mb-2 flex items-center justify-between text-sm font-semibold">
         {title}
-        <Link href="/owner/orders" className="text-xs font-normal text-primary hover:underline">Open live board →</Link>
+        <Link href="/owner/orders" className="text-xs font-normal text-saffron-ink hover:underline">Open live board →</Link>
       </figcaption>
       {orders.length === 0 ? <p className="text-sm text-muted-foreground">No orders.</p> : <div className="grid max-h-80 gap-2 overflow-auto sm:grid-cols-2">{orders.slice(0, 20).map((o) => <OrderCard key={o.order_number} o={o} />)}</div>}
     </figure>
@@ -393,8 +393,8 @@ export function AlertCard({ alerts }: { alerts: { id: string; title: string; bod
   return (
     <ul className="my-2 w-full space-y-1.5">
       {alerts.slice(0, 10).map((a) => (
-        <li key={a.id} className={cn("flex gap-2 rounded-lg border p-2 text-sm", a.severity === "critical" ? "border-destructive/50 bg-destructive/5" : a.severity === "warning" ? "border-amber-500/40 bg-amber-500/5" : "")}>
-          {a.severity === "info" ? <Info className="mt-0.5 size-4 shrink-0 text-primary" aria-label="Info" /> : <AlertTriangle className={cn("mt-0.5 size-4 shrink-0", a.severity === "critical" ? "text-destructive" : "text-amber-600")} aria-label={a.severity} />}
+        <li key={a.id} className={cn("flex gap-2 rounded-lg border p-2 text-sm", a.severity === "critical" ? "border-destructive/50 bg-destructive/5" : a.severity === "warning" ? "border-warning/40 bg-warning/5" : "")}>
+          {a.severity === "info" ? <Info className="mt-0.5 size-4 shrink-0 text-info" aria-label="Info" /> : <AlertTriangle className={cn("mt-0.5 size-4 shrink-0", a.severity === "critical" ? "text-destructive" : "text-warning")} aria-label={a.severity} />}
           <div>
             <p className="font-medium">{a.title}</p>
             {a.body && <p className="whitespace-pre-line text-xs text-muted-foreground">{strip(a.body) as string}</p>}
@@ -409,7 +409,7 @@ export function AlertCard({ alerts }: { alerts: { id: string; title: string; bod
 export function ReportCard({ label, summary, downloads }: { label: string; summary: { revenue_paise: number; orders: number; aov_paise: number; change_percent: number | null; avg_rating: number | null }; downloads: { csv: string; pdf: string } }) {
   return (
     <figure className="my-2 w-full rounded-xl border bg-card p-3 shadow-sm" data-testid="report-card">
-      <figcaption className="flex items-center gap-2 text-sm font-semibold"><FileText className="size-4 text-primary" /> Report · {label}</figcaption>
+      <figcaption className="flex items-center gap-2 text-sm font-semibold"><FileText className="size-4 text-iris" /> Report · {label}</figcaption>
       <dl className="mt-2 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
         <div><dt className="text-xs text-muted-foreground">Revenue</dt><dd className="font-semibold">{formatINR(summary.revenue_paise)}</dd></div>
         <div><dt className="text-xs text-muted-foreground">Orders</dt><dd className="font-semibold">{formatNumber(summary.orders)}</dd></div>

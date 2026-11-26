@@ -93,7 +93,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
         }
       />
 
-      <section className="overflow-hidden rounded-2xl border bg-card" aria-label="Dishes">
+      <section className="overflow-hidden rounded-[18px] border bg-card" aria-label="Dishes">
         <div className="flex flex-wrap items-center gap-2 p-4">
           <div className="relative min-w-48 flex-1 sm:max-w-72">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
@@ -133,7 +133,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
                   data-dish={i.name}
                   className={cn("grid grid-cols-[56px_1fr_auto] items-center gap-x-4 gap-y-3 px-4 py-3 md:grid-cols-[56px_minmax(0,1.6fr)_110px_130px_150px_auto]", !i.is_available && "bg-destructive/[0.03]")}
                 >
-                  <DishImage src={i.image_url} alt="" className={cn("size-14 rounded-xl", !i.is_available && "grayscale")} />
+                  <DishImage src={i.image_url} fallbackHint={`${i.name} ${i.category}`} alt="" className={cn("size-14 rounded-xl", !i.is_available && "grayscale")} />
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 font-medium">
                       <VegMark veg={i.is_veg} /> <span className="truncate">{i.name}</span>
@@ -142,7 +142,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
                       {i.category} · {i.sold_30d} sold in 30d
                     </p>
                   </div>
-                  <p className="text-right font-medium tabular-nums md:text-left">{formatINR(i.price_paise)}</p>
+                  <p className="text-right font-mono font-medium tabular-nums md:text-left">{formatINR(i.price_paise)}</p>
 
                   <div className="col-span-3 flex flex-wrap items-center gap-x-3 gap-y-2 md:contents">
                   <label className="mr-auto inline-flex cursor-pointer items-center gap-2 md:mr-0">
@@ -171,13 +171,13 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
                       name="stock"
                       type="number"
                       min={0}
-                      className={cn("h-8 w-20", low && "border-warning")}
+                      className={cn("h-9 w-20 font-mono", low && "border-saffron bg-saffron-soft/50")}
                       defaultValue={i.stock_qty ?? ""}
                       placeholder="∞"
                       aria-label={`${i.name} portions left`}
                       title="Portions left (empty = unlimited)"
                     />
-                    <Button size="sm" variant="outline" className="h-8" disabled={pending}>
+                    <Button size="sm" variant="outline" disabled={pending}>
                       Save
                     </Button>
                   </form>
@@ -221,7 +221,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
           </ul>
         )}
       </section>
-      {isOwner && <p className="-mt-6 text-xs text-muted-foreground">Tip: the AI assistant can do bulk edits — &ldquo;increase all dosa prices by 10%&rdquo; or &ldquo;set pairings for dalma&rdquo;.</p>}
+      {isOwner && <p className="-mt-6 text-xs text-iris-ink">Tip: the AI assistant can do bulk edits — &ldquo;increase all dosa prices by 10%&rdquo; or &ldquo;set pairings for dalma&rdquo;.</p>}
 
       <section aria-labelledby="inventory">
         <div className="mb-4 flex items-end justify-between">
@@ -237,7 +237,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
             {inventory.map((inv) => (
               <form
                 key={inv.id}
-                className={cn("flex items-center gap-3 rounded-2xl border bg-card p-3.5 text-sm", inv.is_low && "border-warning/50 bg-warning/[0.06]")}
+                className={cn("flex items-center gap-3 rounded-[16px] border bg-card p-3.5 text-sm", inv.is_low && "border-saffron/50 bg-saffron-soft/60")}
                 onSubmit={(e) => {
                   e.preventDefault();
                   run("update_inventory", { inventory_ref: inv.id, qty: Number(new FormData(e.currentTarget).get("qty")) }, inv.id);
@@ -246,15 +246,15 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2 font-medium">
                     <span className="truncate">{inv.name}</span>
-                    {inv.is_low && <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[11px] text-warning">Low</span>}
+                    {inv.is_low && <span className="rounded-full bg-saffron px-2 py-0.5 text-[11px] font-medium text-saffron-foreground">Low</span>}
                   </span>
                   <span className="block text-xs text-muted-foreground">
                     Flag below {inv.low_threshold} {inv.unit}
                   </span>
                 </span>
-                <Input name="qty" type="number" step="0.1" min={0} className="h-8 w-20" defaultValue={inv.qty} aria-label={`${inv.name} quantity in ${inv.unit}`} />
+                <Input name="qty" type="number" step="0.1" min={0} className="h-9 w-20 font-mono" defaultValue={inv.qty} aria-label={`${inv.name} quantity in ${inv.unit}`} />
                 <span className="w-6 text-xs text-muted-foreground">{inv.unit}</span>
-                <Button size="sm" variant="outline" className="h-8" disabled={pending}>
+                <Button size="sm" variant="outline" disabled={pending}>
                   {busyId === inv.id ? <Loader2 className="animate-spin" /> : "Save"}
                 </Button>
               </form>

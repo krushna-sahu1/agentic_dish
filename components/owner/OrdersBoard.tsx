@@ -15,11 +15,11 @@ import { formatTime } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 const COLUMNS = [
-  { status: "paid", title: "New" },
-  { status: "accepted", title: "Accepted" },
-  { status: "preparing", title: "Preparing" },
-  { status: "ready", title: "Ready" },
-  { status: "out_for_delivery", title: "Out for delivery" },
+  { status: "paid", title: "New", dot: "bg-iris" },
+  { status: "accepted", title: "Accepted", dot: "bg-info" },
+  { status: "preparing", title: "Preparing", dot: "bg-saffron" },
+  { status: "ready", title: "Ready", dot: "bg-success" },
+  { status: "out_for_delivery", title: "Out for delivery", dot: "bg-foreground/50" },
 ] as const;
 
 const ACTION_LABEL: Record<string, string> = { accepted: "Accept", preparing: "Start preparing", ready: "Mark ready", out_for_delivery: "Out for delivery", completed: "Complete" };
@@ -59,66 +59,68 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid min-h-[60vh] flex-1 auto-cols-[minmax(260px,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2">
+      <div className="grid min-h-[60vh] flex-1 auto-cols-[minmax(264px,1fr)] grid-flow-col gap-3.5 overflow-x-auto pb-2">
         {COLUMNS.map((col) => {
           const orders = data.active.filter((o) => o.status === col.status).sort((a, b) => a.created_at.localeCompare(b.created_at));
           return (
-            <section key={col.status} aria-label={col.title} className="flex min-h-0 flex-col rounded-2xl bg-muted/60 p-2.5">
-              <h2 className="mb-2.5 flex items-center justify-between px-1.5 text-sm font-medium">
-                {col.title} <span className="rounded-full bg-card px-2 py-0.5 text-xs tabular-nums">{orders.length}</span>
+            <section key={col.status} aria-label={col.title} className={cn("flex min-h-0 flex-col rounded-[18px] border p-3", col.status === "paid" ? "border-iris-line bg-iris-soft" : "border-transparent bg-muted/70")}>
+              <h2 className="mb-3 flex items-center gap-2 px-1 text-sm font-semibold">
+                <span className={cn("size-2 rounded-full", col.dot)} aria-hidden />
+                <span className="flex-1">{col.title}</span>
+                <span className="rounded-md border bg-card px-2 py-0.5 font-mono text-xs tabular-nums">{orders.length}</span>
               </h2>
-              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
+              <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto">
                 {orders.map((o) => (
-                  <article key={o.id} data-testid="board-order" data-order={o.order_number} className={cn("animate-rise rounded-xl border bg-card p-3 text-sm shadow-sm", col.status === "paid" && "border-primary/60 ring-1 ring-primary/30")}>
+                  <article key={o.id} data-testid="board-order" data-order={o.order_number} className={cn("animate-rise rounded-[14px] border bg-card p-3.5 text-sm", col.status === "paid" && "border-iris shadow-[0_0_0_3px_color-mix(in_oklab,var(--iris)_14%,transparent)]")}>
                     <div className="flex items-center justify-between">
-                      <Link href={`/owner/orders/${o.id}`} className="text-base font-semibold hover:underline">#{o.order_number.split("-").pop()}</Link>
-                      <span className={cn("flex items-center gap-1 text-xs", o.minutes_in_status > 20 ? "font-semibold text-destructive" : "text-muted-foreground")}>
+                      <Link href={`/owner/orders/${o.id}`} className="font-mono text-base font-semibold hover:underline">#{o.order_number.split("-").pop()}</Link>
+                      <span className={cn("flex items-center gap-1 font-mono text-xs", o.minutes_in_status > 20 ? "font-semibold text-destructive" : "text-muted-foreground")}>
                         <Clock className="size-3" /> {o.minutes_in_status}m
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {o.order_type.replace("_", "-")}{o.table_number ? ` · Table ${o.table_number}` : ""} · {formatINR(o.total_paise)} · {o.customer_name ?? ""}
                     </p>
-                    <ul className="mt-1.5 space-y-0.5">
+                    <ul className="mt-2.5 space-y-1 border-t border-dashed pt-2.5">
                       {o.items.map((i, k) => (
                         <li key={k}>
-                          <b>{i.qty}×</b> {i.name_snapshot}
+                          <b className="font-mono text-saffron-ink">{i.qty}×</b> {i.name_snapshot}
                           {(i.variant_snapshot || i.addons_snapshot?.length || i.special_instructions) && (
                             <span className="block pl-4 text-xs text-warning">{[i.variant_snapshot?.name, ...(i.addons_snapshot ?? []).map((a) => `+${a.name}`), strip(i.special_instructions)].filter(Boolean).join(" · ")}</span>
                           )}
                         </li>
                       ))}
                     </ul>
-                    {o.notes && <p className="mt-1.5 rounded-lg bg-muted px-2 py-1 text-xs">Note: {strip(o.notes)}</p>}
-                    {o.scheduled_for && <p className="mt-1 text-xs text-primary">Scheduled {formatTime(o.scheduled_for)}</p>}
+                    {o.notes && <p className="mt-2 rounded-lg bg-warning/10 px-2 py-1.5 text-xs text-warning">Note: {strip(o.notes)}</p>}
+                    {o.scheduled_for && <p className="mt-1 text-xs font-medium text-info">Scheduled {formatTime(o.scheduled_for)}</p>}
                     {o.estimated_ready_at && col.status !== "paid" && <p className="mt-1 text-xs text-muted-foreground">ETA {formatTime(o.estimated_ready_at)}</p>}
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    <div className="mt-3 flex flex-wrap items-center gap-1.5">
                       {col.status === "paid" && (
-                        <select aria-label="Ready in minutes" className="h-8 rounded-full border bg-card px-2 text-xs" value={eta[o.id] ?? 20} onChange={(e) => setEta({ ...eta, [o.id]: Number(e.target.value) })}>
+                        <select aria-label="Ready in minutes" className="h-9 rounded-[10px] border bg-card px-2 text-xs" value={eta[o.id] ?? 20} onChange={(e) => setEta({ ...eta, [o.id]: Number(e.target.value) })}>
                           {[10, 15, 20, 30, 45].map((m) => <option key={m} value={m}>{m} min</option>)}
                         </select>
                       )}
                       {o.next_statuses.filter((s) => s !== "cancelled" && (s !== "out_for_delivery" || o.order_type === "delivery")).slice(0, 2).map((s) => (
-                        <Button key={s} size="sm" className="h-8" variant={s === o.next_statuses[0] ? "default" : "outline"} disabled={pending} onClick={() => move(o, s)}>
+                        <Button key={s} size="sm" variant={s === o.next_statuses[0] ? "default" : "outline"} disabled={pending} onClick={() => move(o, s)}>
                           {ACTION_LABEL[s]}
                         </Button>
                       ))}
                       {o.next_statuses.includes("cancelled") && (
-                        <Button size="icon" variant="ghost" className="ml-auto size-8 text-destructive" aria-label={`Cancel ${o.order_number}`} onClick={() => { setCancel(o); setReason(""); }}>
+                        <Button size="icon" variant="ghost" className="ml-auto size-9 text-destructive" aria-label={`Cancel ${o.order_number}`} onClick={() => { setCancel(o); setReason(""); }}>
                           <X />
                         </Button>
                       )}
                     </div>
                   </article>
                 ))}
-                {orders.length === 0 && <p className="rounded-xl border border-dashed px-2 py-6 text-center text-xs text-muted-foreground">No orders</p>}
+                {orders.length === 0 && <p className="rounded-[14px] border border-dashed border-input px-2 py-8 text-center text-xs text-muted-foreground">Nothing here</p>}
               </div>
             </section>
           );
         })}
       </div>
       {data.recent.length > 0 && (
-        <details className="mt-3 rounded-2xl border bg-card px-4 py-3 text-sm">
+        <details className="mt-3 rounded-[18px] border bg-card px-4 py-3 text-sm">
           <summary className="cursor-pointer font-medium">Done today ({data.recent.length})</summary>
           <ul className="mt-1 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2 lg:grid-cols-3">
             {data.recent.map((o) => <li key={o.id}><Link className="hover:underline" href={`/owner/orders/${o.id}`}>{o.order_number}</Link> · {STATUS_LABEL[o.status]} · {formatINR(o.total_paise)}</li>)}

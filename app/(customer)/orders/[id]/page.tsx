@@ -23,14 +23,17 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   }
   const o = d.order;
   return (
-    <div className="mx-auto max-w-3xl space-y-6 py-6">
+    <div className="mx-auto max-w-3xl space-y-6 pb-10 pt-10 sm:pt-14">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-display text-4xl sm:text-5xl">{o.order_number}</h1>
+        <div>
+          <p className="eyebrow">Order</p>
+          <h1 className="mt-2 font-mono text-3xl font-semibold tracking-tight sm:text-4xl">{o.order_number}</h1>
+        </div>
         <ReorderButton orderId={o.id} />
       </div>
       <OrderTracker orderId={o.id} orderType={o.order_type} initialStatus={o.status} initialEta={o.estimated_ready_at} initialEvents={d.events.map((e) => ({ status: e.status, at: e.created_at, note: e.note }))} />
-      <section className="rounded-xl border bg-card p-4">
-        <h2 className="mb-2 font-semibold">Items</h2>
+      <section className="rounded-[20px] border bg-card p-5 sm:p-6">
+        <h2 className="mb-2 text-base font-semibold">Items</h2>
         <ul className="divide-y text-sm">
           {d.items.map((i) => (
             <li key={i.id} className="flex justify-between gap-2 py-2">

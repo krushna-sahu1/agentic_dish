@@ -17,8 +17,8 @@ const STATE: Record<JarvisStatus, { color: [number, number, number]; intensity: 
   idle: { color: [0.78, 0.82, 0.9], intensity: 0.45, swirl: 0, speed: 0.25 },
   connecting: { color: [0.55, 0.6, 0.95], intensity: 0.6, swirl: 0.6, speed: 0.6 },
   listening: { color: [0.2, 1.0, 0.55], intensity: 0.95, swirl: 0, speed: 0.5 },
-  thinking: { color: [0.45, 0.4, 1.0], intensity: 0.95, swirl: 1.4, speed: 1.2 },
-  speaking: { color: [1.0, 0.55, 0.15], intensity: 1.1, swirl: 0.2, speed: 0.8 },
+  thinking: { color: [0.42, 0.35, 1.0], intensity: 0.95, swirl: 1.4, speed: 1.2 },
+  speaking: { color: [1.0, 0.48, 0.18], intensity: 1.1, swirl: 0.2, speed: 0.8 },
 };
 
 const vertex = /* glsl */ `

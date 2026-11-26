@@ -1,16 +1,16 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-type Variant = "default" | "success" | "warning" | "info" | "destructive" | "muted";
+type Variant = "default" | "success" | "warning" | "info" | "destructive" | "muted" | "saffron" | "iris" | "ink";
 
 const STATUS: Record<string, { label: string; variant: Variant }> = {
   awaiting_payment: { label: "Awaiting payment", variant: "muted" },
-  paid: { label: "New", variant: "warning" },
+  paid: { label: "New", variant: "iris" },
   accepted: { label: "Accepted", variant: "info" },
-  preparing: { label: "Preparing", variant: "info" },
-  ready: { label: "Ready", variant: "default" },
-  out_for_delivery: { label: "Out for delivery", variant: "default" },
-  completed: { label: "Completed", variant: "success" },
+  preparing: { label: "Preparing", variant: "saffron" },
+  ready: { label: "Ready", variant: "success" },
+  out_for_delivery: { label: "Out for delivery", variant: "info" },
+  completed: { label: "Completed", variant: "ink" },
   cancelled: { label: "Cancelled", variant: "destructive" },
   refunded: { label: "Refunded", variant: "muted" },
   payment_failed: { label: "Payment failed", variant: "destructive" },

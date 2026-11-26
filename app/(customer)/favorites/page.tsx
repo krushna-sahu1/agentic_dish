@@ -14,8 +14,8 @@ export default async function FavoritesPage() {
   const [ids, menu] = await Promise.all([favoriteIds(user.userId), getMenu()]);
   const items = ids.map((id) => menu.byId.get(id)).filter((i) => !!i);
   return (
-    <div className="py-6">
-      <h1 className="mb-4 font-display text-4xl sm:text-5xl">Your favourites</h1>
+    <div className="pb-10 pt-10 sm:pt-14">
+      <h1 className="mb-8 font-display text-[2.6rem] leading-[1] sm:text-6xl">Your favourites</h1>
       {items.length === 0 ? (
         <p className="text-muted-foreground">
           Nothing saved yet. Tap the heart on any <Link href="/menu" className="text-primary hover:underline">dish</Link>.

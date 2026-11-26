@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { AuthFrame } from "@/components/site/AuthFrame";
 import { SignupForm } from "@/components/site/AuthForms";
 
 export const metadata: Metadata = { title: "Sign up" };
 
 export default function Page() {
   return (
-    <div className="mx-auto max-w-sm py-12">
-      <h1 className="mb-6 font-display text-4xl sm:text-5xl">Create your account</h1>
+    <AuthFrame title="Create your account" subtitle="Save your allergies and address once — the AI host checks them on every order.">
       <Suspense>
         <SignupForm />
       </Suspense>
-    </div>
+    </AuthFrame>
   );
 }

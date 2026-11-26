@@ -37,17 +37,17 @@ const CAPABILITIES: { icon: LucideIcon; title: string; body: string }[] = [
 
 export function CapabilityGrid() {
   return (
-    <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {CAPABILITIES.map(({ icon: Icon, title, body }) => (
-        <li
-          key={title}
-          className="reveal group rounded-3xl border border-border bg-card/60 p-6 transition-colors hover:border-primary/40 sm:p-7"
-        >
-          <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-            <Icon className="size-5" aria-hidden />
-          </span>
-          <h3 className="mt-4 text-base font-semibold tracking-tight">{title}</h3>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{body}</p>
+    <ul className="mt-10 grid gap-px overflow-hidden rounded-[28px] border bg-border sm:grid-cols-2 lg:grid-cols-3">
+      {CAPABILITIES.map(({ icon: Icon, title, body }, i) => (
+        <li key={title} className="reveal group bg-card p-7 transition-colors hover:bg-background sm:p-8">
+          <div className="flex items-center justify-between">
+            <span className="flex size-11 items-center justify-center rounded-[13px] bg-iris-soft text-iris-ink transition-colors group-hover:bg-iris group-hover:text-iris-foreground">
+              <Icon className="size-5" aria-hidden />
+            </span>
+            <span className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+          </div>
+          <h3 className="mt-6 text-lg font-semibold tracking-[-0.01em]">{title}</h3>
+          <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{body}</p>
         </li>
       ))}
     </ul>

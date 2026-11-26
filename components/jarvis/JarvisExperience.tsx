@@ -15,10 +15,10 @@ const JarvisOrb = dynamic(() => import("./JarvisOrb"), { ssr: false });
 
 const STATUS_UI: Record<JarvisStatus, { label: string; dot: string; glow: string }> = {
   idle: { label: "Standby", dot: "bg-white/50", glow: "rgba(200,210,230,0.10)" },
-  connecting: { label: "Connecting", dot: "bg-indigo-300 animate-pulse", glow: "rgba(120,130,255,0.16)" },
-  listening: { label: "Listening", dot: "bg-emerald-400", glow: "rgba(52,211,153,0.20)" },
-  thinking: { label: "Thinking", dot: "bg-violet-400 animate-pulse", glow: "rgba(139,92,246,0.24)" },
-  speaking: { label: "Speaking", dot: "bg-orange-400", glow: "rgba(251,146,60,0.24)" },
+  connecting: { label: "Connecting", dot: "bg-[#a99dff] animate-pulse", glow: "rgba(120,130,255,0.16)" },
+  listening: { label: "Listening", dot: "bg-[#3fcb7e]", glow: "rgba(52,211,153,0.20)" },
+  thinking: { label: "Thinking", dot: "bg-[#8f80ff] animate-pulse", glow: "rgba(143,128,255,0.26)" },
+  speaking: { label: "Speaking", dot: "bg-[#ff7a2e]", glow: "rgba(255,122,46,0.24)" },
 };
 
 type Kpis = { revenue_today_paise: number; active_orders: number };
@@ -77,7 +77,7 @@ export function JarvisExperience() {
   const lastJarvis = [...j.captions].reverse().find((c) => c.role === "assistant");
 
   return (
-    <div className="fixed inset-0 z-[60] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#03050b] text-white" style={{ colorScheme: "dark" }}>
+    <div className="fixed inset-0 z-[60] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#0c0c0e] text-white" style={{ colorScheme: "dark" }}>
       {/* Ambient glow follows the orb's state colour */}
       <div aria-hidden className="pointer-events-none fixed inset-0 transition-[background] duration-1000" style={{ background: `radial-gradient(65% 50% at 50% 40%, ${ui.glow}, transparent 70%)` }} />
       <div
@@ -87,7 +87,7 @@ export function JarvisExperience() {
       />
 
       {/* HUD */}
-      <header className="z-10 shrink-0 border-b border-white/[0.06] bg-[#03050b]/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+      <header className="z-10 shrink-0 border-b border-white/[0.06] bg-[#0c0c0e]/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] flex-col gap-2 px-4 py-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 sm:py-3">
           <div className="flex items-center gap-3">
             <Link href="/owner" aria-label="Back to dashboard" className="-ml-2 flex size-11 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40">
@@ -167,7 +167,7 @@ export function JarvisExperience() {
       </div>
 
       {/* Controls — pinned within thumb reach, safe-area aware */}
-      <div className="z-10 shrink-0 border-t border-white/[0.06] bg-[#03050b]/85 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-xl">
+      <div className="z-10 shrink-0 border-t border-white/[0.06] bg-[#0c0c0e]/85 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] items-center justify-center gap-3">
           <button
             onClick={j.toggleMute}

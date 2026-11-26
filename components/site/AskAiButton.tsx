@@ -16,7 +16,7 @@ export function AskAiButton({ prompt, label = "Ask our AI", ...props }: { prompt
   const [loginCard, setLoginCard] = useState(false);
   return (
     <>
-      <Button {...props} onClick={() => (session ? openChat(prompt) : setLoginCard(true))}>
+      <Button {...props} variant={props.variant ?? "iris-soft"} onClick={() => (session ? openChat(prompt) : setLoginCard(true))}>
         <Sparkles /> {label}
       </Button>
       {!session && loginCard && <LoginToChatCard onClose={() => setLoginCard(false)} />}

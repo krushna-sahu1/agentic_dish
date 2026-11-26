@@ -32,7 +32,7 @@ export function FavoriteButton({ itemId, initial = false }: { itemId: string; in
         });
       }}
     >
-      <Heart className={cn(fav && "fill-primary text-primary")} />
+      <Heart className={cn(fav && "fill-saffron text-saffron")} />
     </Button>
   );
 }

@@ -6,8 +6,8 @@ export const metadata: Metadata = { title: "About us" };
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-3xl py-10">
-      <h1 className="font-display text-5xl">About {BRAND.name}</h1>
+    <div className="mx-auto max-w-3xl pb-10 pt-10 sm:pt-14">
+      <h1 className="font-display text-[2.6rem] leading-[1] sm:text-6xl">About {BRAND.name}</h1>
       <div className="mt-6 space-y-4 text-muted-foreground">
         <p>
           We started as a tiny tiffin counter in Saheed Nagar, grinding our own dosa batter every night. Today our kitchen brings together two food

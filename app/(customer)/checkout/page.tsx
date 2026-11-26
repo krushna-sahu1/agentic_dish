@@ -22,9 +22,11 @@ export default async function CheckoutPage() {
   const t = cart.totals;
 
   return (
-    <div className="grid gap-6 py-6 lg:grid-cols-[1fr_380px]">
+    <div className="grid gap-6 pb-10 pt-10 sm:pt-14 lg:grid-cols-[1fr_400px] lg:gap-8">
       <div className="space-y-4">
-        <h1 className="font-display text-4xl sm:text-5xl">Checkout</h1>
+        <p className="eyebrow">Step 2 of 2 · Pay</p>
+        <h1 className="font-display text-[2.6rem] leading-[1] sm:text-6xl">Almost there.</h1>
+        <p className="text-[15px] text-muted-foreground">Check the details. Nothing is charged until you press Pay.</p>
         {!v.ok && (
           <div className="space-y-1 rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm" role="alert">
             {v.errors.map((e, i) => (

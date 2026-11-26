@@ -104,7 +104,7 @@ export function LoginForm() {
           <div>
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link href="/reset-password" className="text-xs text-primary hover:underline">Forgot?</Link>
+              <Link href="/reset-password" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">Forgot?</Link>
             </div>
             <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
@@ -135,7 +135,7 @@ export function LoginForm() {
       </div>
       <GoogleButton next={next} />
       <p className="text-center text-sm text-muted-foreground">
-        New here? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="text-primary hover:underline">Create an account</Link>
+        New here? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-medium text-foreground underline underline-offset-4">Create an account</Link>
       </p>
     </div>
   );
@@ -197,7 +197,7 @@ export function SignupForm() {
       </Button>
       <GoogleButton next={next} />
       <p className="text-center text-sm text-muted-foreground">
-        Already have an account? <Link href={`/login?next=${encodeURIComponent(next)}`} className="text-primary hover:underline">Log in</Link>
+        Already have an account? <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-medium text-foreground underline underline-offset-4">Log in</Link>
       </p>
     </form>
   );

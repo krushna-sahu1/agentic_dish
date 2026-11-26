@@ -15,8 +15,9 @@ export default async function CartPage() {
     createAdminClient().from("tables").select("number, capacity").eq("is_active", true).order("number"),
   ]);
   return (
-    <div className="py-10">
-      <h1 className="mb-8 font-display text-5xl">Your cart</h1>
+    <div className="pb-10 pt-10 sm:pt-14">
+      <p className="eyebrow">Step 1 of 2 · Review</p>
+      <h1 className="mb-9 mt-3 font-display text-[2.6rem] leading-[1] sm:text-6xl">Your cart</h1>
       <CartPageClient addresses={addresses} coupons={coupons} tables={(tables ?? []) as { number: number; capacity: number }[]} />
     </div>
   );

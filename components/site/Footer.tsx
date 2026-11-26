@@ -23,7 +23,7 @@ export function HoursList({ settings, className }: { settings: Settings; classNa
       {DAYS.map(([k, label]) => (
         <div key={k} className="contents">
           <dt className="opacity-60">{label}</dt>
-          <dd className="tabular-nums">{hoursText(settings.opening_hours[k])}</dd>
+          <dd className="font-mono text-[13px] tabular-nums">{hoursText(settings.opening_hours[k])}</dd>
         </div>
       ))}
     </dl>
@@ -52,13 +52,13 @@ const LINKS: [string, [string, string][]][] = [
 /** Dark, editorial footer shared by every customer-facing page. */
 export function Footer({ settings }: { settings: Settings }) {
   return (
-    <footer className="mt-24 bg-[oklch(0.19_0.01_60)] text-[oklch(0.93_0.012_85)] dark:bg-card">
+    <footer className="mt-24 bg-[#14130f] text-[#f4f3ef] dark:border-t dark:bg-card">
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-3" aria-label={`${BRAND.name} — home`}>
-              <LogoMark className="size-10" />
-              <span className="font-display text-4xl leading-none">{BRAND.name}</span>
+              <LogoMark className="size-10" inverted />
+              <span className="font-display text-3xl leading-none">{BRAND.name}</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm opacity-70">{settings.tagline || BRAND.tagline}</p>
             {settings.address && <p className="mt-6 max-w-xs text-sm opacity-90">{settings.address}</p>}
@@ -70,7 +70,7 @@ export function Footer({ settings }: { settings: Settings }) {
           </div>
           {LINKS.map(([title, links]) => (
             <div key={title}>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] opacity-50">{title}</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] opacity-55">{title}</p>
               <ul className="mt-4 space-y-2.5 text-sm">
                 {links.map(([href, label]) => (
                   <li key={href}>
@@ -83,7 +83,7 @@ export function Footer({ settings }: { settings: Settings }) {
             </div>
           ))}
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] opacity-50">Hours</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] opacity-55">Hours</p>
             <HoursList settings={settings} className="mt-4 grid grid-cols-[3rem_1fr] gap-y-1.5 text-sm" />
           </div>
         </div>

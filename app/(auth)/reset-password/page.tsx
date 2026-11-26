@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { AuthFrame } from "@/components/site/AuthFrame";
 import { ResetPasswordForm } from "@/components/site/AuthForms";
 
 export const metadata: Metadata = { title: "Reset password" };
 
 export default function Page() {
   return (
-    <div className="mx-auto max-w-sm py-12">
-      <h1 className="mb-6 font-display text-4xl sm:text-5xl">Reset your password</h1>
+    <AuthFrame title="Reset your password" subtitle="We'll email you a secure link to choose a new one.">
       <Suspense>
         <ResetPasswordForm />
       </Suspense>
-    </div>
+    </AuthFrame>
   );
 }

@@ -18,8 +18,8 @@ export default async function ProfilePage() {
     user.email ? createAdminClient().from("email_unsubscribes").select("email").eq("email", user.email.toLowerCase()).maybeSingle() : null,
   ]);
   return (
-    <div className="mx-auto max-w-3xl space-y-8 py-6">
-      <h1 className="font-display text-4xl sm:text-5xl">Your profile</h1>
+    <div className="mx-auto max-w-3xl space-y-8 pb-10 pt-10 sm:pt-14">
+      <h1 className="font-display text-[2.6rem] leading-[1] sm:text-6xl">Your profile</h1>
       <section className="rounded-xl border bg-card p-4">
         <p className="mb-3 text-sm text-muted-foreground">{user.email}</p>
         <ProfileForm profile={profile} />

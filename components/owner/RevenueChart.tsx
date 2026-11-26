@@ -23,15 +23,15 @@ export function RevenueChart({ data }: { data: { label: string; revenue_paise: n
             cursor={{ fill: "var(--muted)" }}
             content={({ active, payload, label }) =>
               active && payload?.length ? (
-                <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-md">
+                <div className="rounded-xl border bg-popover px-3 py-2 text-xs shadow-[0_12px_28px_-12px_rgb(20_19_15/0.35)]">
                   <p className="text-muted-foreground">{String(label)}</p>
-                  <p className="font-semibold tabular-nums">{formatINR(Number(payload[0].value))}</p>
+                  <p className="font-mono font-semibold tabular-nums">{formatINR(Number(payload[0].value))}</p>
                   <p className="text-muted-foreground">{(payload[0].payload as { orders: number }).orders} orders</p>
                 </div>
               ) : null
             }
           />
-          <Bar dataKey="revenue_paise" fill="var(--chart-1)" radius={[4, 4, 0, 0]} maxBarSize={44} isAnimationActive={false} />
+          <Bar dataKey="revenue_paise" fill="var(--chart-1)" radius={[6, 6, 2, 2]} maxBarSize={48} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </div>

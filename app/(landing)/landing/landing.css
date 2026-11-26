@@ -11,21 +11,21 @@
 
 html [data-theme="agentic-eats"] {
   /* Raw palette — the single source for this page. */
-  --ae-bg: #07080c;
-  --ae-bg-soft: #0a0c11;
-  --ae-panel: #0d0f16;
-  --ae-panel-2: #11141c;
+  --ae-bg: #0c0c0e;
+  --ae-bg-soft: #101013;
+  --ae-panel: #141417;
+  --ae-panel-2: #1c1c20;
   --ae-line: rgba(255, 255, 255, 0.09);
   --ae-line-soft: rgba(255, 255, 255, 0.055);
   --ae-line-strong: rgba(255, 255, 255, 0.18);
-  --ae-fg: #f3f5f8;
-  --ae-muted: #a2aab9;
-  --ae-dim: #8b93a3;
-  --ae-amber: #f2a33c;
-  --ae-amber-soft: rgba(242, 163, 60, 0.14);
-  --ae-cyan: #3fd0d6;
-  --ae-violet: #9b7bf5;
-  --ae-danger: #f27a7a;
+  --ae-fg: #f4f3ef;
+  --ae-muted: #aeaba3;
+  --ae-dim: #8d8a83;
+  --ae-amber: #ff7a2e;
+  --ae-amber-soft: rgba(255, 122, 46, 0.14);
+  --ae-cyan: #8f80ff;
+  --ae-violet: #a99dff;
+  --ae-danger: #f06a63;
   --ae-radius: 18px;
 
   /*
@@ -41,7 +41,7 @@ html [data-theme="agentic-eats"] {
   --popover: var(--ae-panel-2);
   --popover-foreground: var(--ae-fg);
   --primary: var(--ae-amber);
-  --primary-foreground: #1a1206;
+  --primary-foreground: #0c0c0e;
   --secondary: var(--ae-panel-2);
   --secondary-foreground: var(--ae-fg);
   --muted: var(--ae-panel-2);
@@ -65,8 +65,8 @@ html [data-theme="agentic-eats"] {
 
 /* Keep the page ground black even in light mode / during overscroll. */
 body:has([data-theme="agentic-eats"]) {
-  background: #07080c;
-  color: #f3f5f8;
+  background: #0c0c0e;
+  color: #f4f3ef;
 }
 
 /* ── Typography helpers ──────────────────────────────────────────────────── */
@@ -98,6 +98,7 @@ body:has([data-theme="agentic-eats"]) {
 
 /* Big editorial display line. */
 .ae-display {
+  font-family: var(--font-display-family), ui-sans-serif, system-ui, sans-serif;
   letter-spacing: -0.035em;
   line-height: 0.98;
   font-weight: 600;
@@ -154,15 +155,15 @@ body:has([data-theme="agentic-eats"]) {
 }
 
 .ae-glow-amber {
-  background: radial-gradient(circle, rgba(242, 163, 60, 0.26), transparent 68%);
+  background: radial-gradient(circle, rgba(255, 122, 46, 0.26), transparent 68%);
 }
 
 .ae-glow-cool {
-  background: radial-gradient(circle, rgba(63, 208, 214, 0.2), transparent 70%);
+  background: radial-gradient(circle, rgba(143, 128, 255, 0.2), transparent 70%);
 }
 
 .ae-glow-violet {
-  background: radial-gradient(circle, rgba(155, 123, 245, 0.22), transparent 70%);
+  background: radial-gradient(circle, rgba(91, 71, 245, 0.22), transparent 70%);
 }
 
 /* Hairline rule used between sections. */
@@ -206,13 +207,13 @@ body:has([data-theme="agentic-eats"]) {
 
 .ae-btn-primary {
   background: var(--ae-amber);
-  color: #1a1206;
+  color: #0c0c0e;
   padding: 0.875rem 1.5rem;
   font-weight: 600;
 }
 
 .ae-btn-primary:hover {
-  background: #ffb955;
+  background: #ff9050;
 }
 
 .ae-btn-ghost {
@@ -251,9 +252,9 @@ body:has([data-theme="agentic-eats"]) {
 
 /* Highlighted card (the audience toggle marks the relevant set). */
 .ae-card-active {
-  border-color: rgba(242, 163, 60, 0.42);
+  border-color: rgba(255, 122, 46, 0.42);
   background:
-    radial-gradient(120% 100% at 0% 0%, rgba(242, 163, 60, 0.09), transparent 60%),
+    radial-gradient(120% 100% at 0% 0%, rgba(255, 122, 46, 0.09), transparent 60%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0));
 }
 
@@ -299,13 +300,13 @@ body:has([data-theme="agentic-eats"]) {
 }
 
 .ae-orb::before {
-  background: radial-gradient(circle at 32% 28%, rgba(242, 163, 60, 0.45), transparent 62%);
+  background: radial-gradient(circle at 32% 28%, rgba(255, 122, 46, 0.45), transparent 62%);
   filter: blur(28px);
   animation: ae-breathe 7s ease-in-out infinite;
 }
 
 .ae-orb::after {
-  background: radial-gradient(circle at 72% 74%, rgba(63, 208, 214, 0.2), transparent 66%);
+  background: radial-gradient(circle at 72% 74%, rgba(143, 128, 255, 0.2), transparent 66%);
   filter: blur(40px);
   animation: ae-breathe 9s ease-in-out infinite reverse;
 }
@@ -355,12 +356,12 @@ body:has([data-theme="agentic-eats"]) {
   height: 6px;
   border-radius: 9999px;
   background: var(--ae-amber);
-  box-shadow: 0 0 12px rgba(242, 163, 60, 0.8);
+  box-shadow: 0 0 12px rgba(255, 122, 46, 0.8);
 }
 
 .ae-orb-dot-cool {
   background: var(--ae-cyan);
-  box-shadow: 0 0 12px rgba(63, 208, 214, 0.8);
+  box-shadow: 0 0 12px rgba(143, 128, 255, 0.8);
 }
 
 /* ── Diagram ────────────────────────────────────────────────────────────── */
@@ -475,8 +476,8 @@ body:has([data-theme="agentic-eats"]) {
 
 .ae-tab[aria-selected="true"] {
   color: var(--ae-fg);
-  border-color: rgba(242, 163, 60, 0.45);
-  background: rgba(242, 163, 60, 0.1);
+  border-color: rgba(255, 122, 46, 0.45);
+  background: rgba(255, 122, 46, 0.1);
 }
 
 /* ── Misc ────────────────────────────────────────────────────────────────── */
@@ -494,14 +495,14 @@ body:has([data-theme="agentic-eats"]) {
 }
 
 .ae-tag-accent {
-  border-color: rgba(242, 163, 60, 0.42);
+  border-color: rgba(255, 122, 46, 0.42);
   color: var(--ae-amber);
 }
 
 .ae-placeholder {
   border-style: dashed;
-  border-color: rgba(242, 163, 60, 0.35);
-  background: rgba(242, 163, 60, 0.035);
+  border-color: rgba(255, 122, 46, 0.35);
+  background: rgba(255, 122, 46, 0.035);
 }
 
 .ae-table th {

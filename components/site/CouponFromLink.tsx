@@ -38,8 +38,8 @@ export function CouponFromLink({ code }: { code?: string }) {
   }, [code]);
   if (!shown) return null;
   return (
-    <div role="status" className="mb-4 flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/8 px-4 py-3 text-sm">
-      <Ticket className="size-4 shrink-0 text-primary" aria-hidden />
+    <div role="status" className="mb-4 flex items-center gap-3 rounded-[18px] border border-saffron/40 bg-saffron-soft px-4 py-3 text-sm">
+      <Ticket className="size-4 shrink-0 text-saffron-ink" aria-hidden />
       <p className="flex-1">
         Offer <b className="font-mono tracking-wider">{shown}</b> will be applied in your cart.
       </p>

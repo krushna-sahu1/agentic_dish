@@ -85,26 +85,26 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
 
   return (
     <div>
-      <div className="sticky top-16 z-30 -mx-4 border-b bg-background/95 px-4 pb-2 pt-3 backdrop-blur">
+      <div className="sticky top-16 z-30 -mx-4 border-b bg-background/90 px-4 pb-3 pt-3 backdrop-blur-xl sm:top-[72px] sm:-mx-6 sm:px-6">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
               type="search"
               aria-label="Search the menu"
               placeholder="Search dosa, biryani, chhena poda…"
-              className="pl-9"
+              className="h-12 rounded-[14px] pl-10"
               value={f.q}
               onChange={(e) => setF({ ...f, q: e.target.value })}
             />
           </div>
-          <Button variant="outline" onClick={() => setShowFilters((s) => !s)} aria-expanded={showFilters} aria-controls="menu-filters">
+          <Button variant="outline" className="h-12 rounded-[14px]" onClick={() => setShowFilters((s) => !s)} aria-expanded={showFilters} aria-controls="menu-filters">
             <SlidersHorizontal /> <span className="hidden sm:inline">Filters</span>
-            {activeCount > 0 && <span className="rounded-full bg-primary px-1.5 text-xs text-primary-foreground">{activeCount}</span>}
+            {activeCount > 0 && <span className="flex size-5 items-center justify-center rounded-md bg-primary font-mono text-[11px] text-primary-foreground">{activeCount}</span>}
           </Button>
         </div>
         {showFilters && (
-          <div id="menu-filters" className="mt-3 grid gap-3 rounded-xl border bg-card p-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <div id="menu-filters" className="mt-3 grid animate-rise gap-4 rounded-[18px] border bg-card p-4 text-sm shadow-[0_24px_48px_-28px_rgb(20_19_15/0.3)] sm:grid-cols-2 lg:grid-cols-4">
             <fieldset className="flex flex-wrap gap-3">
               <legend className="sr-only">Diet</legend>
               {(["veg", "vegan", "jain"] as const).map((k) => (
@@ -134,7 +134,7 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
               </Select>
             </label>
             <fieldset className="flex flex-wrap gap-x-3 gap-y-1 sm:col-span-2 lg:col-span-4">
-              <legend className="mb-1 text-muted-foreground">Free from</legend>
+              <legend className="eyebrow mb-2">Free from</legend>
               {ALLERGENS.map((a) => (
                 <label key={a} className="flex items-center gap-1.5 capitalize">
                   <input
@@ -154,14 +154,14 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
             </div>
           </div>
         )}
-        <nav aria-label="Categories" className="mt-2 flex gap-1 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <nav aria-label="Categories" className="mt-3 flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
           {categories.map((c) => (
             <a
               key={c.slug}
               href={`#cat-${c.slug}`}
               className={cn(
-                "whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors",
-                active === c.slug ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent",
+                "inline-flex h-9 items-center whitespace-nowrap rounded-full border px-3.5 text-[13px] font-medium transition-colors",
+                active === c.slug ? "border-primary bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground",
               )}
             >
               {c.name}
@@ -171,17 +171,21 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
       </div>
 
       {grouped.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-muted-foreground">No dishes match those filters.</p>
-          <Button variant="link" onClick={() => openChat(f.q ? `Do you have anything like "${f.q}"?` : undefined)}>
+        <div className="mt-8 flex flex-col items-center rounded-[18px] border border-dashed border-input py-16 text-center">
+          <p className="font-display text-2xl">Nothing matches those filters.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Loosen a filter — or describe what you want.</p>
+          <Button variant="iris-soft" className="mt-5" onClick={() => openChat(f.q ? `Do you have anything like "${f.q}"?` : undefined)}>
             <Sparkles /> Ask our AI instead
           </Button>
         </div>
       ) : (
         grouped.map((g) => (
-          <section key={g.slug} id={`cat-${g.slug}`} data-category-section className="pt-8">
-            <h2 className="mb-3 font-display text-2xl">{g.name}</h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <section key={g.slug} id={`cat-${g.slug}`} data-category-section className="pt-12">
+            <div className="mb-5 flex items-baseline gap-3">
+              <h2 className="font-display text-3xl sm:text-[2.25rem]">{g.name}</h2>
+              <span className="font-mono text-xs text-muted-foreground">{g.items.length} {g.items.length === 1 ? "dish" : "dishes"}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
               {g.items.map((i) => (
                 <DishCard key={i.id} item={i} />
               ))}

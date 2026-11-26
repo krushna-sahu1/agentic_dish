@@ -4,9 +4,8 @@ import { SiteShell } from "@/components/site/SiteShell";
 export const dynamic = "force-dynamic";
 
 /**
- * The landing page gets full-bleed sections plus its own scoped "AI" theme.
- * `data-theme="ai"` remaps the design tokens (and the chat surface) for this
- * route only — the owner dashboard and every other page stay unchanged.
+ * The home page gets full-bleed sections. `data-theme="ai"` only scopes the
+ * shared chat-surface styles; colours come from the global design tokens.
  */
 export default function HomeLayout({ children }: { children: React.ReactNode }) {
   return (

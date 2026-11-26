@@ -29,7 +29,7 @@ export async function SiteShell({ children, bleed = false, showChat = true }: { 
       {settings.announcement && (
         <div className="bg-foreground text-background">
           <p className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs sm:text-sm">
-            <Megaphone className="size-4 shrink-0 text-primary" aria-hidden /> {settings.announcement}
+            <Megaphone className="size-4 shrink-0 text-saffron" aria-hidden /> {settings.announcement}
           </p>
         </div>
       )}

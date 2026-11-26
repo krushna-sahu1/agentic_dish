@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Instrument_Serif } from "next/font/google";
+import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 import type { ClientSession } from "@/components/providers/SessionProvider";
@@ -7,7 +7,8 @@ import { getSessionUser } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 
 const sans = Geist({ subsets: ["latin"], variable: "--font-sans-family", display: "swap" });
-const display = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-display-family", display: "swap" });
+const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display-family", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono-family", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: `${BRAND.name} — South Indian & Odia kitchen`, template: `%s · ${BRAND.name}` },
@@ -26,8 +27,8 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f1e7" },
-    { media: "(prefers-color-scheme: dark)", color: "#171310" },
+    { media: "(prefers-color-scheme: light)", color: "#f6f5f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c0c0e" },
   ],
 };
 
@@ -45,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       }
     : null;
   return (
-    <html lang="en-IN" suppressHydrationWarning className={`${sans.variable} ${display.variable}`}>
+    <html lang="en-IN" suppressHydrationWarning className={`${sans.variable} ${display.variable} ${mono.variable}`}>
       <body className="min-h-dvh">
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-card focus:shadow-lg focus:px-4 focus:py-2">
           Skip to content

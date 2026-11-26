@@ -23,7 +23,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
   const view = sp.view === "board" ? "board" : "table";
 
   const tabs = (
-    <div className="inline-flex rounded-full bg-muted p-1 text-sm" role="tablist" aria-label="Orders view">
+    <div className="inline-flex rounded-xl border bg-muted p-1 text-sm" role="tablist" aria-label="Orders view">
       {[
         ["table", "All orders", "/owner/orders"],
         ["board", "Live board", "/owner/orders?view=board"],
@@ -33,7 +33,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
           href={href}
           role="tab"
           aria-selected={view === key}
-          className={cn("rounded-full px-4 py-1.5 transition-colors", view === key ? "bg-card font-medium shadow-sm" : "text-muted-foreground hover:text-foreground")}
+          className={cn("flex h-9 items-center rounded-[9px] px-4 transition-colors", view === key ? "bg-card font-medium shadow-[0_1px_2px_rgb(20_19_15/0.08)]" : "text-muted-foreground hover:text-foreground")}
         >
           {label}
         </Link>
@@ -54,7 +54,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
     }
     return (
       <DashboardPage className="flex min-h-0 flex-1 flex-col lg:max-w-none">
-        <PageHeader title="Orders" description="Live kitchen board — updates in real time." actions={tabs} />
+        <PageHeader eyebrow={<span className="inline-flex items-center gap-2"><span className="size-1.5 rounded-full bg-success" aria-hidden /> Realtime · chime on new orders</span>} title="Live orders" description="Each button press is the human confirmation." actions={tabs} />
         {initial ? <OrdersBoard initial={initial} /> : <ErrorState title="The live board couldn’t load" description="Check your connection and refresh the page." />}
       </DashboardPage>
     );

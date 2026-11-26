@@ -16,14 +16,14 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col items-center justify-center rounded-2xl border border-dashed bg-card/50 px-6 py-12 text-center", className)}>
+    <div className={cn("flex flex-col items-center justify-center rounded-[18px] border border-dashed border-input bg-card/60 px-6 py-12 text-center", className)}>
       {Icon && (
-        <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <span className="mb-4 flex size-12 items-center justify-center rounded-2xl bg-muted text-foreground">
           <Icon className="size-5" aria-hidden />
         </span>
       )}
-      <p className="font-display text-2xl">{title}</p>
-      {description && <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">{description}</p>}
+      <p className="font-display text-2xl leading-tight">{title}</p>
+      {description && <p className="mt-2 max-w-sm text-sm text-muted-foreground">{description}</p>}
       {children && <div className="mt-5 flex flex-wrap justify-center gap-2">{children}</div>}
     </div>
   );
@@ -42,8 +42,8 @@ export function ErrorState({
   className?: string;
 }) {
   return (
-    <div role="alert" className={cn("flex flex-col items-center justify-center rounded-2xl border border-destructive/25 bg-destructive/5 px-6 py-12 text-center", className)}>
-      <span className="mb-4 flex size-12 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+    <div role="alert" className={cn("flex flex-col items-center justify-center rounded-[18px] border border-destructive/25 bg-destructive/5 px-6 py-12 text-center", className)}>
+      <span className="mb-4 flex size-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
         <AlertTriangle className="size-5" aria-hidden />
       </span>
       <p className="font-display text-2xl">{title}</p>

@@ -52,7 +52,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-5xl leading-none">#{o.order_number.split("-").pop()}</h1>
+            <h1 className="font-mono text-5xl font-semibold leading-none tracking-tight">#{o.order_number.split("-").pop()}</h1>
             <StatusBadge status={o.status} className="text-sm" />
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -106,7 +106,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <ol className="relative mx-5 mb-5 space-y-4 border-l pl-5">
                 {o.events.map((e) => (
                   <li key={e.id} className="relative text-sm">
-                    <span className="absolute -left-[26px] top-1.5 size-2.5 rounded-full border-2 border-card bg-primary" aria-hidden />
+                    <span className="absolute -left-[26px] top-1.5 size-2.5 rounded-full border-2 border-card bg-saffron" aria-hidden />
                     <p className="font-medium">{STATUS_LABEL[e.status] ?? e.status}</p>
                     <p className="text-xs text-muted-foreground">
                       {formatDateTime(e.created_at)}

@@ -8,9 +8,9 @@ export const metadata: Metadata = { title: "Contact" };
 export default async function ContactPage() {
   const s = await getSettings();
   return (
-    <div className="mx-auto grid max-w-4xl gap-10 py-10 md:grid-cols-2">
+    <div className="mx-auto grid max-w-5xl gap-10 pb-10 pt-10 sm:pt-14 md:grid-cols-2">
       <div>
-        <h1 className="font-display text-5xl">Contact us</h1>
+        <h1 className="font-display text-[2.6rem] leading-[1] sm:text-6xl">Contact us</h1>
         <ul className="mt-6 space-y-3 text-sm">
           <li className="flex items-start gap-2"><MapPin className="mt-0.5 size-4 text-primary" /> {s.address}</li>
           <li className="flex items-center gap-2"><Phone className="size-4 text-primary" /> <a className="hover:underline" href={`tel:${s.phone?.replace(/\s/g, "")}`}>{s.phone}</a></li>

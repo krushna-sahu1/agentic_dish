@@ -16,7 +16,7 @@ export function OrdersTable({ orders }: { orders: OwnerOrderView[] }) {
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-y bg-muted/40 text-left text-xs text-muted-foreground">
+            <tr className="border-y bg-muted/40 text-left font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
               <th className="px-5 py-2.5 font-medium">Order</th>
               <th className="px-3 py-2.5 font-medium">Customer</th>
               <th className="px-3 py-2.5 font-medium">Items</th>
@@ -31,10 +31,10 @@ export function OrdersTable({ orders }: { orders: OwnerOrderView[] }) {
             {orders.map((o) => (
               <tr key={o.id} className="group relative border-b transition-colors last:border-0 hover:bg-muted/40" data-testid="orders-row">
                 <td className="px-5 py-3">
-                  <Link href={`/owner/orders/${o.id}`} className="font-semibold after:absolute after:inset-0" aria-label={`Open order ${o.order_number}`}>
+                  <Link href={`/owner/orders/${o.id}`} className="font-mono font-semibold after:absolute after:inset-0" aria-label={`Open order ${o.order_number}`}>
                     {shortNo(o.order_number)}
                   </Link>
-                  <span className="block text-xs text-muted-foreground">{o.order_number}</span>
+                  <span className="block font-mono text-[11px] text-muted-foreground">{o.order_number}</span>
                 </td>
                 <td className="px-3 py-3">{o.customer_name ?? <span className="text-muted-foreground">Guest</span>}</td>
                 <td className="max-w-64 px-3 py-3">
@@ -44,11 +44,11 @@ export function OrdersTable({ orders }: { orders: OwnerOrderView[] }) {
                   {TYPE_LABEL[o.order_type] ?? o.order_type}
                   {o.table_number ? ` · T${o.table_number}` : ""}
                 </td>
-                <td className="px-3 py-3 text-right font-medium tabular-nums">{formatINR(o.total_paise)}</td>
+                <td className="px-3 py-3 text-right font-mono font-medium tabular-nums">{formatINR(o.total_paise)}</td>
                 <td className="px-3 py-3">
                   <StatusBadge status={o.status} />
                 </td>
-                <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">{formatDateTime(o.created_at)}</td>
+                <td className="whitespace-nowrap px-3 py-3 font-mono text-xs text-muted-foreground">{formatDateTime(o.created_at)}</td>
                 <td className="px-3 py-3 text-muted-foreground">
                   <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
                 </td>

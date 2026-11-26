@@ -40,44 +40,44 @@ export default async function DishPage({ params }: Props) {
   const card = toCardItem(item);
 
   return (
-    <article className="py-6">
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
+    <article className="pb-6 pt-8 sm:pt-12">
+      <nav aria-label="Breadcrumb" className="eyebrow mb-6">
         <Link href="/menu" className="hover:underline">Menu</Link> / <Link href={`/menu#cat-${item.category_slug}`} className="hover:underline">{item.category_name}</Link>
       </nav>
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl border">
-          <DishImage src={item.image_url} alt={item.name} priority className={!orderable.ok ? "grayscale" : undefined} />
+      <div className="grid gap-8 md:grid-cols-2 lg:gap-14">
+        <div className="h-fit overflow-hidden rounded-[28px] border bg-muted">
+          <DishImage src={item.image_url} fallbackHint={`${item.name} ${item.category_name}`} alt={item.name} priority className={!orderable.ok ? "grayscale" : undefined} />
         </div>
         <div>
           <div className="flex items-start gap-3">
-            <VegMark veg={item.is_veg} className="mt-2" />
-            <h1 className="font-display text-4xl sm:text-5xl">{item.name}</h1>
+            <VegMark veg={item.is_veg} className="mt-3" />
+            <h1 className="font-display text-4xl leading-[1] sm:text-[3.5rem]">{item.name}</h1>
           </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
             {item.tags.map((t) => (
               <Badge key={t} variant="secondary" className="capitalize">{t.replace("_", " ")}</Badge>
             ))}
             {item.avg_rating ? (
-              <span className="flex items-center gap-1"><Star className="size-4 fill-amber-400 text-amber-400" /> {item.avg_rating.toFixed(1)} ({item.review_count})</span>
+              <span className="flex items-center gap-1"><Star className="size-4 fill-saffron text-saffron" aria-hidden /> {item.avg_rating.toFixed(1)} ({item.review_count})</span>
             ) : null}
           </div>
-          <p className="mt-4 text-muted-foreground">{item.description}</p>
-          <p className="mt-4 text-2xl font-semibold">{formatINR(item.price_paise)}</p>
+          <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted-foreground">{item.description}</p>
+          <p className="mt-6 font-display text-4xl tabular-nums">{formatINR(item.price_paise)}</p>
           {!orderable.ok && <p className="mt-1 text-sm font-medium text-destructive">Currently {orderable.reason}</p>}
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <AddToCartButton item={card} size="lg" label="Add to cart" />
             <FavoriteButton itemId={item.id} />
-            <AskAiButton variant="ghost" size="sm" prompt={`What goes well with ${item.name}?`} label="What goes with this?" />
+            <AskAiButton size="sm" prompt={`What goes well with ${item.name}?`} label="What goes with this?" />
           </div>
 
-          <dl className="mt-6 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-xl border p-3"><dt className="flex items-center gap-1.5 text-muted-foreground"><Flame className="size-4" /> Spice</dt><dd className="mt-1 flex items-center gap-2">{spiceLabel(item.spice_level)} <SpiceLevel level={item.spice_level} /></dd></div>
-            <div className="rounded-xl border p-3"><dt className="flex items-center gap-1.5 text-muted-foreground"><Clock className="size-4" /> Prep time</dt><dd className="mt-1">~{item.prep_time_min} min</dd></div>
-            <div className="rounded-xl border p-3"><dt className="flex items-center gap-1.5 text-muted-foreground"><Utensils className="size-4" /> Portion</dt><dd className="mt-1">{item.portion ?? "—"}</dd></div>
-            <div className="rounded-xl border p-3"><dt className="text-muted-foreground">Calories</dt><dd className="mt-1">{item.calories ? `${item.calories} kcal` : "—"}</dd></div>
-            <div className="col-span-2 rounded-xl border p-3">
-              <dt className="text-muted-foreground">Allergens</dt>
-              <dd className="mt-1 capitalize">{item.allergens.length ? item.allergens.join(", ") : "None of the 8 major allergens"}</dd>
+          <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[18px] border bg-border text-sm">
+            <div className="bg-card p-4"><dt className="eyebrow flex items-center gap-1.5"><Flame className="size-3.5" aria-hidden /> Spice</dt><dd className="mt-2 flex items-center gap-2 font-medium">{spiceLabel(item.spice_level)} <SpiceLevel level={item.spice_level} /></dd></div>
+            <div className="bg-card p-4"><dt className="eyebrow flex items-center gap-1.5"><Clock className="size-3.5" aria-hidden /> Prep time</dt><dd className="mt-2 font-medium">~{item.prep_time_min} min</dd></div>
+            <div className="bg-card p-4"><dt className="eyebrow flex items-center gap-1.5"><Utensils className="size-3.5" aria-hidden /> Portion</dt><dd className="mt-2 font-medium">{item.portion ?? "—"}</dd></div>
+            <div className="bg-card p-4"><dt className="eyebrow">Calories</dt><dd className="mt-2 font-medium">{item.calories ? `${item.calories} kcal` : "—"}</dd></div>
+            <div className="col-span-2 bg-card p-4">
+              <dt className="eyebrow">Allergens</dt>
+              <dd className="mt-2 font-medium capitalize">{item.allergens.length ? item.allergens.join(", ") : "None of the 8 major allergens"}</dd>
               <dd className="mt-1 text-xs text-muted-foreground">{[item.is_vegan && "Vegan", item.is_jain && "Jain-friendly"].filter(Boolean).join(" · ")}</dd>
             </div>
           </dl>
@@ -93,7 +93,7 @@ export default async function DishPage({ params }: Props) {
 
       {pairings.length > 0 && (
         <section className="mt-12" aria-labelledby="pairings">
-          <h2 id="pairings" className="mb-4 font-display text-2xl">Goes well with</h2>
+          <h2 id="pairings" className="mb-5 font-display text-3xl">Goes well with</h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             {pairings.slice(0, 4).map((p) => (
               <div key={p.item.id}>
@@ -106,14 +106,14 @@ export default async function DishPage({ params }: Props) {
       )}
 
       <section className="mt-12" aria-labelledby="reviews">
-        <h2 id="reviews" className="mb-4 font-display text-2xl">Reviews</h2>
+        <h2 id="reviews" className="mb-5 font-display text-3xl">Reviews</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-muted-foreground">No reviews yet.</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {reviews.map((r, i) => (
-              <li key={i} className="rounded-xl border bg-card p-4 text-sm">
-                <p aria-label={`${r.rating} out of 5 stars`}>{"★".repeat(r.rating)}<span className="text-muted-foreground">{"★".repeat(5 - r.rating)}</span></p>
+              <li key={i} className="rounded-[18px] border bg-card p-5 text-sm">
+                <p className="text-saffron" aria-label={`${r.rating} out of 5 stars`}>{"★".repeat(r.rating)}<span className="text-muted-foreground">{"★".repeat(5 - r.rating)}</span></p>
                 {r.comment && <p className="mt-1">{r.comment}</p>}
                 <p className="mt-1 text-xs text-muted-foreground">— {r.reviewer_name}, {formatDateTime(r.created_at)}</p>
                 {r.owner_reply && <p className="mt-2 rounded-lg bg-muted p-2 text-xs"><b>Reply from the restaurant:</b> {r.owner_reply}</p>}

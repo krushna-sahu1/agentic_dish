@@ -25,7 +25,6 @@ import { executeCustomerConfirmAction, previewCustomerConfirmAction, rejectCusto
 import { newConversationAction } from "@/app/actions/chat";
 import { formatINR, formatINRExact } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { LogoMark } from "@/components/site/Logo";
 import { ChatActionsProvider, useChatActions } from "./chat-actions";
 import { ChatLauncher } from "./ChatLauncher";
 import { ConfirmCard } from "./ConfirmCard";
@@ -388,7 +387,9 @@ export function CustomerChat({
               <div className="chat-drag-handle" aria-hidden />
               <header className="chat-header">
                 <span className="relative shrink-0">
-                  <LogoMark className="size-8" />
+                  <span className="flex size-9 items-center justify-center rounded-[11px] bg-iris text-iris-foreground">
+                    <Sparkles className="size-4" aria-hidden />
+                  </span>
                   <span
                     className={cn("absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-background", isOpen ? "bg-success" : "bg-muted-foreground")}
                     aria-hidden
@@ -471,7 +472,7 @@ function CartStrip({ onNavigate }: { onNavigate: () => void }) {
         data-testid="cart-strip"
         className={cn("chat-cart-strip", flash && "chat-cart-strip--flash")}
       >
-        <ShoppingBag className="size-3.5 text-primary" aria-hidden />
+        <ShoppingBag className="size-3.5 text-saffron-ink" aria-hidden />
         <span>
           {count} item{count === 1 ? "" : "s"}
         </span>

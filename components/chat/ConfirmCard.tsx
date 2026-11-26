@@ -118,7 +118,7 @@ export function ConfirmCard({ args: rawArgs, status, result, respond, preview, e
                   <span className="flex flex-wrap items-center gap-1.5">
                     {c.before != null && <span className="rounded bg-muted px-1.5 py-0.5 line-through decoration-muted-foreground/60">{c.before}</span>}
                     {c.before != null && c.after != null && <ArrowRight className="size-3.5 text-muted-foreground" aria-label="becomes" />}
-                    {c.after != null && <span className="rounded bg-primary/10 px-1.5 py-0.5 font-medium">{c.after}</span>}
+                    {c.after != null && <span className="rounded bg-saffron-soft px-1.5 py-0.5 font-medium text-saffron-ink">{c.after}</span>}
                   </span>
                 </li>
               ))}
@@ -154,7 +154,7 @@ export function ConfirmCard({ args: rawArgs, status, result, respond, preview, e
           )}
           {p.allow_image_upload && upload && <ImageUpload upload={upload} onUploaded={(url) => setArgs({ ...args, image_url: url })} current={args.image_url as string | undefined} />}
           {(p.warnings ?? []).map((w, i) => (
-            <p key={i} className="flex gap-2 rounded-lg bg-amber-500/10 px-2 py-1.5 text-amber-800 dark:text-amber-300">
+            <p key={i} className="flex gap-2 rounded-lg bg-warning/10 px-2 py-1.5 text-warning">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {w}
             </p>
           ))}

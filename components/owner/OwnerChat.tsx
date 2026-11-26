@@ -190,20 +190,25 @@ export function OwnerChat({ role, allowedChanges, greeting }: { role: "owner" | 
         <div className="flex h-full min-h-0 flex-col">
           <div className="flex flex-wrap items-end justify-between gap-3 pb-4">
             <div>
-              <h1 className="font-display text-4xl leading-none sm:text-5xl">AI assistant</h1>
-              <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"><Sparkles className="size-4 text-primary" /> Ask anything about sales, dishes, orders or settings.</p>
+              <div className="flex items-center gap-3">
+                <span className="flex size-10 items-center justify-center rounded-[12px] bg-iris text-iris-foreground">
+                  <Sparkles className="size-5" aria-hidden />
+                </span>
+                <h1 className="font-display text-[2.25rem] leading-none sm:text-[2.75rem]">AI assistant</h1>
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">Reads every number. Changes nothing without your Confirm click.</p>
             </div>
             <Button variant="outline" size="sm" onClick={async () => { await newConversationAction("owner"); setResetKey((k) => k + 1); }}>
               <RotateCcw /> New chat
             </Button>
           </div>
           {greeting && (
-            <details className="mb-3 rounded-2xl border bg-card px-4 py-3 text-sm" open>
-              <summary className="cursor-pointer font-medium">{greeting.title}</summary>
-              <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted-foreground">{greeting.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
+            <details className="mb-3 rounded-[18px] border border-iris-line bg-iris-soft px-4 py-3 text-sm" open>
+              <summary className="cursor-pointer font-semibold text-iris-ink">{greeting.title}</summary>
+              <ul className="mt-1.5 list-disc space-y-0.5 pl-5 text-iris-ink/90">{greeting.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
             </details>
           )}
-          <div className="min-h-[420px] flex-1 overflow-hidden rounded-3xl border bg-card">
+          <div className="min-h-[420px] flex-1 overflow-hidden rounded-[24px] border bg-card shadow-[0_24px_48px_-36px_rgb(20_19_15/0.35)]">
             <CopilotChat
               className="h-full"
               labels={{
