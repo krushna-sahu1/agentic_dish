@@ -18,8 +18,10 @@ export function VegMark({ veg, className }: { veg: boolean; className?: string }
 export function SpiceLevel({ level, className }: { level: number; className?: string }) {
   if (level <= 0) return null;
   return (
-    <span className={cn("text-xs whitespace-nowrap", className)} aria-label={`${spiceLabel(level)} (${level} of 5)`} title={spiceLabel(level)}>
-      <span aria-hidden>{"🌶".repeat(level)}</span>
+    <span role="img" className={cn("inline-flex items-end gap-[2px]", className)} aria-label={`${spiceLabel(level)}, ${level} of 5`} title={spiceLabel(level)}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span key={n} aria-hidden className={cn("w-[3px] rounded-full", n <= level ? "bg-nonveg" : "bg-border")} style={{ height: 4 + n * 1.6 }} />
+      ))}
     </span>
   );
 }

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { getSessionUser } from "@/lib/auth";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { audit } from "@/lib/agents/guard";
 import { getCategoryBreakdown, getOrderTypeSplit, getRatingsSummary, getRevenue, getTopItems } from "@/lib/agents/owner/analytics";
 

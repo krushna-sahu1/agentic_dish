@@ -36,6 +36,11 @@ describe("coupon rules", () => {
     expect(checkCouponEligibility(base, { totalRedemptions: 100, userRedemptions: 0 }, now).ok).toBe(false);
     expect(checkCouponEligibility(base, { totalRedemptions: 1, userRedemptions: 1 }, now).ok).toBe(false);
   });
+  it("campaign coupons only work for the people who were emailed", () => {
+    const usage = { totalRedemptions: 0, userRedemptions: 0 };
+    expect(checkCouponEligibility({ ...base, is_private: true }, usage, now).ok).toBe(false);
+    expect(checkCouponEligibility({ ...base, is_private: true }, { ...usage, invited: true }, now).ok).toBe(true);
+  });
   it("describes offers", () => {
     expect(describeCoupon(base)).toBe("20% off up to ₹100 on orders above ₹400");
   });

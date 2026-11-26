@@ -1,16 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Instrument_Serif } from "next/font/google";
+import { Anek_Latin, Geist } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 import type { ClientSession } from "@/components/providers/SessionProvider";
 import { getSessionUser } from "@/lib/auth";
-import { BRAND } from "@/lib/brand";
+import { BRAND, BUSINESS } from "@/lib/business";
 
-const sans = Geist({ subsets: ["latin"], variable: "--font-sans-family", display: "swap" });
-const display = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-display-family", display: "swap" });
+const sans = Geist({ subsets: ["latin", "latin-ext"], variable: "--font-sans-family", display: "swap" });
+const display = Anek_Latin({ subsets: ["latin", "latin-ext"], axes: ["wdth"], variable: "--font-display-family", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: `${BRAND.name} — South Indian & Odia kitchen`, template: `%s · ${BRAND.name}` },
+  title: { default: `${BRAND.name} · ${BUSINESS.cuisine} kitchen`, template: `%s · ${BRAND.name}` },
   description: BRAND.description,
   applicationName: BRAND.name,
   openGraph: { siteName: BRAND.name, title: BRAND.name, description: BRAND.description, type: "website" },
@@ -26,8 +26,8 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f1e7" },
-    { media: "(prefers-color-scheme: dark)", color: "#171310" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f7f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1512" },
   ],
 };
 

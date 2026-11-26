@@ -1,5 +1,5 @@
 /** Transactional email via Resend. No-ops (logs) when RESEND_API_KEY is unset. */
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { formatINR, STATUS_LABEL } from "@/lib/format";
 import { formatDateTime } from "@/lib/time";
 
@@ -29,10 +29,10 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 
 function layout(title: string, body: string) {
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  return `<!doctype html><html><body style="font-family:system-ui,sans-serif;background:#faf7f2;padding:24px;color:#1c1917">
-  <div style="max-width:560px;margin:auto;background:#fff;border-radius:12px;padding:24px;border:1px solid #e7e5e4">
-  <h2 style="margin:0 0 12px;color:#c2410c">${esc(title)}</h2>${body}
-  <p style="margin-top:24px;font-size:12px;color:#78716c">${BRAND.name} · <a href="${site}">${site}</a></p></div></body></html>`;
+  return `<!doctype html><html><body style="font-family:system-ui,sans-serif;background:#f5f7f2;padding:24px;color:#14201a">
+  <div style="max-width:560px;margin:auto;background:#fff;border-radius:12px;padding:24px;border:1px solid #dbe2d5">
+  <h2 style="margin:0 0 12px;color:#1b5e3f">${esc(title)}</h2>${body}
+  <p style="margin-top:24px;font-size:12px;color:#55635a">${BRAND.name} · <a href="${site}">${site}</a></p></div></body></html>`;
 }
 
 export interface EmailOrder {

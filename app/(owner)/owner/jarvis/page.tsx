@@ -7,7 +7,7 @@ export const metadata = { title: "Jarvis" };
 
 /** Edge-to-edge on phones so env(safe-area-inset-*) works inside the voice UI. */
 export const viewport: Viewport = {
-  themeColor: "#03050b",
+  themeColor: "#0b120f",
   colorScheme: "dark",
   viewportFit: "cover",
 };

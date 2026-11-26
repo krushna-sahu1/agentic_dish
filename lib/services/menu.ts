@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Allergen, Category, ItemAddon, ItemTag, ItemVariant, MenuItem, Profile } from "@/lib/types";
+import { BUSINESS } from "@/lib/business";
 import { ServiceError } from "./errors";
 
 export interface MenuItemFull extends MenuItem {
@@ -19,6 +20,29 @@ export interface Menu {
   byId: Map<string, MenuItemFull>;
 }
 
+interface ItemStats {
+  menu_item_id: string;
+  avg_rating: number;
+  review_count: number;
+  sold_30d: number;
+}
+
+const STATS_TTL_MS = 5 * 60_000;
+let statsMemo: { at: number; rows: Promise<ItemStats[]> } | null = null;
+
+/** Ratings and sales per dish. Display only, so a few minutes old is fine; price, stock and availability are never cached. */
+function itemStats(): Promise<ItemStats[]> {
+  if (statsMemo && Date.now() - statsMemo.at < STATS_TTL_MS) return statsMemo.rows;
+  const rows = (async () => {
+    const { data, error } = await createAdminClient().from("menu_item_stats").select("*");
+    if (error) throw new Error(error.message);
+    return data as ItemStats[];
+  })();
+  statsMemo = { at: Date.now(), rows };
+  rows.catch(() => (statsMemo = null));
+  return rows;
+}
+
 /** Whole menu (≈60 items) loaded once per request; filtering happens in memory. */
 export const getMenu = cache(async (opts: { includeDeleted?: boolean } = {}): Promise<Menu> => {
   const db = createAdminClient();
@@ -27,18 +51,13 @@ export const getMenu = cache(async (opts: { includeDeleted?: boolean } = {}): Pr
     db.from("menu_items").select("*").order("sort_order"),
     db.from("item_variants").select("*").order("sort_order"),
     db.from("item_addons").select("*").order("price_paise"),
-    db.from("menu_item_stats").select("*"),
+    itemStats(),
   ]);
-  for (const r of [cats, items, variants, addons, stats]) if (r.error) throw new Error(r.error.message);
+  for (const r of [cats, items, variants, addons]) if (r.error) throw new Error(r.error.message);
 
   const categories = (cats.data as Category[]).filter((c) => opts.includeDeleted || c.is_active);
   const catById = new Map((cats.data as Category[]).map((c) => [c.id, c]));
-  const statById = new Map(
-    (stats.data as { menu_item_id: string; avg_rating: number; review_count: number; sold_30d: number }[]).map((s) => [
-      s.menu_item_id,
-      s,
-    ]),
-  );
+  const statById = new Map(stats.map((s) => [s.menu_item_id, s]));
   const full: MenuItemFull[] = (items.data as MenuItem[])
     .filter((m) => opts.includeDeleted || (!m.is_deleted && catById.get(m.category_id)?.is_active))
     .map((m) => {
@@ -91,25 +110,6 @@ const norm = (s: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-/** Synonyms so "spicy chicken", "coffee", "kheer" etc. find the right dishes. */
-const SYNONYMS: Record<string, string[]> = {
-  coffee: ["filter coffee"],
-  tea: ["masala chai", "chai"],
-  kheer: ["payasam"],
-  prawn: ["chingudi"],
-  prawns: ["chingudi"],
-  shrimp: ["chingudi"],
-  fish: ["machha"],
-  pani: ["gupchup"],
-  puri: ["gupchup"],
-  buttermilk: ["neer mor"],
-  chaas: ["neer mor"],
-  rasgulla: ["rasagola"],
-  dal: ["dalma"],
-  sweet: ["desserts"],
-  drink: ["beverages"],
-  drinks: ["beverages"],
-};
 
 function scoreItem(item: MenuItemFull, q: string): number {
   if (!q) return 1;
@@ -120,7 +120,7 @@ function scoreItem(item: MenuItemFull, q: string): number {
   if (name.includes(q)) score += 50;
   const tokens = q.split(" ").filter((t) => t.length > 1);
   for (const t of tokens) {
-    const alts = [t, ...(SYNONYMS[t] ?? [])];
+    const alts = [t, ...(BUSINESS.searchSynonyms[t] ?? [])];
     let best = 0;
     for (const a of alts) {
       if (name.split(" ").includes(a) || name.includes(a)) best = Math.max(best, 10);

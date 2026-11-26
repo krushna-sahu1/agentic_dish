@@ -2,87 +2,103 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * One palette for every screen: banana leaf, turmeric and rice paper.
+ * Light mode leads with leaf green; dark mode leads with turmeric on deep leaf.
+ */
 :root,
 html [data-copilotkit] {
-  --background: oklch(0.967 0.013 85);
-  --foreground: oklch(0.2 0.01 60);
-  --card: oklch(0.992 0.006 85);
-  --card-foreground: oklch(0.2 0.01 60);
-  --popover: oklch(0.995 0.004 85);
-  --popover-foreground: oklch(0.2 0.01 60);
-  --primary: oklch(0.56 0.19 37);
-  --primary-foreground: oklch(0.985 0.01 80);
-  --secondary: oklch(0.93 0.018 80);
-  --secondary-foreground: oklch(0.25 0.012 60);
-  --muted: oklch(0.938 0.014 82);
-  --muted-foreground: oklch(0.47 0.016 60);
-  --accent: oklch(0.925 0.02 78);
-  --accent-foreground: oklch(0.2 0.01 60);
-  --destructive: oklch(0.54 0.2 27);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.5 0.12 150);
-  --warning: oklch(0.53 0.12 62);
-  --info: oklch(0.52 0.12 250);
-  --border: oklch(0.885 0.016 80);
-  --input: oklch(0.86 0.018 80);
-  --ring: oklch(0.56 0.19 37);
-  --veg: oklch(0.55 0.16 145);
-  --nonveg: oklch(0.52 0.19 27);
-  /* Validated categorical palette (dataviz skill; fixed order, never cycled) */
-  --chart-1: #2a78d6;
-  --chart-2: #eb6834;
-  --chart-3: #1baf7a;
-  --chart-4: #eda100;
-  --chart-5: #e87ba4;
-  --chart-6: #008300;
-  --chart-other: #a8a29e;
-  /* Sequential (blue, light → dark) for heatmaps */
-  --seq-0: #f1f6fd;
-  --seq-1: #cde2fb;
-  --seq-2: #9ec5f4;
-  --seq-3: #6da7ec;
-  --seq-4: #3987e5;
-  --seq-5: #256abf;
-  --seq-6: #184f95;
-  --seq-7: #0d366b;
-  --radius: 0.875rem;
+  --background: #f5f7f2;
+  --foreground: #14201a;
+  --card: #ffffff;
+  --card-foreground: #14201a;
+  --popover: #ffffff;
+  --popover-foreground: #14201a;
+  --primary: #1b5e3f;
+  --primary-foreground: #f6faf3;
+  --secondary: #e8ede3;
+  --secondary-foreground: #22302a;
+  --muted: #edf1e9;
+  --muted-foreground: #55635a;
+  --accent: #e2eadc;
+  --accent-foreground: #14201a;
+  --destructive: #b3311d;
+  --destructive-foreground: #ffffff;
+  --success: #24724a;
+  --warning: #8f5a00;
+  --info: #2c5f8a;
+  --border: #dbe2d5;
+  --input: #cad4c4;
+  --ring: #1b5e3f;
+  --turmeric: #e5a823;
+  --leaf: #123d2a;
+  --leaf-foreground: #eef4ea;
+  --veg: #1f8a45;
+  --nonveg: #b3311d;
+  --chart-1: #1b5e3f;
+  --chart-2: #dd9d1c;
+  --chart-3: #3b6fa0;
+  --chart-4: #c2573a;
+  --chart-5: #8a6bb0;
+  --chart-6: #6fa58a;
+  --chart-other: #9aa69d;
+  /* Sequential (light → dark) for heatmaps */
+  --seq-0: #f0f4ec;
+  --seq-1: #d9e8dc;
+  --seq-2: #b5d3bf;
+  --seq-3: #8bba9d;
+  --seq-4: #5f9d7a;
+  --seq-5: #3c7f5b;
+  --seq-6: #1f6344;
+  --seq-7: #0f402b;
+  --radius: 0.625rem;
   --cpk-default-font-family: var(--font-sans);
 }
 
 .dark,
 html.dark [data-copilotkit] {
-  --background: oklch(0.17 0.008 60);
-  --foreground: oklch(0.95 0.012 85);
-  --card: oklch(0.205 0.009 60);
-  --card-foreground: oklch(0.95 0.012 85);
-  --popover: oklch(0.225 0.01 60);
-  --popover-foreground: oklch(0.95 0.012 85);
-  --primary: oklch(0.69 0.17 42);
-  --primary-foreground: oklch(0.17 0.01 60);
-  --secondary: oklch(0.26 0.01 60);
-  --secondary-foreground: oklch(0.92 0.012 85);
-  --muted: oklch(0.24 0.009 60);
-  --muted-foreground: oklch(0.72 0.015 75);
-  --accent: oklch(0.27 0.012 60);
-  --accent-foreground: oklch(0.95 0.012 85);
-  --destructive: oklch(0.66 0.19 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.72 0.14 150);
-  --warning: oklch(0.78 0.13 75);
-  --info: oklch(0.72 0.11 250);
-  --border: oklch(0.3 0.01 60);
-  --input: oklch(0.33 0.01 60);
-  --ring: oklch(0.69 0.17 42);
-  --veg: oklch(0.7 0.16 145);
-  --nonveg: oklch(0.68 0.18 27);
-  --chart-1: #3987e5;
-  --chart-2: #d95926;
-  --chart-3: #199e70;
-  --chart-4: #c98500;
-  --chart-5: #d55181;
-  --chart-6: #008300;
-  --chart-other: #78716c;
-  --seq-0: #26211d;
+  --background: #0e1512;
+  --foreground: #e8efe5;
+  --card: #151e19;
+  --card-foreground: #e8efe5;
+  --popover: #1a2520;
+  --popover-foreground: #e8efe5;
+  --primary: #efb43c;
+  --primary-foreground: #1b1404;
+  --secondary: #202c25;
+  --secondary-foreground: #dfe8dc;
+  --muted: #1b2620;
+  --muted-foreground: #9aaaa0;
+  --accent: #25332b;
+  --accent-foreground: #e8efe5;
+  --destructive: #f0765f;
+  --destructive-foreground: #1c0703;
+  --success: #62c48c;
+  --warning: #f0a35a;
+  --info: #7fb2e0;
+  --border: #26332b;
+  --input: #33433a;
+  --ring: #efb43c;
+  --turmeric: #efb43c;
+  --leaf: #143526;
+  --leaf-foreground: #e8efe5;
+  --veg: #4fb873;
+  --nonveg: #f0765f;
+  --chart-1: #efb43c;
+  --chart-2: #62b48a;
+  --chart-3: #7fb2e0;
+  --chart-4: #e07f63;
+  --chart-5: #b79ad6;
+  --chart-6: #a9c7b4;
+  --chart-other: #6d7c73;
+  --seq-0: #1a241f;
+  --seq-1: #24392f;
+  --seq-2: #2c4f3f;
+  --seq-3: #38684f;
+  --seq-4: #558261;
+  --seq-5: #8d9b55;
+  --seq-6: #c3a744;
+  --seq-7: #efb43c;
 }
 
 @theme inline {
@@ -116,10 +132,15 @@ html.dark [data-copilotkit] {
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-chart-6: var(--chart-6);
+  --color-turmeric: var(--turmeric);
+  --color-leaf: var(--leaf);
+  --color-leaf-foreground: var(--leaf-foreground);
   --radius-sm: calc(var(--radius) - 6px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: 0.75rem;
+  --radius-2xl: 0.875rem;
+  --radius-3xl: 1.125rem;
   --font-sans: var(--font-sans-family), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-family), ui-serif, Georgia, serif;
   --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -140,11 +161,12 @@ html.dark [data-copilotkit] {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* The display serif ships a single weight — never fake-bold it. */
+  /* Anek Latin, narrowed and bold: the hand-painted signboard voice of the brand. */
   .font-display {
-    font-synthesis: none;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    font-stretch: 86%;
+    letter-spacing: -0.018em;
+    line-height: 1.02;
   }
   :focus-visible {
     outline: 2px solid var(--ring);
@@ -179,6 +201,17 @@ html.dark [data-copilotkit] {
 }
 @utility animate-fade {
   animation: fade 0.5s ease-out both;
+}
+@keyframes print {
+  from {
+    transform: translateY(-10px);
+  }
+  to {
+    transform: none;
+  }
+}
+@utility animate-print {
+  animation: print 0.35s var(--ease-out-soft);
 }
 @utility reveal {
   @supports (animation-timeline: view()) {
@@ -215,68 +248,7 @@ html.dark [data-copilotkit] {
   }
 }
 
-[data-theme="ai"],
-[data-theme="ai"] [data-copilotkit],
-[data-chat-theme="ai"] [data-copilotkit] {
-  --background: #ffffff;
-  --foreground: #111528;
-  --card: #f6f8fc;
-  --card-foreground: #111528;
-  --popover: #ffffff;
-  --popover-foreground: #111528;
-  --primary: #2f6bff;
-  --primary-foreground: #ffffff;
-  --secondary: #eef1f9;
-  --secondary-foreground: #1a2140;
-  --muted: #f1f4fa;
-  --muted-foreground: #586180;
-  --accent: #e8eeff;
-  --accent-foreground: #14204d;
-  --border: #e5e8f2;
-  --input: #dde2ef;
-  --ring: #2f6bff;
-  --success: #0f9d63;
-  --warning: #b0741a;
-  --info: #2f6bff;
-  --destructive: #e5484d;
-  --veg: #16a34a;
-  --nonveg: #dc2626;
-  color-scheme: light;
-}
-
-html.dark [data-theme="ai"],
-html.dark [data-theme="ai"] [data-copilotkit],
-html.dark [data-chat-theme="ai"] [data-copilotkit] {
-  --background: #06070d;
-  --foreground: #e9ecf7;
-  --card: #0d1018;
-  --card-foreground: #e9ecf7;
-  --popover: #10131d;
-  --popover-foreground: #e9ecf7;
-  --primary: #5b8cff;
-  --primary-foreground: #071127;
-  --secondary: #171b28;
-  --secondary-foreground: #dfe4f5;
-  --muted: #12151f;
-  --muted-foreground: #9aa4bd;
-  --accent: #1a2136;
-  --accent-foreground: #e7ecfb;
-  --border: #1e2433;
-  --input: #232a3b;
-  --ring: #5b8cff;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --info: #5b8cff;
-  --destructive: #f87171;
-  color-scheme: dark;
-}
-
-/* Cool footer inside the landing scope (the shared footer is warm elsewhere). */
-[data-theme="ai"] footer {
-  background-color: #080a12;
-  color: #e7ebf7;
-}
-
+/* ── Customer chat ───────────────────────────────────────────────────────── */
 .chat-panel {
   position: fixed;
   left: 0;
@@ -293,7 +265,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   display: flex;
 }
 
-[data-theme="ai"] .chat-sheet {
+.chat-sheet {
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -311,13 +283,13 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
 }
 
 /* Mobile drag handle; the desktop panel is a floating card, not a sheet. */
-[data-theme="ai"] .chat-drag-handle {
+.chat-drag-handle {
   display: flex;
   justify-content: center;
   flex: none;
   padding: 0.5rem 0 0.125rem;
 }
-[data-theme="ai"] .chat-drag-handle::before {
+.chat-drag-handle::before {
   content: "";
   width: 2.25rem;
   height: 4px;
@@ -326,7 +298,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-header {
+.chat-header {
   display: flex;
   align-items: center;
   gap: 0.625rem;
@@ -338,7 +310,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   border-bottom: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
 }
 
-[data-theme="ai"] .chat-icon-btn {
+.chat-icon-btn {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -351,27 +323,27 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 /* 44px hit area without a 44px visual footprint. */
-[data-theme="ai"] .chat-icon-btn::after {
+.chat-icon-btn::after {
   content: "";
   position: absolute;
   inset: -2px;
   border-radius: 999px;
 }
-[data-theme="ai"] .chat-icon-btn:hover {
+.chat-icon-btn:hover {
   background: var(--muted);
   color: var(--foreground);
 }
-[data-theme="ai"] .chat-icon-btn svg {
+.chat-icon-btn svg {
   width: 18px;
   height: 18px;
 }
 
 /* ── Cart strip ─────────────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-cart-wrap {
+.chat-cart-wrap {
   flex: none;
   padding: 0.5rem 0.75rem 0;
 }
-[data-theme="ai"] .chat-cart-strip {
+.chat-cart-strip {
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -384,38 +356,38 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: var(--card-foreground);
   transition: background-color 0.3s ease;
 }
-[data-theme="ai"] .chat-cart-strip:hover {
+.chat-cart-strip:hover {
   background: color-mix(in oklab, var(--primary) 10%, var(--muted));
 }
-[data-theme="ai"] .chat-cart-strip--flash {
+.chat-cart-strip--flash {
   animation: chat-flash 0.7s var(--ease-out-soft);
 }
 
 /* ── Body ───────────────────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-body {
+.chat-body {
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
 }
-[data-theme="ai"] .chat-body > [data-copilotkit] {
+.chat-body > [data-copilotkit] {
   height: 100%;
 }
 
 /* ── Welcome state ──────────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-welcome {
+.chat-welcome {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
 }
-[data-theme="ai"] .chat-welcome__scroll {
+.chat-welcome__scroll {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0.75rem 0.875rem 0.25rem;
 }
-[data-theme="ai"] .chat-welcome__badge {
+.chat-welcome__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -425,11 +397,11 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   background: color-mix(in oklab, var(--primary) 16%, var(--card));
   color: var(--primary);
 }
-[data-theme="ai"] .chat-welcome__badge svg {
+.chat-welcome__badge svg {
   width: 17px;
   height: 17px;
 }
-[data-theme="ai"] .chat-welcome__title {
+.chat-welcome__title {
   margin: 0.625rem 0 0;
   font-family: var(--font-display);
   font-weight: 400;
@@ -438,20 +410,20 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   letter-spacing: -0.01em;
   color: var(--foreground);
 }
-[data-theme="ai"] .chat-welcome__sub {
+.chat-welcome__sub {
   margin: 0.375rem 0 0;
   font-size: 0.875rem;
   line-height: 1.5;
   color: var(--muted-foreground);
 }
-[data-theme="ai"] .chat-welcome__cards {
+.chat-welcome__cards {
   list-style: none;
   margin: 1rem 0 0;
   padding: 0;
   display: grid;
   gap: 0.5rem;
 }
-[data-theme="ai"] .chat-suggestion-card {
+.chat-suggestion-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -466,12 +438,12 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   text-align: left;
   transition: transform 0.15s var(--ease-out-soft), border-color 0.15s ease, box-shadow 0.15s ease;
 }
-[data-theme="ai"] .chat-suggestion-card:hover {
+.chat-suggestion-card:hover {
   transform: translateY(-1px);
   border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
   box-shadow: 0 12px 26px -20px rgb(0 0 0 / 0.6);
 }
-[data-theme="ai"] .chat-suggestion-card svg {
+.chat-suggestion-card svg {
   width: 16px;
   height: 16px;
   flex: none;
@@ -483,12 +455,12 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
    lives there, so it never covers the suggestion chips or the message text.
    The gradient lets messages fade out under the composer instead of being
    sliced in half. */
-[data-theme="ai"] .chat-composer {
+.chat-composer {
   pointer-events: auto;
   padding: 1.375rem 0.75rem 0.5rem;
   background: linear-gradient(to bottom, transparent 0, var(--background) 1.375rem);
 }
-[data-theme="ai"] .chat-composer__pill {
+.chat-composer__pill {
   display: flex;
   align-items: flex-end;
   gap: 0.25rem;
@@ -498,13 +470,13 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   border: 1px solid var(--border);
   box-shadow: 0 12px 30px -20px rgb(0 0 0 / 0.55);
 }
-[data-theme="ai"] .chat-composer__field {
+.chat-composer__field {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
   align-items: center;
 }
-[data-theme="ai"] .chat-composer__field textarea {
+.chat-composer__field textarea {
   width: 100%;
   min-height: 44px;
   padding: 0.6875rem 0.25rem;
@@ -517,10 +489,10 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   border: 0;
   outline: none;
 }
-[data-theme="ai"] .chat-composer__field textarea::placeholder {
+.chat-composer__field textarea::placeholder {
   color: var(--muted-foreground);
 }
-[data-theme="ai"] .chat-composer__disclaimer {
+.chat-composer__disclaimer {
   padding: 0.375rem 0.25rem 0;
   font-size: 11px;
   line-height: 1.4;
@@ -528,7 +500,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: var(--muted-foreground);
 }
 /* The disclaimer slot brings its own wrapper — strip its padding/width. */
-[data-theme="ai"] .chat-composer__disclaimer > div {
+.chat-composer__disclaimer > div {
   margin: 0;
   padding: 0;
   max-width: none;
@@ -536,7 +508,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: inherit;
 }
 
-[data-theme="ai"] .chat-send {
+.chat-send {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -548,19 +520,19 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: var(--primary-foreground);
   transition: transform 0.15s var(--ease-out-soft), opacity 0.15s ease, background-color 0.15s ease;
 }
-[data-theme="ai"] .chat-send:hover:not(:disabled) {
+.chat-send:hover:not(:disabled) {
   transform: translateY(-1px);
 }
-[data-theme="ai"] .chat-send:disabled {
+.chat-send:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
-[data-theme="ai"] .chat-send svg {
+.chat-send svg {
   width: 18px;
   height: 18px;
 }
 
-[data-theme="ai"] .chat-mic {
+.chat-mic {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -572,15 +544,15 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: var(--muted-foreground);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
-[data-theme="ai"] .chat-mic:hover:not(:disabled) {
+.chat-mic:hover:not(:disabled) {
   background: var(--muted);
   color: var(--foreground);
 }
-[data-theme="ai"] .chat-mic[data-listening="true"] {
+.chat-mic[data-listening="true"] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
-[data-theme="ai"] .chat-mic[data-listening="true"]::after {
+.chat-mic[data-listening="true"]::after {
   content: "";
   position: absolute;
   inset: -3px;
@@ -589,17 +561,17 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   animation: chat-mic-pulse 1.5s ease-out infinite;
   pointer-events: none;
 }
-[data-theme="ai"] .chat-mic:disabled {
+.chat-mic:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
-[data-theme="ai"] .chat-mic svg {
+.chat-mic svg {
   width: 18px;
   height: 18px;
 }
 
 /* ── Suggestion chips (after the first message) ─────────────────────────── */
-[data-theme="ai"] .chat-chips {
+.chat-chips {
   display: flex;
   gap: 0.375rem;
   overflow-x: auto;
@@ -607,10 +579,10 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   padding: 0.375rem 0 0.5rem;
   scrollbar-width: none;
 }
-[data-theme="ai"] .chat-chips::-webkit-scrollbar {
+.chat-chips::-webkit-scrollbar {
   display: none;
 }
-[data-theme="ai"] .chat-chip {
+.chat-chip {
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -624,19 +596,19 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   white-space: nowrap;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-[data-theme="ai"] .chat-chip:hover {
+.chat-chip:hover {
   background: var(--accent);
   border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
 }
 
 /* ── Messages ───────────────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-assistant {
+.chat-assistant {
   display: flex;
   align-items: flex-start;
   gap: 0.625rem;
   padding: 0.375rem 0;
 }
-[data-theme="ai"] .chat-assistant__avatar {
+.chat-assistant__avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -649,30 +621,30 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: var(--primary);
   border: 1px solid color-mix(in oklab, var(--primary) 24%, transparent);
 }
-[data-theme="ai"] .chat-assistant__avatar svg {
+.chat-assistant__avatar svg {
   width: 13px;
   height: 13px;
 }
-[data-theme="ai"] .chat-assistant__body {
+.chat-assistant__body {
   flex: 1 1 auto;
   min-width: 0;
 }
-[data-theme="ai"] .chat-assistant__body .prose {
+.chat-assistant__body .prose {
   color: var(--foreground);
   font-size: 0.9375rem;
   line-height: 1.6;
 }
-[data-theme="ai"] .chat-assistant__body .prose > :first-child {
+.chat-assistant__body .prose > :first-child {
   margin-top: 0;
 }
-[data-theme="ai"] .chat-assistant__body .prose > :last-child {
+.chat-assistant__body .prose > :last-child {
   margin-bottom: 0;
 }
 
-[data-theme="ai"] .chat-body [data-testid="copilot-user-message"] {
+.chat-body [data-testid="copilot-user-message"] {
   padding-top: 0.375rem;
 }
-[data-theme="ai"] .chat-body [data-testid="copilot-user-message"] .prose {
+.chat-body [data-testid="copilot-user-message"] .prose {
   background: color-mix(in oklab, var(--primary) 14%, var(--card));
   color: var(--foreground);
   border-radius: 1.125rem;
@@ -683,18 +655,18 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
 }
 
 /* Subtle copy action under an assistant reply. */
-[data-theme="ai"] .chat-body [data-testid="copilot-assistant-toolbar"] button {
+.chat-body [data-testid="copilot-assistant-toolbar"] button {
   width: 30px;
   height: 30px;
   opacity: 0.55;
   transition: opacity 0.15s ease;
 }
-[data-theme="ai"] .chat-body [data-testid="copilot-assistant-toolbar"]:hover button {
+.chat-body [data-testid="copilot-assistant-toolbar"]:hover button {
   opacity: 1;
 }
 
 /* ── Typing indicator ───────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-typing {
+.chat-typing {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -702,22 +674,22 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   border-radius: 999px;
   background: var(--muted);
 }
-[data-theme="ai"] .chat-typing span {
+.chat-typing span {
   width: 6px;
   height: 6px;
   border-radius: 999px;
   background: var(--muted-foreground);
   animation: chat-dot 1.25s ease-in-out infinite;
 }
-[data-theme="ai"] .chat-typing span:nth-child(2) {
+.chat-typing span:nth-child(2) {
   animation-delay: 0.15s;
 }
-[data-theme="ai"] .chat-typing span:nth-child(3) {
+.chat-typing span:nth-child(3) {
   animation-delay: 0.3s;
 }
 
 /* ── Scroll to bottom ───────────────────────────────────────────────────── */
-[data-theme="ai"] .chat-scroll-bottom {
+.chat-scroll-bottom {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -733,17 +705,17 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   font-size: 11.5px;
   transition: background-color 0.15s ease, transform 0.15s var(--ease-out-soft);
 }
-[data-theme="ai"] .chat-scroll-bottom:hover {
+.chat-scroll-bottom:hover {
   background: var(--accent);
   transform: translateY(-1px);
 }
-[data-theme="ai"] .chat-scroll-bottom svg {
+.chat-scroll-bottom svg {
   width: 14px;
   height: 14px;
 }
 
 /* ── Tool cards (dish, cart, checkout, order status, confirm) ───────────── */
-[data-theme="ai"] .chat-card {
+.chat-card {
   border-radius: 1rem;
   border: 1px solid var(--border);
   background: var(--card);
@@ -752,15 +724,15 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   overflow: hidden;
 }
 /* Confirm / pay cards read as an action, not as information. */
-[data-theme="ai"] .chat-card--action {
+.chat-card--action {
   border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
   background: color-mix(in oklab, var(--primary) 8%, var(--card));
 }
-[data-theme="ai"] .chat-card--danger {
+.chat-card--danger {
   border-color: color-mix(in oklab, var(--destructive) 45%, var(--border));
   background: color-mix(in oklab, var(--destructive) 8%, var(--card));
 }
-[data-theme="ai"] .chat-card__title {
+.chat-card__title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -770,10 +742,10 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   border-bottom: 1px solid var(--border);
   background: color-mix(in oklab, var(--muted) 60%, transparent);
 }
-[data-theme="ai"] .chat-card__body {
+.chat-card__body {
   padding: 0.75rem 0.875rem;
 }
-[data-theme="ai"] .chat-card__footer {
+.chat-card__footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -784,7 +756,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
 }
 
 /* The one primary action style used by every chat card. */
-[data-theme="ai"] .chat-card__action {
+.chat-card__action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -798,24 +770,24 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   font-weight: 500;
   transition: transform 0.15s var(--ease-out-soft), background-color 0.15s ease;
 }
-[data-theme="ai"] .chat-card__action:hover {
+.chat-card__action:hover {
   transform: translateY(-1px);
 }
-[data-theme="ai"] .chat-card__action--ghost {
+.chat-card__action--ghost {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--foreground);
 }
-[data-theme="ai"] .chat-card__action--ghost:hover {
+.chat-card__action--ghost:hover {
   background: var(--muted);
 }
-[data-theme="ai"] .chat-card__action svg {
+.chat-card__action svg {
   width: 15px;
   height: 15px;
 }
 
 /* ── Launcher + login card ──────────────────────────────────────────────── */
-[data-theme="ai"].chat-launcher {
+.chat-launcher {
   position: fixed;
   right: 1rem;
   bottom: max(1.25rem, env(safe-area-inset-bottom));
@@ -837,11 +809,11 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   transition: transform 0.18s var(--ease-out-soft), box-shadow 0.18s ease;
   animation: chat-launcher-in 0.4s var(--ease-out-soft);
 }
-[data-theme="ai"].chat-launcher:hover {
+.chat-launcher:hover {
   transform: translateY(-2px);
   box-shadow: 0 22px 46px -18px rgb(0 0 0 / 0.55);
 }
-[data-theme="ai"] .chat-launcher__icon {
+.chat-launcher__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -851,15 +823,28 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
-[data-theme="ai"] .chat-launcher__icon svg {
+.chat-launcher__icon svg {
   width: 16px;
   height: 16px;
 }
-[data-theme="ai"] .chat-launcher__label {
+.chat-launcher__label {
   white-space: nowrap;
 }
+/* Phones: icon only, so it never sits on top of prices and Add buttons. */
+@media (max-width: 639px) {
+  .chat-launcher {
+    padding: 0.375rem;
+  }
+  .chat-launcher__label {
+    display: none;
+  }
+  .chat-launcher__icon {
+    width: 44px;
+    height: 44px;
+  }
+}
 
-[data-theme="ai"].chat-login-card {
+.chat-login-card {
   position: fixed;
   right: 1rem;
   bottom: max(1.25rem, env(safe-area-inset-bottom));
@@ -875,7 +860,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.55);
   animation: chat-launcher-in 0.35s var(--ease-out-soft);
 }
-[data-theme="ai"] .chat-login-card__close {
+.chat-login-card__close {
   position: absolute;
   right: 0.5rem;
   top: 0.5rem;
@@ -888,15 +873,15 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   color: var(--muted-foreground);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
-[data-theme="ai"] .chat-login-card__close:hover {
+.chat-login-card__close:hover {
   background: var(--muted);
   color: var(--foreground);
 }
-[data-theme="ai"] .chat-login-card__close svg {
+.chat-login-card__close svg {
   width: 16px;
   height: 16px;
 }
-[data-theme="ai"] .chat-login-card__title {
+.chat-login-card__title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -904,7 +889,7 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   font-size: 0.875rem;
   font-weight: 500;
 }
-[data-theme="ai"] .chat-login-card__icon {
+.chat-login-card__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -915,17 +900,17 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   background: var(--primary);
   color: var(--primary-foreground);
 }
-[data-theme="ai"] .chat-login-card__icon svg {
+.chat-login-card__icon svg {
   width: 14px;
   height: 14px;
 }
-[data-theme="ai"] .chat-login-card__actions {
+.chat-login-card__actions {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.875rem;
 }
-[data-theme="ai"] .chat-login-card__primary,
-[data-theme="ai"] .chat-login-card__secondary {
+.chat-login-card__primary,
+.chat-login-card__secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -937,22 +922,22 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   font-weight: 500;
   transition: background-color 0.15s ease, transform 0.15s var(--ease-out-soft);
 }
-[data-theme="ai"] .chat-login-card__primary {
+.chat-login-card__primary {
   background: var(--primary);
   color: var(--primary-foreground);
 }
-[data-theme="ai"] .chat-login-card__primary:hover {
+.chat-login-card__primary:hover {
   transform: translateY(-1px);
 }
-[data-theme="ai"] .chat-login-card__secondary {
+.chat-login-card__secondary {
   border: 1px solid var(--border);
   color: var(--foreground);
 }
-[data-theme="ai"] .chat-login-card__secondary:hover {
+.chat-login-card__secondary:hover {
   background: var(--muted);
 }
-[data-theme="ai"] .chat-login-card__primary svg,
-[data-theme="ai"] .chat-login-card__secondary svg {
+.chat-login-card__primary svg,
+.chat-login-card__secondary svg {
   width: 15px;
   height: 15px;
 }
@@ -969,8 +954,8 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
 }
 
 @media (min-width: 640px) {
-  [data-theme="ai"].chat-launcher,
-  [data-theme="ai"].chat-login-card {
+  .chat-launcher,
+  .chat-login-card {
     right: 1.5rem;
   }
 }
@@ -1030,13 +1015,13 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
   .chat-panel[data-open="true"] {
     display: flex;
   }
-  [data-theme="ai"] .chat-sheet {
+  .chat-sheet {
     border-bottom: 1px solid var(--border);
     border-radius: 1.5rem;
     box-shadow: 0 30px 80px -24px rgb(0 0 0 / 0.55);
     animation: chat-panel-in 0.26s var(--ease-out-soft);
   }
-  [data-theme="ai"] .chat-drag-handle {
+  .chat-drag-handle {
     display: none;
   }
 }
@@ -1054,125 +1039,14 @@ html.dark [data-chat-theme="ai"] [data-copilotkit] {
 
 @media (prefers-reduced-motion: reduce) {
   .chat-panel,
-  [data-theme="ai"] .chat-cart-strip--flash,
-  [data-theme="ai"] .chat-mic[data-listening="true"]::after,
-  [data-theme="ai"] .chat-typing span {
+  .chat-cart-strip--flash,
+  .chat-mic[data-listening="true"]::after,
+  .chat-typing span {
     animation: none !important;
   }
-  [data-theme="ai"] .chat-suggestion-card:hover,
-  [data-theme="ai"] .chat-send:hover:not(:disabled),
-  [data-theme="ai"] .chat-scroll-bottom:hover {
+  .chat-suggestion-card:hover,
+  .chat-send:hover:not(:disabled),
+  .chat-scroll-bottom:hover {
     transform: none;
-  }
-}
-
-/* ── Aurora glow: hero background + a single headline word ─────────────────── */
-@keyframes ai-aurora-drift {
-  from {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  to {
-    transform: translate3d(0, -3%, 0) scale(1.08);
-  }
-}
-
-.ai-aurora {
-  background:
-    radial-gradient(38% 46% at 18% 22%, rgb(47 107 255 / 0.3), transparent 70%),
-    radial-gradient(34% 42% at 82% 16%, rgb(139 92 246 / 0.26), transparent 72%),
-    radial-gradient(40% 50% at 78% 74%, rgb(34 211 238 / 0.22), transparent 70%),
-    radial-gradient(32% 40% at 26% 84%, rgb(255 180 138 / 0.24), transparent 70%);
-  filter: saturate(115%);
-  animation: ai-aurora-drift 16s ease-in-out infinite alternate;
-}
-
-html.dark .ai-aurora {
-  opacity: 0.7;
-}
-
-.ai-gradient-text {
-  background-image: linear-gradient(98deg, #2f6bff 0%, #7c5cff 44%, #22c8e6 74%, #ffb98c 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-
-/* ── Animated conic border (hero chat card only) ──────────────────────────── */
-@property --ai-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes ai-ring-spin {
-  to {
-    --ai-angle: 360deg;
-  }
-}
-
-.ai-ring {
-  position: relative;
-  background: var(--card);
-}
-
-.ai-ring::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(from var(--ai-angle), #2f6bff, #7c5cff, #22d3ee, #ffb98c, #2f6bff);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: destination-out;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  animation: ai-ring-spin 7s linear infinite;
-  pointer-events: none;
-}
-
-/* ── Tiny CSS-only motion for the chat demo ───────────────────────────────── */
-@keyframes ai-blink {
-  0%,
-  80%,
-  100% {
-    opacity: 0.25;
-    transform: translateY(0);
-  }
-  40% {
-    opacity: 1;
-    transform: translateY(-2px);
-  }
-}
-
-.ai-dot {
-  animation: ai-blink 1.3s infinite;
-}
-.ai-dot:nth-child(2) {
-  animation-delay: 0.18s;
-}
-.ai-dot:nth-child(3) {
-  animation-delay: 0.36s;
-}
-
-@keyframes ai-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-.ai-float {
-  animation: ai-float 5s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ai-aurora,
-  .ai-ring::before,
-  .ai-float,
-  .ai-dot {
-    animation: none !important;
   }
 }

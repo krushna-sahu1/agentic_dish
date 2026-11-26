@@ -14,11 +14,11 @@ import type { JarvisStatus } from "./useJarvis";
 const COUNT = 4200;
 
 const STATE: Record<JarvisStatus, { color: [number, number, number]; intensity: number; swirl: number; speed: number }> = {
-  idle: { color: [0.78, 0.82, 0.9], intensity: 0.45, swirl: 0, speed: 0.25 },
-  connecting: { color: [0.55, 0.6, 0.95], intensity: 0.6, swirl: 0.6, speed: 0.6 },
+  idle: { color: [0.78, 0.88, 0.8], intensity: 0.45, swirl: 0, speed: 0.25 },
+  connecting: { color: [0.5, 0.85, 0.65], intensity: 0.6, swirl: 0.6, speed: 0.6 },
   listening: { color: [0.2, 1.0, 0.55], intensity: 0.95, swirl: 0, speed: 0.5 },
-  thinking: { color: [0.45, 0.4, 1.0], intensity: 0.95, swirl: 1.4, speed: 1.2 },
-  speaking: { color: [1.0, 0.55, 0.15], intensity: 1.1, swirl: 0.2, speed: 0.8 },
+  thinking: { color: [0.95, 0.85, 0.5], intensity: 0.95, swirl: 1.4, speed: 1.2 },
+  speaking: { color: [0.94, 0.7, 0.24], intensity: 1.1, swirl: 0.2, speed: 0.8 },
 };
 
 const vertex = /* glsl */ `
@@ -115,8 +115,8 @@ function Particles({ status, levels }: { status: JarvisStatus; levels: () => { m
     u.uTime.value += delta * (0.6 + cfg.speed);
     u.uScale.value = state.gl.getPixelRatio();
 
-    // Colour: thinking drifts between blue and purple.
-    if (status === "thinking") target.setRGB(0.35 + 0.35 * (0.5 + 0.5 * Math.sin(t * 1.7)), 0.4, 1.0);
+    // Colour: thinking drifts between leaf green and turmeric.
+    if (status === "thinking") target.setRGB(0.55 + 0.4 * (0.5 + 0.5 * Math.sin(t * 1.7)), 0.8, 0.45);
     else target.setRGB(...cfg.color);
     (u.uColor.value as THREE.Color).lerp(target, k);
     u.uIntensity.value += (cfg.intensity - u.uIntensity.value) * k;

@@ -11,7 +11,6 @@ export type AgentKind = "customer" | "owner";
 
 export const MAX_MESSAGE_CHARS = 2000;
 export const RATE_LIMIT_PER_MIN = 30;
-export const ANON_RATE_LIMIT_PER_MIN = 20;
 
 /**
  * Tools staff may use on the owner agent (§7.4). Everything else on the owner
@@ -39,21 +38,11 @@ export const STAFF_ALLOWED_TOOLS = new Set<string>([
   "list_alerts",
 ]);
 
-/** Customer-agent tools that work without logging in (read-only menu/info). */
-export const ANONYMOUS_CUSTOMER_TOOLS = new Set<string>([
-  "search_menu",
-  "get_item_details",
-  "get_recommendations",
-  "get_pairings",
-  "get_restaurant_info",
-]);
-
 export interface AgentContext {
   agent: AgentKind;
   userId: string | null;
   email: string | null;
   role: Role | null;
-  ip?: string | null;
 }
 
 export class ToolAccessError extends Error {
@@ -67,7 +56,6 @@ export class ToolAccessError extends Error {
 
 export function canUseTool(ctx: Pick<AgentContext, "agent" | "role" | "userId">, tool: string): { ok: true } | { ok: false; code: "login_required" | "forbidden"; message: string } {
   if (ctx.agent === "customer") {
-    if (ANONYMOUS_CUSTOMER_TOOLS.has(tool)) return { ok: true };
     if (!ctx.userId) return { ok: false, code: "login_required", message: "Please log in so I can do that for you." };
     return { ok: true };
   }
@@ -82,17 +70,11 @@ export function canUseTool(ctx: Pick<AgentContext, "agent" | "role" | "userId">,
   };
 }
 
-export function assertCanUseTool(ctx: AgentContext, tool: string) {
-  const r = canUseTool(ctx, tool);
-  if (!r.ok) throw new ToolAccessError(r.message, r.code);
-}
-
 // ---------------------------------------------------------------- rate limiting
-export async function checkRateLimit(ctx: Pick<AgentContext, "userId" | "ip" | "agent">): Promise<boolean> {
-  const bucket = ctx.userId ? `agent:${ctx.agent}:user:${ctx.userId}` : `agent:${ctx.agent}:ip:${ctx.ip ?? "unknown"}`;
-  const limit = ctx.userId ? RATE_LIMIT_PER_MIN : ANON_RATE_LIMIT_PER_MIN;
+export async function checkRateLimit(ctx: Pick<AgentContext, "userId" | "agent">): Promise<boolean> {
+  const bucket = `agent:${ctx.agent}:user:${ctx.userId}`;
   try {
-    const { data, error } = await createAdminClient().rpc("hit_rate_limit", { p_bucket: bucket, p_limit: limit, p_window_seconds: 60 });
+    const { data, error } = await createAdminClient().rpc("hit_rate_limit", { p_bucket: bucket, p_limit: RATE_LIMIT_PER_MIN, p_window_seconds: 60 });
     if (error) return true; // fail open on infra error; auth/role checks still apply
     return data === true;
   } catch {
@@ -147,7 +129,7 @@ export function untrusted(text: string | null | undefined): string | null {
   return `<user_text>${cleaned}</user_text>`;
 }
 
-export const UNTRUSTED_FIELDS = new Set(["comment", "notes", "special_instructions", "owner_reply", "cancelled_reason", "body", "reason_text"]);
+export const UNTRUSTED_FIELDS = new Set(["customer", "customer_name", "guest_name", "full_name", "comment", "notes", "special_instructions", "owner_reply", "cancelled_reason", "body", "reason_text"]);
 
 /** Deep-wraps known user-text fields in a tool result. */
 export function wrapUntrustedFields<T>(value: T): T {

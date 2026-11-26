@@ -66,9 +66,11 @@ export async function executeOwnerChange(name: OwnerChangeName, args: unknown) {
 }
 
 export async function rejectOwnerChange(name: OwnerChangeName, args: unknown) {
-  const user = await getSessionUser();
-  await audit({ ctx: { userId: user?.userId ?? null, agent: "owner" }, tool: name, params: args, status: "rejected_by_user", summary: "Owner cancelled" });
-  return { ok: true as const, data: null };
+  return runOwner(name, async (u) => {
+    const { data } = parse(name, args);
+    await audit({ ctx: { userId: u.userId, agent: "owner" }, tool: name, params: data, status: "rejected_by_user", summary: "Owner cancelled" });
+    return null;
+  });
 }
 
 export async function liveKpisAction() {

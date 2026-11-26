@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogIn, Sparkles, X } from "lucide-react";
+import { LogIn, MessageCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,7 +19,6 @@ export function LoginToChatCard({ onClose, className }: { onClose?: () => void; 
       role="dialog"
       aria-label="Log in to chat with our AI host"
       data-testid="chat-login-card"
-      data-theme="ai"
       className={cn("chat-login-card", className)}
     >
       {onClose && (
@@ -29,7 +28,7 @@ export function LoginToChatCard({ onClose, className }: { onClose?: () => void; 
       )}
       <p className="chat-login-card__title">
         <span className="chat-login-card__icon" aria-hidden>
-          <Sparkles />
+          <MessageCircle />
         </span>
         Log in to chat with our AI host
       </p>

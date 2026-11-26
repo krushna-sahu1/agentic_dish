@@ -1,14 +1,7 @@
 "use client";
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { formatINR } from "@/lib/format";
-
-const shortINR = (paise: number) => {
-  const r = paise / 100;
-  if (r >= 100000) return `₹${(r / 100000).toFixed(1)}L`;
-  if (r >= 1000) return `₹${(r / 1000).toFixed(1)}k`;
-  return `₹${Math.round(r)}`;
-};
+import { formatINR, formatINRShort } from "@/lib/format";
 
 /** Single-series daily revenue bars (no legend: the panel title names the series). */
 export function RevenueChart({ data }: { data: { label: string; revenue_paise: number; orders: number }[] }) {
@@ -18,7 +11,7 @@ export function RevenueChart({ data }: { data: { label: string; revenue_paise: n
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="28%">
           <CartesianGrid vertical={false} stroke="var(--border)" />
           <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
-          <YAxis tickLine={false} axisLine={false} width={52} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} tickFormatter={shortINR} />
+          <YAxis tickLine={false} axisLine={false} width={52} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} tickFormatter={formatINRShort} />
           <Tooltip
             cursor={{ fill: "var(--muted)" }}
             content={({ active, payload, label }) =>

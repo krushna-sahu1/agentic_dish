@@ -33,12 +33,12 @@ export function LazyCustomerChat(props: Props) {
       setInitial({ open: true, prompt: (e as CustomEvent<{ prompt?: string }>).detail?.prompt });
       setLoad(true);
     };
-    window.addEventListener("agentic:open-chat", onOpen);
-    if (!session) return () => window.removeEventListener("agentic:open-chat", onOpen);
+    window.addEventListener("open-chat", onOpen);
+    if (!session) return () => window.removeEventListener("open-chat", onOpen);
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
     const idle = w.requestIdleCallback ? w.requestIdleCallback(() => setLoad(true), { timeout: 6000 }) : globalThis.setTimeout(() => setLoad(true), 4000);
     return () => {
-      window.removeEventListener("agentic:open-chat", onOpen);
+      window.removeEventListener("open-chat", onOpen);
       if (w.cancelIdleCallback) w.cancelIdleCallback(idle as number);
       else clearTimeout(idle as unknown as number);
     };

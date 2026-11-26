@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Sparkles } from "lucide-react";
+import { Search, SlidersHorizontal, MessageCircle } from "lucide-react";
 import { Input, Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { ALLERGENS, ITEM_TAGS } from "@/lib/types";
+import { ALLERGENS, ITEM_TAGS, TAG_LABEL } from "@/lib/types";
+import { BUSINESS } from "@/lib/business";
 import { cn } from "@/lib/utils";
 import { DishCard, type DishCardItem } from "./DishCard";
 import { openChat } from "./chat-events";
@@ -85,14 +86,14 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
 
   return (
     <div>
-      <div className="sticky top-16 z-30 -mx-4 border-b bg-background/95 px-4 pb-2 pt-3 backdrop-blur">
+      <div className="sticky top-16 z-30 -mx-4 border-b bg-background/95 px-4 pt-3 backdrop-blur sm:top-[72px] sm:-mx-6 sm:px-6">
         <div className="flex gap-2">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
               type="search"
               aria-label="Search the menu"
-              placeholder="Search dosa, biryani, chhena poda…"
+              placeholder={BUSINESS.searchPlaceholder}
               className="pl-9"
               value={f.q}
               onChange={(e) => setF({ ...f, q: e.target.value })}
@@ -128,7 +129,7 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
                 <option value="">Any</option>
                 {ITEM_TAGS.map((t) => (
                   <option key={t} value={t}>
-                    {t.replace("_", " ")}
+                    {TAG_LABEL[t]}
                   </option>
                 ))}
               </Select>
@@ -154,14 +155,14 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
             </div>
           </div>
         )}
-        <nav aria-label="Categories" className="mt-2 flex gap-1 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <nav aria-label="Categories" className="mt-1 flex gap-5 overflow-x-auto [scrollbar-width:none]">
           {categories.map((c) => (
             <a
               key={c.slug}
               href={`#cat-${c.slug}`}
               className={cn(
-                "whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors",
-                active === c.slug ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent",
+                "-mb-px whitespace-nowrap border-b-2 py-2.5 text-sm transition-colors",
+                active === c.slug ? "border-primary font-semibold text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               {c.name}
@@ -174,14 +175,14 @@ export function MenuBrowser({ categories, items: initial }: { categories: { slug
         <div className="py-16 text-center">
           <p className="text-muted-foreground">No dishes match those filters.</p>
           <Button variant="link" onClick={() => openChat(f.q ? `Do you have anything like "${f.q}"?` : undefined)}>
-            <Sparkles /> Ask our AI instead
+            <MessageCircle /> Ask our AI instead
           </Button>
         </div>
       ) : (
         grouped.map((g) => (
-          <section key={g.slug} id={`cat-${g.slug}`} data-category-section className="pt-8">
-            <h2 className="mb-3 font-display text-2xl">{g.name}</h2>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <section key={g.slug} id={`cat-${g.slug}`} data-category-section className="scroll-mt-40 pt-10">
+            <h2 className="font-display text-3xl sm:text-4xl">{g.name}</h2>
+            <div className="mt-2 grid gap-x-14 lg:grid-cols-2">
               {g.items.map((i) => (
                 <DishCard key={i.id} item={i} />
               ))}

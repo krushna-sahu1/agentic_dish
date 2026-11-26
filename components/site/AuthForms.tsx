@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { resolvePostAuthPath } from "@/app/actions/auth";
+import type { AuthMethods } from "@/lib/auth-methods";
 
 function safeNext(next: string | null) {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
@@ -37,13 +38,11 @@ function GoogleButton({ next }: { next: string }) {
   );
 }
 
-export function LoginForm() {
+export function LoginForm({ methods }: { methods: AuthMethods }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
   const [mode, setMode] = useState<"email" | "phone">("email");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -57,14 +56,18 @@ export function LoginForm() {
     router.refresh();
   };
 
-  const emailLogin = async (e: React.FormEvent) => {
+  // Read from the form, not state: text typed before the page hydrates is kept.
+  const emailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const field = (id: string) => (e.currentTarget.elements.namedItem(id) as HTMLInputElement).value;
+    const email = field("email").trim();
+    const password = field("password");
     setBusy(true);
     setError(null);
     const { error } = await createClient().auth.signInWithPassword({ email, password });
+    if (!error) return done();
     setBusy(false);
-    if (error) setError(error.message);
-    else await done();
+    setError(error.message);
   };
 
   const phoneLogin = async (e: React.FormEvent) => {
@@ -81,13 +84,14 @@ export function LoginForm() {
       return;
     }
     const { error } = await supabase.auth.verifyOtp({ phone: formatted, token: otp, type: "sms" });
+    if (!error) return done();
     setBusy(false);
-    if (error) setError(error.message);
-    else await done();
+    setError(error.message);
   };
 
   return (
     <div className="space-y-5">
+      {methods.phone && (
       <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-sm" role="tablist" aria-label="Login method">
         {(["email", "phone"] as const).map((m) => (
           <button key={m} role="tab" aria-selected={mode === m} onClick={() => setMode(m)} className={`rounded-md py-1.5 ${mode === m ? "bg-card font-medium shadow-sm" : "text-muted-foreground"}`}>
@@ -95,21 +99,22 @@ export function LoginForm() {
           </button>
         ))}
       </div>
+      )}
       {mode === "email" ? (
         <form onSubmit={emailLogin} className="space-y-3">
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input id="email" type="email" autoComplete="email" required />
           </div>
           <div>
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
               <Link href="/reset-password" className="text-xs text-primary hover:underline">Forgot?</Link>
             </div>
-            <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input id="password" type="password" autoComplete="current-password" required />
           </div>
           <Button type="submit" className="w-full" disabled={busy}>
-            {busy && <Loader2 className="animate-spin" />} Log in
+            {busy && <Loader2 className="animate-spin" />} {busy ? "Logging in…" : "Log in"}
           </Button>
         </form>
       ) : (
@@ -130,10 +135,14 @@ export function LoginForm() {
         </form>
       )}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-      <div className="relative text-center text-xs text-muted-foreground before:absolute before:inset-x-0 before:top-1/2 before:h-px before:bg-border">
-        <span className="relative bg-background px-2">or</span>
-      </div>
-      <GoogleButton next={next} />
+      {methods.google && (
+        <>
+          <div className="relative text-center text-xs text-muted-foreground before:absolute before:inset-x-0 before:top-1/2 before:h-px before:bg-border">
+            <span className="relative bg-background px-2">or</span>
+          </div>
+          <GoogleButton next={next} />
+        </>
+      )}
       <p className="text-center text-sm text-muted-foreground">
         New here? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="text-primary hover:underline">Create an account</Link>
       </p>
@@ -141,7 +150,7 @@ export function LoginForm() {
   );
 }
 
-export function SignupForm() {
+export function SignupForm({ methods }: { methods: AuthMethods }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
@@ -195,7 +204,7 @@ export function SignupForm() {
       <Button type="submit" className="w-full" disabled={busy}>
         {busy && <Loader2 className="animate-spin" />} Create account
       </Button>
-      <GoogleButton next={next} />
+      {methods.google && <GoogleButton next={next} />}
       <p className="text-center text-sm text-muted-foreground">
         Already have an account? <Link href={`/login?next=${encodeURIComponent(next)}`} className="text-primary hover:underline">Log in</Link>
       </p>

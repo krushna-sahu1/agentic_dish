@@ -52,7 +52,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-5xl leading-none">#{o.order_number.split("-").pop()}</h1>
+            <h1 className="font-display text-4xl">#{o.order_number.split("-").pop()}</h1>
             <StatusBadge status={o.status} className="text-sm" />
           </div>
           <p className="mt-2 text-sm text-muted-foreground">

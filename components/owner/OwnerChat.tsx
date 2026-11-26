@@ -2,7 +2,7 @@
 
 import "@copilotkit/react-core/v2/styles.css";
 import { useMemo, useState } from "react";
-import { RotateCcw, Sparkles } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { CopilotChat, CopilotKitProvider, useAgentContext, useConfigureSuggestions, type ReactHumanInTheLoop, type ReactToolCallRenderer } from "@copilotkit/react-core/v2";
@@ -190,8 +190,8 @@ export function OwnerChat({ role, allowedChanges, greeting }: { role: "owner" | 
         <div className="flex h-full min-h-0 flex-col">
           <div className="flex flex-wrap items-end justify-between gap-3 pb-4">
             <div>
-              <h1 className="font-display text-4xl leading-none sm:text-5xl">AI assistant</h1>
-              <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground"><Sparkles className="size-4 text-primary" /> Ask anything about sales, dishes, orders or settings.</p>
+              <h1 className="font-display text-3xl sm:text-4xl">AI assistant</h1>
+              <p className="mt-1.5 text-sm text-muted-foreground">Ask about sales, dishes, orders or settings. Changes wait for your Confirm.</p>
             </div>
             <Button variant="outline" size="sm" onClick={async () => { await newConversationAction("owner"); setResetKey((k) => k + 1); }}>
               <RotateCcw /> New chat
@@ -203,7 +203,7 @@ export function OwnerChat({ role, allowedChanges, greeting }: { role: "owner" | 
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-muted-foreground">{greeting.lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
             </details>
           )}
-          <div className="min-h-[420px] flex-1 overflow-hidden rounded-3xl border bg-card">
+          <div className="min-h-[420px] flex-1 overflow-hidden rounded-2xl border bg-card">
             <CopilotChat
               className="h-full"
               labels={{

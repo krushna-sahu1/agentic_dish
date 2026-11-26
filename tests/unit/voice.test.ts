@@ -20,7 +20,7 @@ describe("speechErrorMessage", () => {
 
 describe("customer prompt", () => {
   it("tells the agent voice input may mishear dish names", () => {
-    expect(customerSystemPrompt({ restaurantName: "Test", loggedIn: true })).toContain(
+    expect(customerSystemPrompt({ restaurantName: "Test" })).toContain(
       "Voice messages may have misheard words. Match unclear dish names to the closest menu item, or ask if unsure.",
     );
   });

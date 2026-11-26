@@ -154,7 +154,7 @@ export function ConfirmCard({ args: rawArgs, status, result, respond, preview, e
           )}
           {p.allow_image_upload && upload && <ImageUpload upload={upload} onUploaded={(url) => setArgs({ ...args, image_url: url })} current={args.image_url as string | undefined} />}
           {(p.warnings ?? []).map((w, i) => (
-            <p key={i} className="flex gap-2 rounded-lg bg-amber-500/10 px-2 py-1.5 text-amber-800 dark:text-amber-300">
+            <p key={i} className="flex gap-2 rounded-lg bg-warning/10 px-2 py-1.5 text-warning">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" /> {w}
             </p>
           ))}

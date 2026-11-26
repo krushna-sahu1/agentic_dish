@@ -38,7 +38,7 @@ function Header({ title, period, onDismiss }: { title: string; period?: string; 
   return (
     <div className="mb-3 flex items-start gap-2">
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/50">{title}</p>
+        <p className="text-xs font-medium text-white/50">{title}</p>
         {period && <p className="truncate text-xs text-white/35">{period}</p>}
       </div>
       {onDismiss && (
@@ -127,7 +127,7 @@ function DataPanel({ spec, onDismiss }: { spec: PanelSpec; onDismiss: () => void
                   </div>
                   <div className="h-1.5 overflow-hidden rounded-full bg-white/8">
                     <motion.div
-                      className={cn("h-full rounded-full", i === 0 ? "bg-gradient-to-r from-orange-400 to-amber-300" : "bg-gradient-to-r from-sky-400/80 to-violet-400/80")}
+                      className={cn("h-full rounded-full", i === 0 ? "bg-gradient-to-r from-amber-400 to-amber-300" : "bg-gradient-to-r from-sky-400/80 to-violet-400/80")}
                       initial={{ width: 0 }}
                       animate={{ width: `${(b.value / max) * 100}%` }}
                       transition={{ duration: 0.9, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
@@ -152,7 +152,7 @@ function DataPanel({ spec, onDismiss }: { spec: PanelSpec; onDismiss: () => void
       return (
         <div className={glass}>
           <Header title={spec.title} period={spec.period} onDismiss={onDismiss} />
-          {spec.headline && <p className="-mt-1 mb-3 text-sm font-medium text-orange-200">{spec.headline}</p>}
+          {spec.headline && <p className="-mt-1 mb-3 text-sm font-medium text-amber-200">{spec.headline}</p>}
           <div className="grid gap-[3px]" style={{ gridTemplateColumns: `2rem repeat(${hours.length}, minmax(0, 1fr))` }} role="img" aria-label={spec.headline ?? "Orders by day and hour"}>
             {days.map((d, row) => (
               <div key={d} className="contents">
@@ -195,7 +195,7 @@ function DataPanel({ spec, onDismiss }: { spec: PanelSpec; onDismiss: () => void
                 <motion.li key={o.order_number} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }} className="rounded-xl border border-white/8 bg-white/[0.04] p-3">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-sm font-semibold">{o.order_number.replace(/^ORD-\d{8}-/, "#")}</span>
-                    <span className="rounded-full bg-orange-400/15 px-2 py-0.5 text-[10px] font-medium text-orange-200">{STATUS_LABEL[o.status] ?? o.status}</span>
+                    <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-medium text-amber-200">{STATUS_LABEL[o.status] ?? o.status}</span>
                   </div>
                   <p className="mt-1 line-clamp-2 text-xs text-white/60">{o.items}</p>
                   <div className="mt-1.5 flex justify-between text-[11px] text-white/45">
@@ -276,7 +276,7 @@ function ConfirmPanel({ panel, onConfirm, onCancel, onDismiss }: { panel: Extrac
   const p = panel.preview;
   const closed = panel.state === "done" || panel.state === "cancelled" || panel.state === "error";
   return (
-    <div className={cn(glass, "border-orange-300/30 shadow-[0_0_50px_-12px_rgba(251,146,60,0.45)]")} role="alertdialog" aria-label={p.title}>
+    <div className={cn(glass, "border-amber-300/30 shadow-[0_0_50px_-12px_rgba(239,180,60,0.45)]")} role="alertdialog" aria-label={p.title}>
       <Header title="Confirm on screen" onDismiss={closed ? onDismiss : undefined} />
       <p className="text-base font-semibold">{p.title}</p>
       {p.description && <p className="mt-1 text-xs text-white/55">{stripUserText(p.description)}</p>}
@@ -331,7 +331,7 @@ function ConfirmPanel({ panel, onConfirm, onCancel, onDismiss }: { panel: Extrac
             disabled={panel.state === "running"}
             className={cn(
               "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold text-black transition active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-white/40 disabled:opacity-60",
-              p.destructive ? "bg-rose-400 hover:bg-rose-300" : "bg-orange-400 hover:bg-orange-300",
+              p.destructive ? "bg-rose-400 hover:bg-rose-300" : "bg-amber-400 hover:bg-amber-300",
             )}
           >
             {panel.state === "running" ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Check className="size-4" aria-hidden />}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import { executeOwnerChange, uploadDishImageAction } from "@/app/actions/owner";
-import { ITEM_TAGS } from "@/lib/types";
+import { ITEM_TAGS, TAG_LABEL } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export interface DishFormValue {
@@ -24,7 +24,6 @@ export interface DishFormValue {
   is_available: boolean;
 }
 
-const TAG_LABEL: Record<string, string> = { bestseller: "Bestseller", chef_special: "Chef's special", new: "New", healthy: "Healthy", kids: "Kids" };
 const SPICE = ["Not spicy", "Mild", "Medium", "Spicy", "Very spicy", "Fiery"];
 
 export const emptyDish = (category: string): DishFormValue => ({
@@ -93,8 +92,7 @@ export function DishFormDialog({
       spice_level: v.spice_level,
       tags: v.tags,
       prep_time_min: v.prep_time_min,
-      // A removed photo falls back to the menu's illustrated placeholder.
-      ...(v.image_url ? { image_url: v.image_url } : editing ? { image_url: "/dishes/placeholder.svg" } : {}),
+      ...(v.image_url || editing ? { image_url: v.image_url } : {}),
     };
     setError(null);
     start(async () => {

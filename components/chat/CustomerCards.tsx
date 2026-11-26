@@ -41,21 +41,20 @@ export function DishCarousel({ title, items, notes }: { title?: string; items: D
 
 function MiniDish({ d }: { d: Dish }) {
   return (
-    <article className="flex w-44 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card shadow-[0_1px_2px_rgb(0_0_0/0.04),0_14px_30px_-26px_rgb(0_0_0/0.55)]" data-testid="mini-dish" data-dish={d.slug}>
-      <Link href={`/menu/${d.slug}`} className="relative">
-        <DishImage src={d.image_url} alt="" className={cn("aspect-[4/3]", !d.available && "grayscale")} />
-        {!d.available && <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-xs font-semibold text-white">SOLD OUT</span>}
+    <article className="flex w-48 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card " data-testid="mini-dish" data-dish={d.slug}>
+      <Link href={`/menu/${d.slug}`} tabIndex={-1} aria-hidden className="empty:hidden">
+        <DishImage src={d.image_url} alt="" className={cn("aspect-[4/3] w-full", !d.available && "grayscale")} />
       </Link>
-      <div className="flex flex-1 flex-col gap-1 p-2">
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
         <div className="flex items-start gap-1.5">
           <VegMark veg={d.is_veg} className="mt-0.5" />
-          <p className="flex-1 text-xs font-semibold leading-tight">{d.name}</p>
+          <p className="flex-1 text-[13px] font-semibold leading-tight"><Link href={`/menu/${d.slug}`} className="underline-offset-2 hover:underline">{d.name}</Link></p>
         </div>
         <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
           <SpiceLevel level={d.spice_level} />
           {d.rating ? (
             <span className="flex items-center gap-0.5">
-              <Star className="size-3 fill-amber-400 text-amber-400" />
+              <Star className="size-3 fill-turmeric text-turmeric" />
               {Number(d.rating).toFixed(1)}
             </span>
           ) : null}
@@ -243,7 +242,7 @@ export function CartSummaryCard({ cart, headline }: { cart: CompactCart; headlin
         {t.tipPaise > 0 && <Row k="Tip" v={t.tipPaise} />}
       </dl>
       {[...cart.warnings, ...(cart.coupon_message ? [cart.coupon_message] : [])].map((w, i) => (
-        <p key={i} className="mt-1 text-xs text-amber-700 dark:text-amber-300">{w}</p>
+        <p key={i} className="mt-1 text-xs text-warning">{w}</p>
       ))}
     </CardShell>
   );

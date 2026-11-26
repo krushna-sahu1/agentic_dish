@@ -18,7 +18,6 @@ export interface DeepgramFunction {
 export const JARVIS_WRITE_TOOLS = new Set<string>(Object.keys(OWNER_CHANGE_SCHEMAS));
 /** Tools that run straight away (reads, plus draft_email which only drafts). */
 export const JARVIS_DIRECT_TOOLS = [...ownerReadTools, ...ownerEmailTools];
-export const JARVIS_READ_TOOLS = new Set<string>(JARVIS_DIRECT_TOOLS.map((t) => t.name));
 
 /** Zod → plain JSON Schema object (input side, so defaulted fields stay optional). */
 export function zodToParameters(schema: z.ZodTypeAny): Record<string, unknown> {

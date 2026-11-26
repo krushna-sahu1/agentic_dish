@@ -5,7 +5,6 @@
 import { z } from "zod";
 
 export const EMAIL_GROUPS = ["all", "inactive", "new", "loyal", "big_spenders", "ordered_dish"] as const;
-export type EmailGroup = (typeof EMAIL_GROUPS)[number];
 
 export const GROUP_DEFAULTS = { days: 30, min_orders: 3, min_spend_rupees: 2000 } as const;
 

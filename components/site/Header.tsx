@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, LayoutDashboard, LogOut, Menu as MenuIcon, ShoppingBag, Sparkles, User, X } from "lucide-react";
+import { ArrowRight, LayoutDashboard, LogOut, Menu as MenuIcon, ShoppingBag, MessageCircle, User, X } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useCart } from "@/components/providers/CartProvider";
 import { useSession } from "@/components/providers/SessionProvider";
 import { signOutAction } from "@/app/actions/auth";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { Logo } from "./Logo";
@@ -20,7 +21,7 @@ const NAV = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: string; isOpen: boolean; showChat?: boolean }) {
+export function Header({ statusLabel, isOpen }: { statusLabel: string; isOpen: boolean }) {
   const { count } = useCart();
   const session = useSession();
   const pathname = usePathname();
@@ -67,7 +68,7 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:h-[72px] sm:px-6">
-        <Link href="/" className="min-w-0" aria-label="Agentic Dish — home">
+        <Link href="/" className="min-w-0" aria-label={`${BRAND.name} home`}>
           <Logo markClassName="size-7 sm:size-8" />
         </Link>
 
@@ -79,7 +80,7 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
                 key={n.href}
                 href={n.href}
                 aria-current={active ? "page" : undefined}
-                className={cn("rounded-full px-3.5 py-2 text-sm transition-colors", active ? "bg-foreground/[0.06] font-medium" : "text-muted-foreground hover:text-foreground")}
+                className={cn("rounded-lg px-3 py-2 text-sm transition-colors", active ? "bg-accent font-medium" : "text-muted-foreground hover:text-foreground")}
               >
                 {n.label}
               </Link>
@@ -95,15 +96,9 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
             </span>
             {statusLabel}
           </span>
-          {showChat ? (
             <Button variant="ghost" size="sm" className="hidden h-9 sm:inline-flex" onClick={() => openChat()}>
-              <Sparkles className="text-primary" /> Ask AI
+              <MessageCircle className="text-primary" /> Ask AI
             </Button>
-          ) : (
-            <Link href={session ? "/menu" : "/signup"} className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden h-9 sm:inline-flex")}>
-              {session ? "Order now" : "Sign up"}
-            </Link>
-          )}
           <ThemeToggle />
           <Link
             href="/cart"
@@ -176,21 +171,15 @@ export function Header({ statusLabel, isOpen, showChat = true }: { statusLabel: 
             </Link>
           ))}
           <div className="mt-8 grid gap-3">
-            {showChat ? (
-              <Button
-                size="lg"
-                onClick={() => {
-                  setMobileOpen(false);
-                  openChat();
-                }}
-              >
-                <Sparkles /> Order with our AI host
-              </Button>
-            ) : (
-              <Link href={session ? "/menu" : "/signup"} className={buttonVariants({ size: "lg" })}>
-                {session ? "Order now" : "Sign up"}
-              </Link>
-            )}
+            <Button
+              size="lg"
+              onClick={() => {
+                setMobileOpen(false);
+                openChat();
+              }}
+            >
+              <MessageCircle /> Order with our AI host
+            </Button>
             {!session && (
               <Link href={`/login?next=${encodeURIComponent(pathname)}`} className={buttonVariants({ variant: "outline", size: "lg" })}>
                 Log in

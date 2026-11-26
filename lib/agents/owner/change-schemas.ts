@@ -24,7 +24,7 @@ const menuItemFields = {
   prep_time_min: z.number().int().min(1).max(180).optional(),
   portion: z.string().max(60).optional(),
   is_available: z.boolean().optional(),
-  image_url: z.string().max(500).optional(),
+  image_url: z.string().max(500).nullable().optional(),
   low_stock_threshold: z.number().int().min(0).max(1000).optional(),
 };
 
@@ -69,7 +69,7 @@ export const OWNER_CHANGE_SCHEMAS = {
       calories: z.number().int().min(0).max(5000).optional(),
       prep_time_min: z.number().int().min(1).max(180).default(15),
       portion: z.string().max(60).optional(),
-      image_url: z.string().max(500).optional(),
+      image_url: z.string().max(500).nullable().optional(),
     }),
   },
   delete_menu_item: {

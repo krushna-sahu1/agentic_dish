@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import type { Settings } from "@/lib/types";
 import { LogoMark } from "./Logo";
 
@@ -52,7 +52,7 @@ const LINKS: [string, [string, string][]][] = [
 /** Dark, editorial footer shared by every customer-facing page. */
 export function Footer({ settings }: { settings: Settings }) {
   return (
-    <footer className="mt-24 bg-[oklch(0.19_0.01_60)] text-[oklch(0.93_0.012_85)] dark:bg-card">
+    <footer className="mt-24 bg-leaf text-leaf-foreground">
       <div className="mx-auto max-w-7xl px-4 pb-10 pt-16 sm:px-6">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div>
@@ -91,7 +91,7 @@ export function Footer({ settings }: { settings: Settings }) {
           <p>
             © {new Date().getFullYear()} {BRAND.name}. All rights reserved.
           </p>
-          <p>Payments are processed securely by Razorpay — our AI host never handles payments.</p>
+          <p>Payments are processed securely by Razorpay . Our AI host never handles payments.</p>
         </div>
       </div>
     </footer>

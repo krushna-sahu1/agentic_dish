@@ -90,6 +90,7 @@ export async function addAddress(userId: string, input: AddressInput): Promise<A
     .single();
   if (error) throw new Error(error.message);
   if (makeDefault) await db().from("profiles").update({ default_address_id: data.id }).eq("user_id", userId);
+  await db().from("carts").update({ address_id: data.id }).eq("user_id", userId).is("address_id", null);
   return data as Address;
 }
 
@@ -185,6 +186,8 @@ export async function createReservation(userId: string, input: { party_size: num
     })
     .select("*")
     .single();
+  // The database refuses overlapping bookings, so a lost race lands here instead of double-booking.
+  if (error?.code === "23P01") throw new ServiceError("That table was just taken. Please pick another time.", "unavailable", { alternatives: avail.alternatives ?? [] });
   if (error) throw new Error(error.message);
   void sendEmail(email, "Your table is booked", reservationEmail(data as Reservation));
   return data as Reservation;

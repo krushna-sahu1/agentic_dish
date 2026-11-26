@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { ArrowRight, IndianRupee, Inbox, ReceiptText, Sparkles, Star, Timer, UtensilsCrossed } from "lucide-react";
+import { ArrowRight, Inbox, MessageCircle, UtensilsCrossed } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState, ErrorState } from "@/components/ui/states";
-import { DashboardPage, PageHeader, Panel, StatCard } from "@/components/owner/Page";
+import { DashboardPage, PageHeader, Panel, Stat, StatStrip } from "@/components/owner/Page";
 import { OrdersTable } from "@/components/owner/OrdersTable";
 import { RevenueChart } from "@/components/owner/RevenueChart";
-import { Change } from "@/components/owner/OwnerCards";
+import { AlertCard, Change } from "@/components/owner/OwnerCards";
 import { requireRole } from "@/lib/auth";
 import { getLiveKpis, getRevenue, getTopItems } from "@/lib/agents/owner/analytics";
-import { listOrders } from "@/lib/services/owner";
+import { listAlerts, listOrders } from "@/lib/services/owner";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatINR, formatNumber } from "@/lib/format";
 import { addDays, zonedDateString } from "@/lib/time";
@@ -28,17 +28,20 @@ export default async function OwnerOverviewPage() {
   const isOwner = user.role === "owner";
   const yesterday = addDays(zonedDateString(new Date()), -1);
 
-  const [kpisR, revenueR, topR, recentR, summaryR] = await Promise.allSettled([
+  const [kpisR, revenueR, topR, recentR, summaryR, alertsR] = await Promise.allSettled([
     getLiveKpis(),
     isOwner ? getRevenue({ range: { preset: "last_7_days" }, granularity: "day" }) : Promise.resolve(null),
     getTopItems({ range: { preset: "last_7_days" }, limit: 5, order_by: isOwner ? "revenue" : "qty" }),
     listOrders({ limit: 8 }),
     isOwner ? createAdminClient().from("owner_alerts").select("title, data").eq("dedupe_key", `daily-summary-${yesterday}`).maybeSingle() : Promise.resolve(null),
+    listAlerts({ unread_only: true, limit: 12 }),
   ]);
   const kpis = settled(kpisR);
   const revenue = settled(revenueR);
   const top = settled(topR);
   const recent = settled(recentR);
+  // Things that need a person: not greetings, internal markers or ordinary new-order notices.
+  const attention = (settled(alertsR) ?? []).filter((a) => a.severity !== "info").slice(0, 4);
   const summary = settled(summaryR)?.data as { title: string; data: { lines?: string[] } } | null | undefined;
 
   const firstName = user.profile?.full_name?.split(" ")[0];
@@ -49,64 +52,71 @@ export default async function OwnerOverviewPage() {
       <PageHeader
         eyebrow={new Date().toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", weekday: "long", day: "numeric", month: "long" })}
         title={`${greetingFor(new Date())}${firstName ? `, ${firstName}` : ""}.`}
-        description="Here’s how the kitchen is doing today."
-        actions={
+                actions={
           <>
             <Link href="/owner/orders?view=board" className={buttonVariants({ variant: "outline" })}>
               Live board
             </Link>
             <Link href="/owner/assistant" className={buttonVariants()}>
-              <Sparkles /> Ask the assistant
+              <MessageCircle /> Ask the assistant
             </Link>
           </>
         }
       />
 
-      {summary && (
-        <details className="mb-6 rounded-2xl border bg-card px-5 py-4 text-sm" open>
-          <summary className="cursor-pointer font-medium">{summary.title}</summary>
-          <ul className="mt-2 list-disc space-y-0.5 pl-5 text-muted-foreground">
-            {(summary.data?.lines ?? []).map((l, i) => (
-              <li key={i}>{l}</li>
-            ))}
-          </ul>
-        </details>
-      )}
-
-      {/* Stat cards */}
       {kpis ? (
-        <div className={cn("grid grid-cols-2 gap-3 sm:gap-4", isOwner ? "lg:grid-cols-4" : "lg:grid-cols-3")} data-testid="stat-cards">
-          {isOwner && <StatCard label="Revenue today" value={formatINR(kpis.revenue_today_paise)} icon={IndianRupee} hint={kpis.orders_today ? `Avg ${formatINR(Math.round(kpis.revenue_today_paise / kpis.orders_today))} per order` : "No paid orders yet"} />}
-          <StatCard label="Orders today" value={formatNumber(kpis.orders_today)} icon={ReceiptText} hint="Paid and in progress" />
-          <StatCard
-            label="Active orders"
+        <StatStrip data-testid="stat-cards">
+          {isOwner && <Stat label="Revenue today" value={formatINR(Math.round(kpis.revenue_today_paise / 100) * 100)} hint={kpis.orders_today ? `Avg ${formatINR(Math.round(kpis.revenue_today_paise / kpis.orders_today / 100) * 100)} per order` : "No paid orders yet"} />}
+          <Stat label="Orders today" value={formatNumber(kpis.orders_today)} hint="Paid and in progress" />
+          <Stat
+            label="Active now"
             value={formatNumber(kpis.active_orders)}
-            icon={Timer}
             highlight={kpis.new_orders_waiting > 0}
             hint={
               kpis.new_orders_waiting > 0 ? (
-                <Link href="/owner/orders?view=board" className="font-medium text-primary hover:underline">
-                  {kpis.new_orders_waiting} waiting to be accepted →
+                <Link href="/owner/orders?view=board" className="font-medium text-foreground underline underline-offset-2">
+                  {kpis.new_orders_waiting} waiting to be accepted
                 </Link>
               ) : (
                 "Nothing waiting"
               )
             }
           />
-          <StatCard label="Avg rating" value={kpis.avg_rating_30d ? `${kpis.avg_rating_30d}` : "—"} icon={Star} hint="Last 30 days" />
-        </div>
+          <Stat label="Average rating" value={kpis.avg_rating_30d ? `${kpis.avg_rating_30d}` : "–"} hint="Last 30 days" />
+        </StatStrip>
       ) : (
         <ErrorState title="Live numbers are unavailable" description="We couldn’t reach the database just now. The rest of the dashboard may still work — refresh in a moment." className="py-8" />
       )}
 
-      <div className={cn("mt-6 grid gap-6", isOwner && "lg:grid-cols-[1.6fr_1fr]")}>
+      {(attention.length > 0 || summary) && (
+        <div className={cn("mt-4 grid gap-4", attention.length > 0 && summary && "lg:grid-cols-2")}>
+          {attention.length > 0 && (
+            <Panel title="Needs attention">
+              <div className="px-3 pb-3">
+                <AlertCard alerts={attention as never} />
+              </div>
+            </Panel>
+          )}
+          {summary && (
+            <Panel title={summary.title}>
+              <ul className="space-y-1.5 px-5 pb-5 text-sm text-muted-foreground">
+                {(summary.data?.lines ?? []).map((l, i) => (
+                  <li key={i}>{l}</li>
+                ))}
+              </ul>
+            </Panel>
+          )}
+        </div>
+      )}
+
+      <div className={cn("mt-4 grid gap-4", isOwner && "lg:grid-cols-[1.6fr_1fr]")}>
         {isOwner && (
           <Panel
             title="Revenue, last 7 days"
             description={
               revenue ? (
                 <span className="inline-flex items-center gap-2">
-                  {formatINR(revenue.totals.revenue_paise)} · {formatNumber(revenue.totals.orders)} orders · <Change value={revenue.previous.change_percent} /> vs previous 7 days
+                  {formatINR(Math.round(revenue.totals.revenue_paise / 100) * 100)} · {formatNumber(revenue.totals.orders)} orders · <Change value={revenue.previous.change_percent} /> vs previous 7 days
                 </span>
               ) : undefined
             }
@@ -131,7 +141,7 @@ export default async function OwnerOverviewPage() {
           </Panel>
         )}
 
-        <Panel title="Top dishes" description={`Last 7 days · by ${isOwner ? "revenue" : "portions sold"}`} action={<Link href="/owner/menu" className="text-xs font-medium text-primary hover:underline">Menu →</Link>}>
+        <Panel title="Top dishes" description={`Last 7 days · by ${isOwner ? "revenue" : "portions sold"}`} action={<Link href="/owner/menu" className="text-xs font-medium text-primary hover:underline">Edit menu</Link>}>
           {top ? (
             top.items.length ? (
               <ol className="space-y-4 px-5 pb-5 pt-1">
@@ -140,7 +150,7 @@ export default async function OwnerOverviewPage() {
                   return (
                     <li key={i.menu_item_id}>
                       <div className="flex items-baseline gap-3 text-sm">
-                        <span className="w-4 font-display text-lg text-muted-foreground">{idx + 1}</span>
+                        <span className="w-4 tabular-nums text-muted-foreground">{idx + 1}</span>
                         <span className="min-w-0 flex-1 truncate font-medium">{i.name}</span>
                         <span className="tabular-nums text-muted-foreground">{isOwner ? formatINR(i.revenue_paise) : `${formatNumber(i.qty)} sold`}</span>
                       </div>
@@ -161,9 +171,8 @@ export default async function OwnerOverviewPage() {
       </div>
 
       <Panel
-        className="mt-6 overflow-hidden"
+        className="mt-4 overflow-hidden"
         title="Recent orders"
-        description="The latest orders across every status"
         action={
           <Link href="/owner/orders" className={buttonVariants({ variant: "ghost", size: "sm" })}>
             All orders <ArrowRight />

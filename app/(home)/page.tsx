@@ -1,159 +1,108 @@
 import Link from "next/link";
-import { ArrowRight, Clock, CreditCard, MapPin, MessageCircle, Phone, Truck } from "lucide-react";
+import { ArrowRight, Clock, MapPin, Phone } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { AskAiButton } from "@/components/site/AskAiButton";
 import { hoursText } from "@/components/site/Footer";
-import { BeforeAfter } from "@/components/landing/BeforeAfter";
-import { CapabilityGrid } from "@/components/landing/CapabilityGrid";
-import { HeroChatDemo } from "@/components/landing/HeroChatDemo";
+import { VegMark } from "@/components/site/Markers";
+import { getMenu, isOrderable } from "@/lib/services/menu";
 import { getSettings, openStatus } from "@/lib/services/settings";
-import { getSessionUser } from "@/lib/auth";
-import { BRAND } from "@/lib/brand";
+import { formatINR } from "@/lib/format";
 import { zonedDateString } from "@/lib/time";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 const STEPS = [
-  {
-    icon: MessageCircle,
-    title: "Tell us what you’re craving",
-    body: "Browse the menu, or just say “two masala dosas, less spicy” to our AI host. It knows every dish, allergen and combo.",
-  },
-  {
-    icon: CreditCard,
-    title: "Confirm and pay securely",
-    body: "You review every item and price before checkout. Payments go through Razorpay — the AI never touches your money.",
-  },
-  {
-    icon: Truck,
-    title: "Fresh from our kitchen",
-    body: "We cook to order and you track it live — delivery, pickup or a table waiting for you.",
-  },
+  { title: "Say what you want", body: "Type it or speak it: “two masala dosas, less spicy”. The host knows every dish, price and allergen on the menu." },
+  { title: "Check the order", body: "You see each item and the total before anything happens. If a dish clashes with your allergies, it stops and asks." },
+  { title: "Pay it yourself", body: "Checkout is Razorpay, and only you can press Pay. Then follow the order from the kitchen to your door or table." },
 ];
 
+const PROMPTS = ["Something light, no onion, under ₹250", "Veg dinner for 4 under ₹1000", "What's spicy today?"];
+
 export default async function HomePage() {
-  const [settings, user] = await Promise.all([getSettings(), getSessionUser().catch(() => null)]);
+  const [settings, menu] = await Promise.all([getSettings(), getMenu()]);
   const status = openStatus(settings);
   const open = status.isOpen && settings.accepting_orders;
   const statusLabel = settings.accepting_orders ? status.label : "Online orders paused";
-
   const todayKey = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][new Date(`${zonedDateString(new Date())}T12:00:00`).getDay()];
+  const board = menu.items
+    .filter((i) => isOrderable(i).ok)
+    .sort((a, b) => b.sold_30d - a.sold_30d)
+    .slice(0, 8);
 
   return (
     <>
-      {/* ───────────── Hero ───────────── */}
-      <section className="relative isolate overflow-hidden">
-        {/* Aurora glow — hero background only */}
-        <div aria-hidden className="ai-aurora pointer-events-none absolute inset-x-0 -top-40 -z-10 h-[34rem] sm:h-[42rem]" />
+      <section className="mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-10 sm:px-6 sm:pt-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:pb-28">
+        <div>
+          <p className="flex items-center gap-2 text-sm">
+            <span className={cn("size-2 rounded-full", open ? "bg-success" : "bg-destructive")} aria-hidden />
+            {statusLabel}
+          </p>
+          <h1 className="mt-5 text-balance font-display text-[3.4rem] sm:text-7xl lg:text-[5.5rem]">Just say what you&apos;re craving.</h1>
+          <p className="mt-6 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground">
+            Our AI host takes your order, checks it against your allergies and books your table. You confirm, you pay, we cook.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <AskAiButton size="lg" label="Order by chat" />
+            <Link href="/menu" className={buttonVariants({ variant: "outline", size: "lg" })}>
+              See the menu <ArrowRight aria-hidden />
+            </Link>
+          </div>
+          <ul className="mt-8 flex flex-wrap gap-2" aria-label="Try asking">
+            {PROMPTS.map((p) => (
+              <li key={p}>
+                <AskAiButton variant="secondary" size="sm" prompt={p} label={p} plain />
+              </li>
+            ))}
+          </ul>
+        </div>
 
-        <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 pb-16 pt-10 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:pb-24 lg:pt-24">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-xs font-medium backdrop-blur">
-              <span className={cn("size-2 rounded-full", open ? "bg-success" : "bg-destructive")} aria-hidden />
-              {statusLabel}
-              <span className="text-muted-foreground">· Bhubaneswar</span>
-            </p>
-
-            <h1 className="mt-6 text-balance text-[3rem] leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.75rem]">
-              Just say what you&apos;re <em className="ai-gradient-text not-italic">craving.</em>
-            </h1>
-
-            <p className="mt-6 max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
-              Our AI host takes your order, checks allergens and books your table — all in a single line.
-            </p>
-
-            <div className="mt-9 flex flex-wrap gap-3">
-              {user ? (
-                <Link href="/menu" className={buttonVariants({ size: "lg" })}>
-                  Order now <ArrowRight aria-hidden />
+        {/* The menu board: what people actually ordered this month. */}
+        <div className="rounded-3xl bg-leaf p-6 text-leaf-foreground sm:p-9">
+          <h2 className="font-display text-3xl text-turmeric">Most ordered this month</h2>
+          <ul className="mt-6 space-y-3.5">
+            {board.map((i) => (
+              <li key={i.id}>
+                <Link href={`/menu/${i.slug}`} className="group flex items-baseline gap-2.5">
+                  <VegMark veg={i.is_veg} className="translate-y-0.5 self-center" />
+                  <span className="font-display text-xl group-hover:text-turmeric sm:text-2xl">{i.name}</span>
+                  <span aria-hidden className="flex-1 translate-y-[-4px] border-b border-dotted border-current opacity-35" />
+                  <span className="font-display text-xl tabular-nums sm:text-2xl">{formatINR(i.price_paise)}</span>
                 </Link>
-              ) : (
-                <>
-                  <Link href="/signup" className={buttonVariants({ size: "lg" })}>
-                    Sign up
-                  </Link>
-                  <Link href="/login" className={buttonVariants({ variant: "outline", size: "lg" })}>
-                    Log in
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-
-          <HeroChatDemo open={open} statusLabel={statusLabel} />
+              </li>
+            ))}
+          </ul>
+          <Link href="/menu" className="mt-7 inline-flex items-center gap-1.5 text-sm font-medium text-turmeric underline-offset-4 hover:underline">
+            All {menu.items.length} dishes <ArrowRight className="size-4" aria-hidden />
+          </Link>
         </div>
       </section>
 
-      {/* ───────────── Before / after ───────────── */}
-      <BeforeAfter />
-
-      {/* ───────────── AI capabilities ───────────── */}
-      <section aria-labelledby="capabilities" className="border-t border-border bg-card/30">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-28">
-          <div className="reveal max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Built-in, not bolt-on</p>
-            <h2 id="capabilities" className="mt-4 text-balance text-4xl leading-[1.02] tracking-tight sm:text-5xl">
-              An AI host that actually knows the kitchen.
-            </h2>
-            <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-              Every capability below is live in the ordering flow today — nothing here is a demo.
-            </p>
-          </div>
-          <CapabilityGrid />
-        </div>
-      </section>
-
-      {/* ───────────── How it works ───────────── */}
-      <section aria-labelledby="how" className="border-t border-border bg-card/50">
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:py-28">
-          <div className="reveal max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">How it works</p>
-            <h2 id="how" className="mt-4 text-balance text-4xl leading-[1.02] tracking-tight sm:text-5xl">
-              From craving to doorstep in three steps.
-            </h2>
-          </div>
-          <ol className="mt-10 grid gap-4 md:grid-cols-3">
+      <section aria-labelledby="how" className="border-y bg-card">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_2.2fr] lg:py-20">
+          <h2 id="how" className="font-display text-4xl sm:text-5xl">How ordering works</h2>
+          <ol className="grid gap-8 sm:grid-cols-3">
             {STEPS.map((s, i) => (
-              <li key={s.title} className="reveal rounded-3xl border border-border bg-background p-6 transition-colors hover:border-primary/40 sm:p-8">
-                <div className="flex items-center gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <s.icon className="size-5" aria-hidden />
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Step {i + 1}</span>
-                </div>
-                <h3 className="mt-5 text-lg font-semibold tracking-tight">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+              <li key={s.title}>
+                <span className="font-display text-2xl text-primary">{i + 1}</span>
+                <h3 className="mt-1 text-lg font-semibold">{s.title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{s.body}</p>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* ───────────── Visit / CTA ───────────── */}
-      <section aria-labelledby="visit" className="mx-auto max-w-7xl px-4 pb-24 pt-20 sm:px-6 lg:pt-28">
-        <div className="reveal grid gap-10 overflow-hidden rounded-[2rem] border border-border bg-gradient-to-br from-primary/[0.07] via-card to-card p-8 sm:p-12 lg:grid-cols-[1.4fr_1fr] lg:p-16">
-          <div>
-            <h2 id="visit" className="text-balance text-4xl leading-[1.02] tracking-tight sm:text-5xl">
-              Your table is waiting.
-            </h2>
-            <p className="mt-4 max-w-md text-muted-foreground">
-              Come in for a slow lunch, or let us bring {BRAND.name} to you. Either way, it&apos;s cooked the moment you order.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/reservations" className={buttonVariants({ size: "lg" })}>
-                Book a table
-              </Link>
-              <Link href="/menu" className={buttonVariants({ variant: "outline", size: "lg" })}>
-                Browse menu
-              </Link>
-            </div>
-          </div>
-          <ul className="space-y-4 self-end text-sm text-muted-foreground">
+      <section aria-labelledby="visit" className="mx-auto grid max-w-7xl gap-10 px-4 pt-16 sm:px-6 lg:grid-cols-[1fr_2.2fr] lg:pt-20">
+        <h2 id="visit" className="font-display text-4xl sm:text-5xl">Or come and sit down</h2>
+        <div className="grid gap-8 sm:grid-cols-[1.4fr_auto] sm:items-start">
+          <ul className="space-y-3 text-[15px]">
             {settings.address && (
               <li className="flex gap-3">
-                <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden />
+                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
                 {settings.lat && settings.lng ? (
-                  <a className="text-foreground underline-offset-4 hover:underline" target="_blank" rel="noreferrer" href={`https://www.openstreetmap.org/?mlat=${settings.lat}&mlon=${settings.lng}#map=17/${settings.lat}/${settings.lng}`}>
+                  <a className="underline-offset-4 hover:underline" target="_blank" rel="noreferrer" href={`https://www.openstreetmap.org/?mlat=${settings.lat}&mlon=${settings.lng}#map=17/${settings.lat}/${settings.lng}`}>
                     {settings.address}
                   </a>
                 ) : (
@@ -162,17 +111,20 @@ export default async function HomePage() {
               </li>
             )}
             <li className="flex gap-3">
-              <Clock className="mt-0.5 size-4 shrink-0" aria-hidden /> Today: {hoursText(settings.opening_hours[todayKey])}
+              <Clock className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden /> Today {hoursText(settings.opening_hours[todayKey])}
             </li>
             {settings.phone && (
               <li className="flex gap-3">
-                <Phone className="mt-0.5 size-4 shrink-0" aria-hidden />
-                <a className="text-foreground underline-offset-4 hover:underline" href={`tel:${settings.phone.replace(/\s/g, "")}`}>
+                <Phone className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
+                <a className="underline-offset-4 hover:underline" href={`tel:${settings.phone.replace(/\s/g, "")}`}>
                   {settings.phone}
                 </a>
               </li>
             )}
           </ul>
+          <Link href="/reservations" className={buttonVariants({ size: "lg" })}>
+            Book a table
+          </Link>
         </div>
       </section>
     </>

@@ -8,8 +8,3 @@ export class ServiceError extends Error {
     super(message);
   }
 }
-
-export function assertOk<T>(res: { data: T | null; error: { message: string } | null }, what = "query"): T {
-  if (res.error) throw new Error(`${what} failed: ${res.error.message}`);
-  return res.data as T;
-}

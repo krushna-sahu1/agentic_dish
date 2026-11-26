@@ -58,7 +58,7 @@ insert into public.menu_items (
   category_id, name, slug, description, price_paise, image_url, is_veg, is_vegan, is_jain,
   spice_level, allergens, tags, calories, prep_time_min, portion, stock_qty, low_stock_threshold, sort_order
 )
-select c.id, v.name, v.slug, v.description, v.price * 100, '/dishes/' || v.img || '.svg',
+select c.id, v.name, v.slug, v.description, v.price * 100, null,
        v.is_veg, v.is_vegan, v.is_jain, v.spice, v.allergens::text[], v.tags::text[],
        v.calories, v.prep, v.portion, v.stock::int, v.low, v.sort
 from (values

@@ -104,11 +104,9 @@ test.describe("customer agent", () => {
   });
 });
 
-test("the landing page has no chat, and logged-out visitors get a login card elsewhere @mobile", async ({ page }) => {
+test("logged-out visitors get a login card instead of the chat @mobile", async ({ page }) => {
   requireDb();
   await page.goto("/");
-  await expect(page.getByTestId("chat-launcher")).toHaveCount(0);
-  await page.goto("/menu");
   await page.getByTestId("chat-launcher").click();
   const card = page.getByTestId("chat-login-card");
   await expect(card).toContainText("Log in to chat with our AI host");

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
 import type { Settings } from "@/lib/types";
 import { ChangeDialog } from "./ChangeDialog";
+import { PageHeader } from "./Page";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 const toText = (slots?: { open: string; close: string }[]) => (slots ?? []).map((s) => `${s.open}-${s.close}`).join(", ");
@@ -65,12 +66,10 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   );
 
   return (
-    <form onSubmit={submit} className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
-      <div>
-        <h1 className="font-display text-4xl leading-none sm:text-5xl">Settings</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Hours, fees and ordering. Changes are previewed before they apply.</p>
-      </div>
+    <form onSubmit={submit} className="mx-auto w-full max-w-4xl space-y-4 px-4 py-6 sm:px-6 lg:px-8 lg:py-7">
+      <PageHeader title="Settings" description="Every change is previewed before it applies." actions={<Button type="submit">Review changes</Button>} />
       <section className="grid gap-4 rounded-2xl border bg-card p-5 sm:grid-cols-2">
+        <h2 className="font-semibold sm:col-span-2">Ordering</h2>
         <div>
           <Label htmlFor="override">Open / closed</Label>
           <Select id="override" value={f.is_open_override} onChange={(e) => setF({ ...f, is_open_override: e.target.value as Settings["is_open_override"] })}>
@@ -88,6 +87,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         </div>
       </section>
       <section className="grid gap-4 rounded-2xl border bg-card p-5 sm:grid-cols-3">
+        <h2 className="font-semibold sm:col-span-3">Fees and delivery</h2>
         {num("delivery_fee", "Delivery fee (₹)")}
         {num("free_delivery_above", "Free delivery above (₹)")}
         {num("packaging_fee", "Packaging fee (₹)")}
@@ -97,7 +97,8 @@ export function SettingsForm({ settings }: { settings: Settings }) {
         {num("delivery_radius_km", "Delivery radius (km)", "0.5")}
       </section>
       <section className="rounded-2xl border bg-card p-5">
-        <h2 className="mb-2 text-sm font-semibold">Opening hours <span className="font-normal text-muted-foreground">(e.g. 07:00-15:30, 17:30-23:00; empty = closed)</span></h2>
+        <h2 className="font-semibold">Opening hours</h2>
+        <p className="mb-3 mt-0.5 text-xs text-muted-foreground">Like 07:00-15:30, 17:30-23:00. Leave empty for closed.</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {DAYS.map((d) => (
             <label key={d} className="flex items-center gap-2 text-sm">
@@ -107,7 +108,6 @@ export function SettingsForm({ settings }: { settings: Settings }) {
           ))}
         </div>
       </section>
-      <Button type="submit" size="lg">Review changes</Button>
       <ChangeDialog change={change} onClose={(applied) => { setChange(null); if (applied) router.refresh(); }} />
     </form>
   );

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 // Tool modules import the admin client transitively; nothing here touches the DB.
 vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => ({ from: () => ({ insert: async () => ({}) }), rpc: async () => ({ data: true }) }) }));
 
-import { ANONYMOUS_CUSTOMER_TOOLS, canUseTool, runTool, STAFF_ALLOWED_TOOLS, untrusted, wrapUntrustedFields } from "@/lib/agents/guard";
+import { canUseTool, runTool, STAFF_ALLOWED_TOOLS, untrusted, wrapUntrustedFields } from "@/lib/agents/guard";
 import { customerTools } from "@/lib/agents/customer/tools";
 import { ownerReadTools } from "@/lib/agents/owner/tools";
 import { OWNER_CHANGE_SCHEMAS } from "@/lib/agents/owner/change-schemas";
@@ -30,10 +30,9 @@ describe("role checks (guard.ts)", () => {
     expect(canUseTool(customerOnOwner, "get_revenue").ok).toBe(false);
     expect(canUseTool({ agent: "owner", role: null, userId: null }, "list_orders").ok).toBe(false);
   });
-  it("anonymous customers can browse but not touch carts/orders", () => {
+  it("logged-out visitors can't use any customer tool", () => {
     const anon = { agent: "customer" as const, role: null, userId: null };
-    for (const t of ANONYMOUS_CUSTOMER_TOOLS) expect(canUseTool(anon, t).ok).toBe(true);
-    for (const t of ["add_to_cart", "prepare_checkout", "get_order_status", "reorder"]) expect(canUseTool(anon, t)).toMatchObject({ ok: false, code: "login_required" });
+    for (const t of ["search_menu", "add_to_cart", "prepare_checkout", "get_order_status", "reorder"]) expect(canUseTool(anon, t)).toMatchObject({ ok: false, code: "login_required" });
   });
   it("runTool blocks forbidden calls before validation or execution", async () => {
     const handler = vi.fn(async () => "x");

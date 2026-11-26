@@ -14,6 +14,8 @@ import { getItemDetails, getMenu, isOrderable } from "@/lib/services/menu";
 import { ServiceError } from "@/lib/services/errors";
 import { formatINR, spiceLabel } from "@/lib/format";
 import { formatDateTime } from "@/lib/time";
+import { TAG_LABEL } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -44,24 +46,27 @@ export default async function DishPage({ params }: Props) {
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
         <Link href="/menu" className="hover:underline">Menu</Link> / <Link href={`/menu#cat-${item.category_slug}`} className="hover:underline">{item.category_name}</Link>
       </nav>
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="overflow-hidden rounded-3xl border">
-          <DishImage src={item.image_url} alt={item.name} priority className={!orderable.ok ? "grayscale" : undefined} />
-        </div>
-        <div>
+      <div className={cn("grid gap-10", item.image_url ? "md:grid-cols-2" : "lg:grid-cols-[1.2fr_0.8fr]")}>
+        {item.image_url && (
+          <div className="overflow-hidden rounded-3xl border">
+            <DishImage src={item.image_url} alt={item.name} priority className={cn("w-full", !orderable.ok && "grayscale")} />
+          </div>
+        )}
+        <div className={cn(!item.image_url && "contents")}>
+          <div>
           <div className="flex items-start gap-3">
-            <VegMark veg={item.is_veg} className="mt-2" />
-            <h1 className="font-display text-4xl sm:text-5xl">{item.name}</h1>
+            <VegMark veg={item.is_veg} className="mt-4" />
+            <h1 className="font-display text-5xl sm:text-6xl">{item.name}</h1>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
             {item.tags.map((t) => (
-              <Badge key={t} variant="secondary" className="capitalize">{t.replace("_", " ")}</Badge>
+              <Badge key={t} variant="secondary" >{TAG_LABEL[t] ?? t}</Badge>
             ))}
             {item.avg_rating ? (
-              <span className="flex items-center gap-1"><Star className="size-4 fill-amber-400 text-amber-400" /> {item.avg_rating.toFixed(1)} ({item.review_count})</span>
+              <span className="flex items-center gap-1"><Star className="size-4 fill-turmeric text-turmeric" /> {item.avg_rating.toFixed(1)} ({item.review_count})</span>
             ) : null}
           </div>
-          <p className="mt-4 text-muted-foreground">{item.description}</p>
+          <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">{item.description}</p>
           <p className="mt-4 text-2xl font-semibold">{formatINR(item.price_paise)}</p>
           {!orderable.ok && <p className="mt-1 text-sm font-medium text-destructive">Currently {orderable.reason}</p>}
           <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -70,14 +75,16 @@ export default async function DishPage({ params }: Props) {
             <AskAiButton variant="ghost" size="sm" prompt={`What goes well with ${item.name}?`} label="What goes with this?" />
           </div>
 
-          <dl className="mt-6 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-xl border p-3"><dt className="flex items-center gap-1.5 text-muted-foreground"><Flame className="size-4" /> Spice</dt><dd className="mt-1 flex items-center gap-2">{spiceLabel(item.spice_level)} <SpiceLevel level={item.spice_level} /></dd></div>
-            <div className="rounded-xl border p-3"><dt className="flex items-center gap-1.5 text-muted-foreground"><Clock className="size-4" /> Prep time</dt><dd className="mt-1">~{item.prep_time_min} min</dd></div>
-            <div className="rounded-xl border p-3"><dt className="flex items-center gap-1.5 text-muted-foreground"><Utensils className="size-4" /> Portion</dt><dd className="mt-1">{item.portion ?? "—"}</dd></div>
-            <div className="rounded-xl border p-3"><dt className="text-muted-foreground">Calories</dt><dd className="mt-1">{item.calories ? `${item.calories} kcal` : "—"}</dd></div>
-            <div className="col-span-2 rounded-xl border p-3">
+          </div>
+          <div>
+          <dl className={cn("grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border bg-card p-6 text-sm", item.image_url && "mt-8")}>
+            <div><dt className="flex items-center gap-1.5 text-muted-foreground"><Flame className="size-4" /> Spice</dt><dd className="mt-1 flex items-center gap-2">{spiceLabel(item.spice_level)} <SpiceLevel level={item.spice_level} /></dd></div>
+            <div><dt className="flex items-center gap-1.5 text-muted-foreground"><Clock className="size-4" /> Prep time</dt><dd className="mt-1">~{item.prep_time_min} min</dd></div>
+            <div><dt className="flex items-center gap-1.5 text-muted-foreground"><Utensils className="size-4" /> Portion</dt><dd className="mt-1">{item.portion ?? "—"}</dd></div>
+            <div><dt className="text-muted-foreground">Calories</dt><dd className="mt-1">{item.calories ? `${item.calories} kcal` : "—"}</dd></div>
+            <div className="col-span-2">
               <dt className="text-muted-foreground">Allergens</dt>
-              <dd className="mt-1 capitalize">{item.allergens.length ? item.allergens.join(", ") : "None of the 8 major allergens"}</dd>
+              <dd className="mt-1">{item.allergens.length ? <span className="capitalize">{item.allergens.join(", ")}</span> : "None of the 8 major allergens"}</dd>
               <dd className="mt-1 text-xs text-muted-foreground">{[item.is_vegan && "Vegan", item.is_jain && "Jain-friendly"].filter(Boolean).join(" · ")}</dd>
             </div>
           </dl>
@@ -88,32 +95,30 @@ export default async function DishPage({ params }: Props) {
               {item.addons.length > 0 && <p><span className="font-medium">Add-ons:</span> {item.addons.map((a) => `${a.name} +${formatINR(a.price_paise)}`).join(" · ")}</p>}
             </div>
           )}
+          </div>
         </div>
       </div>
 
       {pairings.length > 0 && (
         <section className="mt-12" aria-labelledby="pairings">
-          <h2 id="pairings" className="mb-4 font-display text-2xl">Goes well with</h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+          <h2 id="pairings" className="mb-2 font-display text-3xl">Goes well with</h2>
+          <div className="grid gap-x-14 lg:grid-cols-2">
             {pairings.slice(0, 4).map((p) => (
-              <div key={p.item.id}>
-                <DishCard item={toCardItem(p.item)} compact />
-                <p className="mt-1 px-1 text-xs text-muted-foreground">{p.reason}</p>
-              </div>
+              <DishCard key={p.item.id} item={toCardItem(p.item)} compact note={p.reason} />
             ))}
           </div>
         </section>
       )}
 
       <section className="mt-12" aria-labelledby="reviews">
-        <h2 id="reviews" className="mb-4 font-display text-2xl">Reviews</h2>
+        <h2 id="reviews" className="mb-4 font-display text-3xl">Reviews</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-muted-foreground">No reviews yet.</p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
             {reviews.map((r, i) => (
               <li key={i} className="rounded-xl border bg-card p-4 text-sm">
-                <p aria-label={`${r.rating} out of 5 stars`}>{"★".repeat(r.rating)}<span className="text-muted-foreground">{"★".repeat(5 - r.rating)}</span></p>
+                <p aria-label={`${r.rating} out of 5 stars`}><span className="text-turmeric">{"★".repeat(r.rating)}</span><span className="text-muted-foreground/50">{"★".repeat(5 - r.rating)}</span></p>
                 {r.comment && <p className="mt-1">{r.comment}</p>}
                 <p className="mt-1 text-xs text-muted-foreground">— {r.reviewer_name}, {formatDateTime(r.created_at)}</p>
                 {r.owner_reply && <p className="mt-2 rounded-lg bg-muted p-2 text-xs"><b>Reply from the restaurant:</b> {r.owner_reply}</p>}

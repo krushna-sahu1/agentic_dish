@@ -23,7 +23,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
   const view = sp.view === "board" ? "board" : "table";
 
   const tabs = (
-    <div className="inline-flex rounded-full bg-muted p-1 text-sm" role="tablist" aria-label="Orders view">
+    <div className="inline-flex rounded-lg bg-muted p-1 text-sm" role="tablist" aria-label="Orders view">
       {[
         ["table", "All orders", "/owner/orders"],
         ["board", "Live board", "/owner/orders?view=board"],
@@ -33,7 +33,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
           href={href}
           role="tab"
           aria-selected={view === key}
-          className={cn("rounded-full px-4 py-1.5 transition-colors", view === key ? "bg-card font-medium shadow-sm" : "text-muted-foreground hover:text-foreground")}
+          className={cn("rounded-md px-4 py-1.5 transition-colors", view === key ? "bg-card font-medium shadow-sm" : "text-muted-foreground hover:text-foreground")}
         >
           {label}
         </Link>
@@ -53,8 +53,8 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
       initial = null;
     }
     return (
-      <DashboardPage className="flex min-h-0 flex-1 flex-col lg:max-w-none">
-        <PageHeader title="Orders" description="Live kitchen board — updates in real time." actions={tabs} />
+      <DashboardPage className="flex min-h-0 flex-1 flex-col !max-w-none">
+        <PageHeader title="Orders" description="Live kitchen board" actions={tabs} />
         {initial ? <OrdersBoard initial={initial} /> : <ErrorState title="The live board couldn’t load" description="Check your connection and refresh the page." />}
       </DashboardPage>
     );
@@ -83,7 +83,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Searc
       <PageHeader title="Orders" description="Search, filter and open any order." actions={tabs} />
       <Panel
         className="overflow-hidden"
-        title={orders ? `${orders.length} order${orders.length === 1 ? "" : "s"}` : "Orders"}
+        title={orders ? `${orders.length === 200 ? "Latest " : ""}${orders.length} order${orders.length === 1 ? "" : "s"}` : "Orders"}
         description={RANGE_FILTERS.find((r) => r.value === range)?.label}
       >
         <OrdersFilters />

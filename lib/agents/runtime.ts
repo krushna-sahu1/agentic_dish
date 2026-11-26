@@ -19,8 +19,7 @@ import { ownerSystemPrompt } from "./owner/prompt";
 
 /** Resolve the caller from the request's Supabase auth cookies. */
 export async function contextFromRequest(request: Request, agent: AgentKind): Promise<AgentContext> {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip") ?? null;
-  const base: AgentContext = { agent, userId: null, email: null, role: null, ip };
+  const base: AgentContext = { agent, userId: null, email: null, role: null };
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return base;
   const cookieHeader = request.headers.get("cookie") ?? "";
   const cookies = cookieHeader
@@ -58,7 +57,7 @@ async function buildAgent(ctx: AgentContext): Promise<BuiltInAgent> {
   if (ctx.agent === "customer") {
     return new BuiltInAgent({
       model: getModel("customer"),
-      prompt: customerSystemPrompt({ restaurantName: settings.name, loggedIn: !!ctx.userId }),
+      prompt: customerSystemPrompt({ restaurantName: settings.name }),
       tools: toAgentTools(ctx, customerTools),
       maxSteps: 6,
       temperature: 0.3,

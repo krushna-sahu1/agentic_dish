@@ -80,7 +80,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <PageHeader
         title="Menu"
         description={`${items.length} dishes · ${soldOut} sold out`}
@@ -131,20 +131,22 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
                   key={i.id}
                   data-testid="menu-row"
                   data-dish={i.name}
-                  className={cn("grid grid-cols-[56px_1fr_auto] items-center gap-x-4 gap-y-3 px-4 py-3 md:grid-cols-[56px_minmax(0,1.6fr)_110px_130px_150px_auto]", !i.is_available && "bg-destructive/[0.03]")}
+                  className={cn("grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-4 py-2.5 md:grid-cols-[minmax(0,1.6fr)_90px_130px_150px_auto]", !i.is_available && "bg-destructive/[0.03]")}
                 >
-                  <DishImage src={i.image_url} alt="" className={cn("size-14 rounded-xl", !i.is_available && "grayscale")} />
-                  <div className="min-w-0">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <DishImage src={i.image_url} alt="" className={cn("size-10 shrink-0 rounded-lg", !i.is_available && "grayscale")} />
+                    <div className="min-w-0">
                     <p className="flex items-center gap-2 font-medium">
                       <VegMark veg={i.is_veg} /> <span className="truncate">{i.name}</span>
                     </p>
                     <p className="truncate text-xs text-muted-foreground">
                       {i.category} · {i.sold_30d} sold in 30d
                     </p>
+                    </div>
                   </div>
                   <p className="text-right font-medium tabular-nums md:text-left">{formatINR(i.price_paise)}</p>
 
-                  <div className="col-span-3 flex flex-wrap items-center gap-x-3 gap-y-2 md:contents">
+                  <div className="col-span-2 flex flex-wrap items-center gap-x-3 gap-y-2 md:contents">
                   <label className="mr-auto inline-flex cursor-pointer items-center gap-2 md:mr-0">
                     <input
                       type="checkbox"
@@ -226,14 +228,14 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
       <section aria-labelledby="inventory">
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <h2 id="inventory" className="font-display text-3xl">
+            <h2 id="inventory" className="font-display text-2xl">
               Inventory
             </h2>
             <p className="text-sm text-muted-foreground">Ingredients on hand. Items below their threshold are flagged.</p>
           </div>
         </div>
         {inventory.length ? (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {inventory.map((inv) => (
               <form
                 key={inv.id}
@@ -261,7 +263,7 @@ export function MenuManager({ items, inventory, categories, role }: { items: Men
             ))}
           </div>
         ) : (
-          <EmptyState icon={Package} title="No ingredients tracked" description="Ask the assistant to start tracking stock for key ingredients." />
+          <EmptyState icon={Package} title="No ingredients tracked" description="Ingredients added to your database show up here." />
         )}
       </section>
 

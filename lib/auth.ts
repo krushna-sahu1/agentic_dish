@@ -1,4 +1,6 @@
 import { cache } from "react";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Profile, Role } from "@/lib/types";
@@ -10,15 +12,6 @@ export interface SessionUser {
   profile: Profile | null;
 }
 
-export class AuthError extends Error {
-  constructor(
-    message: string,
-    public code: "unauthenticated" | "forbidden" = "unauthenticated",
-  ) {
-    super(message);
-  }
-}
-
 /**
  * Verified user for this request. The role is always read from `profiles`
  * server-side — never from anything the client sends.
@@ -26,9 +19,10 @@ export class AuthError extends Error {
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return null;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let { data, error } = await supabase.auth.getUser();
+  // A dropped connection is not a sign-out: try once more before treating it as one.
+  if (error?.name === "AuthRetryableFetchError") ({ data, error } = await supabase.auth.getUser());
+  const user = data.user;
   if (!user) return null;
   const { data: profile } = await createAdminClient().from("profiles").select("*").eq("user_id", user.id).maybeSingle();
   return {
@@ -39,15 +33,20 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   };
 });
 
-export async function requireUser(): Promise<SessionUser> {
-  const u = await getSessionUser();
-  if (!u) throw new AuthError("Please log in to continue.");
-  return u;
+async function toLogin(): Promise<never> {
+  const path = (await headers()).get("x-pathname") ?? "/";
+  redirect(`/login?next=${encodeURIComponent(path)}`);
 }
 
+/** For pages: the signed-in user, or a redirect to log in. */
+export async function requireUser(): Promise<SessionUser> {
+  return (await getSessionUser()) ?? toLogin();
+}
+
+/** For pages: a signed-in user with one of these roles, else a redirect. */
 export async function requireRole(roles: Role[]): Promise<SessionUser> {
   const u = await requireUser();
-  if (!roles.includes(u.role)) throw new AuthError("You don't have access to this.", "forbidden");
+  if (!roles.includes(u.role)) redirect("/");
   return u;
 }
 

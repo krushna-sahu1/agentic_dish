@@ -8,7 +8,7 @@
  */
 import { z } from "zod";
 import { tool, type ToolDef } from "../tool-def";
-import { wrapUntrustedFields } from "../guard";
+import { untrusted, wrapUntrustedFields } from "../guard";
 import { RANGE_PRESETS } from "@/lib/time";
 import {
   comparePeriods,
@@ -51,6 +51,13 @@ export const rangeSchema = z
   })
   .optional();
 
+/** Customer lists carry the person's own text in `name`, which elsewhere means a dish. */
+function wrapCustomerNames<T extends object>(data: T, key: string): T {
+  const list = (data as Record<string, unknown>)[key];
+  if (!Array.isArray(list)) return data;
+  return { ...data, [key]: list.map((c: { name?: string | null }) => ({ ...c, name: untrusted(c.name) })) };
+}
+
 const r = { range: rangeSchema };
 const statusEnum = z.enum(["awaiting_payment", "paid", "accepted", "preparing", "ready", "out_for_delivery", "completed", "cancelled", "refunded", "payment_failed"]);
 
@@ -77,7 +84,7 @@ export const ownerReadTools: ToolDef[] = [
   tool({ name: "get_category_breakdown", description: "Revenue and quantity per menu category with share %.", schema: z.object(r), handler: (_c, a) => getCategoryBreakdown(a) }),
   tool({ name: "get_peak_hours", description: "Orders by weekday × hour (heatmap) and the busiest hour/day/slot. Default: last 30 days.", schema: z.object(r), handler: (_c, a) => getPeakHours(a) }),
   tool({ name: "get_order_type_split", description: "Delivery vs pickup vs dine-in orders and revenue.", schema: z.object(r), handler: (_c, a) => getOrderTypeSplit(a) }),
-  tool({ name: "get_customer_stats", description: "New vs returning customers, repeat rate, top customers (contact info masked).", schema: z.object(r), handler: (_c, a) => getCustomerStats(a) }),
+  tool({ name: "get_customer_stats", description: "New vs returning customers, repeat rate, top customers (contact info masked).", schema: z.object(r), handler: async (_c, a) => wrapCustomerNames(await getCustomerStats(a), "top_customers") }),
   tool({ name: "get_coupon_performance", description: "Orders, discount given and revenue per coupon code.", schema: z.object(r), handler: (_c, a) => getCouponPerformance(a) }),
   tool({
     name: "compare_periods",
@@ -167,7 +174,7 @@ export const ownerReadTools: ToolDef[] = [
     name: "get_customer",
     description: "Look up a customer by name, phone, exact email or order number. Contact info is always masked.",
     schema: z.object({ query: z.string().min(2).max(80) }),
-    handler: async (_c, a) => ({ customers: await getCustomer(a.query) }),
+    handler: async (_c, a) => wrapCustomerNames({ customers: await getCustomer(a.query) }, "customers"),
   }),
   tool({
     name: "get_audit_log",

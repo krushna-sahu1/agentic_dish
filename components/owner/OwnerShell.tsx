@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AudioLines, ExternalLink, LayoutDashboard, Menu as MenuIcon, ReceiptText, Settings, Sparkles, UtensilsCrossed, X } from "lucide-react";
+import { AudioLines, ExternalLink, LayoutDashboard, Menu as MenuIcon, MessageCircle, ReceiptText, Settings, UtensilsCrossed, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LogoMark } from "@/components/site/Logo";
 import { alertsAction, liveKpisAction, markAlertsReadAction } from "@/app/actions/owner";
 import { createClient } from "@/lib/supabase/client";
-import { BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/business";
 import { cn } from "@/lib/utils";
 import { AlertCard, AlertsBellIcon } from "./OwnerCards";
 
@@ -96,7 +96,7 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
     { href: "/owner", label: "Overview", icon: LayoutDashboard, exact: true },
     { href: "/owner/orders", label: "Orders", icon: ReceiptText, count: kpis?.new_orders_waiting },
     { href: "/owner/menu", label: "Menu", icon: UtensilsCrossed },
-    { href: "/owner/assistant", label: "AI assistant", icon: Sparkles },
+    { href: "/owner/assistant", label: "AI assistant", icon: MessageCircle },
     ...(role === "owner"
       ? [
           { href: "/owner/jarvis", label: "Jarvis", icon: AudioLines },
@@ -141,8 +141,8 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
       <Link href="/owner" className="flex items-center gap-2.5 px-3 pb-6 pt-1">
         <LogoMark className="size-8" />
         <span className="min-w-0">
-          <span className="block font-display text-2xl leading-none">{BRAND.name}</span>
-          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Dashboard</span>
+          <span className="block font-display text-xl leading-none">{BRAND.name}</span>
+          <span className="text-xs text-muted-foreground">Dashboard</span>
         </span>
       </Link>
       <nav aria-label="Dashboard" className="grid gap-0.5">
@@ -154,14 +154,14 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
               href={n.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
-                active ? "bg-foreground text-background" : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                active ? "bg-accent font-semibold text-foreground [&_svg]:text-primary" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
               )}
             >
               <n.icon className="size-4" aria-hidden />
               <span className="flex-1">{n.label}</span>
               {!!n.count && (
-                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums", active ? "bg-primary text-primary-foreground" : "bg-primary/12 text-primary")}>
+                <span className={"rounded-full bg-turmeric px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#1b1404]"}>
                   {n.count}
                 </span>
               )}
@@ -170,20 +170,6 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
         })}
       </nav>
       <div className="mt-auto space-y-3 pt-6">
-        {kpis && (
-          <div className="rounded-2xl border bg-background/60 p-3 text-xs" aria-live="polite">
-            <p className="flex items-center gap-2 font-medium">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-success" />
-              </span>
-              Live
-            </p>
-            <p className="mt-1 text-muted-foreground">
-              {kpis.active_orders} active · {kpis.orders_today} today
-            </p>
-          </div>
-        )}
         <div className="flex items-center gap-2 border-t px-1 pt-3">
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold uppercase">{(name ?? role).slice(0, 1)}</span>
           <span className="min-w-0 flex-1">
@@ -202,7 +188,7 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
   return (
     <div className="flex h-dvh bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r bg-card/50 p-4 lg:block">{sidebar}</aside>
+      <aside className="hidden w-56 shrink-0 border-r bg-card p-3 lg:block">{sidebar}</aside>
 
       {/* Mobile drawer */}
       {navOpen && (
@@ -218,11 +204,19 @@ export function OwnerShell({ role, name, children }: { role: "owner" | "staff"; 
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 px-3 backdrop-blur sm:px-6 lg:h-16">
+        <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-card px-3 sm:px-6 lg:px-8">
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={() => setNavOpen(true)}>
             <MenuIcon />
           </Button>
-          <p className="text-sm font-medium">{current?.label ?? "Dashboard"}</p>
+          <p className="text-sm font-semibold lg:hidden">{current?.label ?? "Dashboard"}</p>
+          {kpis && (
+            <p className="hidden items-center gap-2 text-sm text-muted-foreground lg:flex" aria-live="polite">
+              <span className="size-2 rounded-full bg-success" aria-hidden /> Live
+              <span className="tabular-nums">
+                {kpis.active_orders} active, {kpis.orders_today} today
+              </span>
+            </p>
+          )}
           <div className="ml-auto flex items-center gap-1">{bell}</div>
         </header>
         <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">

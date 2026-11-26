@@ -87,24 +87,9 @@ export async function removeCouponAction() {
   return run((u) => cart.removeCoupon(u.userId));
 }
 
-export async function listCouponsAction() {
-  return run((u) => cart.listAvailableCoupons(u.userId));
-}
-
-export async function validateCheckoutAction() {
-  return run(async (u) => {
-    const v = await orders.validateCheckout(u.userId);
-    return { ok: v.ok, errors: v.errors };
-  });
-}
-
 // ---------------------------------------------------------------- orders
 export async function reorderAction(orderId: string) {
   return run((u) => orders.reorder(u.userId, orderId));
-}
-
-export async function getOrderAction(orderId: string) {
-  return run((u) => orders.getOrderForUser(u.userId, orderId));
 }
 
 // ---------------------------------------------------------------- account
@@ -186,7 +171,10 @@ export async function executeCustomerConfirmAction(name: CustomerConfirmName, ar
 }
 
 export async function rejectCustomerConfirmAction(name: CustomerConfirmName, args: unknown) {
-  const user = await getSessionUser();
-  await audit({ ctx: { userId: user?.userId ?? null, agent: "customer" }, tool: name, params: args, status: "rejected_by_user", summary: "User cancelled" });
-  return { ok: true as const, data: null };
+  return run(async (u) => {
+    const parsed = CUSTOMER_CONFIRMS[name]?.schema.safeParse(args ?? {});
+    if (!parsed?.success) throw new ServiceError("Unknown action.", "unknown");
+    await audit({ ctx: { userId: u.userId, agent: "customer" }, tool: name, params: parsed.data, status: "rejected_by_user", summary: "User cancelled" });
+    return null;
+  });
 }

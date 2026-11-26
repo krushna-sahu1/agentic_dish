@@ -78,12 +78,17 @@ export interface CartView {
 
 const db = () => createAdminClient();
 
+async function defaultAddressId(userId: string): Promise<string | undefined> {
+  const { data } = await db().from("addresses").select("id").eq("user_id", userId).order("is_default", { ascending: false }).limit(1);
+  return data?.[0]?.id as string | undefined;
+}
+
 export async function getOrCreateCart(userId: string): Promise<CartRow> {
   const { data } = await db().from("carts").select("*").eq("user_id", userId).maybeSingle();
   if (data) return data as CartRow;
   const ins = await db()
     .from("carts")
-    .upsert({ user_id: userId }, { onConflict: "user_id" })
+    .upsert({ user_id: userId, address_id: (await defaultAddressId(userId)) ?? null }, { onConflict: "user_id" })
     .select("*")
     .single();
   if (ins.error) throw new Error(ins.error.message);
@@ -93,19 +98,22 @@ export async function getOrCreateCart(userId: string): Promise<CartRow> {
 async function couponForCart(userId: string, code: string | null): Promise<{ coupon: CouponRow | null; message: string | null }> {
   if (!code) return { coupon: null, message: null };
   const { data: c } = await db().from("coupons").select("*").eq("code", code).maybeSingle();
-  const usage = await couponUsage(userId, (c as CouponRow | null)?.id);
+  const usage = await couponUsage(userId, c as CouponRow | null);
   const check = checkCouponEligibility((c as CouponRow) ?? null, usage);
   if (!check.ok) return { coupon: null, message: check.reason };
   return { coupon: c as CouponRow, message: null };
 }
 
-export async function couponUsage(userId: string, couponId?: string) {
-  if (!couponId) return { totalRedemptions: 0, userRedemptions: 0 };
-  const [total, mine] = await Promise.all([
-    db().from("coupon_redemptions").select("id", { count: "exact", head: true }).eq("coupon_id", couponId),
-    db().from("coupon_redemptions").select("id", { count: "exact", head: true }).eq("coupon_id", couponId).eq("user_id", userId),
+export async function couponUsage(userId: string, coupon: CouponRow | null) {
+  if (!coupon) return { totalRedemptions: 0, userRedemptions: 0, invited: false };
+  const [total, mine, invited] = await Promise.all([
+    db().from("coupon_redemptions").select("id", { count: "exact", head: true }).eq("coupon_id", coupon.id),
+    db().from("coupon_redemptions").select("id", { count: "exact", head: true }).eq("coupon_id", coupon.id).eq("user_id", userId),
+    coupon.is_private
+      ? db().from("email_sends").select("id, email_drafts!inner(coupon_id)", { count: "exact", head: true }).eq("user_id", userId).eq("status", "sent").eq("email_drafts.coupon_id", coupon.id)
+      : null,
   ]);
-  return { totalRedemptions: total.count ?? 0, userRedemptions: mine.count ?? 0 };
+  return { totalRedemptions: total.count ?? 0, userRedemptions: mine.count ?? 0, invited: (invited?.count ?? 0) > 0 };
 }
 
 export async function viewCart(userId: string): Promise<CartView> {
@@ -429,8 +437,8 @@ export async function setOrderOptions(userId: string, input: OrderOptionsInput):
   }
   if (patch.order_type && patch.order_type !== "dine_in" && input.table_number === undefined) patch.table_number = null;
   if (patch.order_type === "delivery" && !cart.address_id && input.address_id === undefined) {
-    const { data: def } = await db().from("addresses").select("id").eq("user_id", userId).order("is_default", { ascending: false }).limit(1);
-    if (def?.[0]) patch.address_id = def[0].id;
+    const id = await defaultAddressId(userId);
+    if (id) patch.address_id = id;
   }
   const r = await db().from("carts").update(patch).eq("id", cart.id);
   if (r.error) throw new Error(r.error.message);
@@ -440,7 +448,7 @@ export async function setOrderOptions(userId: string, input: OrderOptionsInput):
 export async function applyCoupon(userId: string, code: string): Promise<CartView> {
   const c = code.trim().toUpperCase();
   const { data: coupon } = await db().from("coupons").select("*").eq("code", c).maybeSingle();
-  const usage = await couponUsage(userId, (coupon as CouponRow | null)?.id);
+  const usage = await couponUsage(userId, coupon as CouponRow | null);
   const check = checkCouponEligibility((coupon as CouponRow) ?? null, usage);
   if (!check.ok) throw new ServiceError(check.reason, "coupon_invalid");
   const cart = await viewCart(userId);
@@ -470,7 +478,7 @@ export async function listAvailableCoupons(userId: string) {
     .order("min_order_paise");
   const out = [];
   for (const c of (data ?? []) as CouponRow[]) {
-    const usage = await couponUsage(userId, c.id);
+    const usage = await couponUsage(userId, c);
     const check = checkCouponEligibility(c, usage);
     if (check.ok) out.push({ code: c.code, description: c.description, type: c.type, value: c.value, min_order_paise: c.min_order_paise, max_discount_paise: c.max_discount_paise, valid_to: c.valid_to });
   }

@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import { getSessionUser, type SessionUser } from "@/lib/auth";
 import { audit } from "@/lib/agents/guard";
 import { ServiceError } from "@/lib/services/errors";
-import { cancelDraft, editDraftText, getDraftView, sendDraft } from "@/lib/services/bulk-email";
+import { cancelDraft, editDraftText, sendDraft } from "@/lib/services/bulk-email";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyUnsubscribe } from "@/lib/bulk-email/unsubscribe";
 import type { ActionResult } from "./customer";
@@ -49,9 +49,6 @@ export async function cancelEmailDraftAction(draftId: string) {
   return ownerOnly("cancel_email_draft", { draft_id: draftId }, () => cancelDraft(draftId), { summary: () => "Draft cancelled; draft coupon removed" });
 }
 
-export async function getEmailDraftAction(draftId: string) {
-  return ownerOnly("get_email_draft", { draft_id: draftId }, () => getDraftView(draftId));
-}
 
 // ---------------------------------------------------------------- recipients
 

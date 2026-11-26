@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { ArrowRight, Minus, Plus, ShoppingBag, Sparkles, Tag, Trash2 } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingBag, MessageCircle, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input, Label, Select, Textarea } from "@/components/ui/input";
@@ -91,7 +91,7 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
       <EmptyState icon={ShoppingBag} title="Your cart is empty" description="Browse the menu, or just tell our AI host what you’re craving — it’ll fill the cart for you." className="py-20">
         <Link href="/menu" className={buttonVariants()}>Browse the menu</Link>
         <Button variant="outline" onClick={() => openChat("Suggest something popular")}>
-          <Sparkles /> Ask our AI
+          <MessageCircle /> Ask our AI
         </Button>
       </EmptyState>
     );
@@ -280,8 +280,8 @@ export function CartPageClient({ addresses, coupons, tables }: { addresses: Addr
                 <Button type="submit" variant="outline">Apply</Button>
               </form>
             )}
-            {cart.coupon_message && <p className="text-xs text-amber-700 dark:text-amber-300">{cart.coupon_message}</p>}
-            {!cart.coupon_code && linkCouponNote && <p className="text-xs text-amber-700 dark:text-amber-300">{linkCouponNote}</p>}
+            {cart.coupon_message && <p className="text-xs text-warning">{cart.coupon_message}</p>}
+            {!cart.coupon_code && linkCouponNote && <p className="text-xs text-warning">{linkCouponNote}</p>}
             {!cart.coupon_code && coupons.length > 0 && (
               <ul className="space-y-1 text-xs text-muted-foreground">
                 {coupons.slice(0, 4).map((c) => (

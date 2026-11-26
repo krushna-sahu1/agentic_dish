@@ -15,10 +15,10 @@ const JarvisOrb = dynamic(() => import("./JarvisOrb"), { ssr: false });
 
 const STATUS_UI: Record<JarvisStatus, { label: string; dot: string; glow: string }> = {
   idle: { label: "Standby", dot: "bg-white/50", glow: "rgba(200,210,230,0.10)" },
-  connecting: { label: "Connecting", dot: "bg-indigo-300 animate-pulse", glow: "rgba(120,130,255,0.16)" },
+  connecting: { label: "Connecting", dot: "bg-emerald-200 animate-pulse", glow: "rgba(98,196,140,0.12)" },
   listening: { label: "Listening", dot: "bg-emerald-400", glow: "rgba(52,211,153,0.20)" },
-  thinking: { label: "Thinking", dot: "bg-violet-400 animate-pulse", glow: "rgba(139,92,246,0.24)" },
-  speaking: { label: "Speaking", dot: "bg-orange-400", glow: "rgba(251,146,60,0.24)" },
+  thinking: { label: "Thinking", dot: "bg-amber-200 animate-pulse", glow: "rgba(239,180,60,0.14)" },
+  speaking: { label: "Speaking", dot: "bg-amber-400", glow: "rgba(239,180,60,0.24)" },
 };
 
 type Kpis = { revenue_today_paise: number; active_orders: number };
@@ -31,8 +31,8 @@ const mmss = (ms: number) => {
 function HudItem({ label, value, className }: { label: string; value: React.ReactNode; className?: string }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <p className="text-[9px] uppercase tracking-[0.2em] text-white/35">{label}</p>
-      <p className="truncate font-mono text-[13px] tabular-nums text-white/85 sm:text-sm">{value}</p>
+      <p className="text-[11px] text-white/55">{label}</p>
+      <p className="truncate text-[13px] tabular-nums text-white/85 sm:text-sm">{value}</p>
     </div>
   );
 }
@@ -77,23 +77,18 @@ export function JarvisExperience() {
   const lastJarvis = [...j.captions].reverse().find((c) => c.role === "assistant");
 
   return (
-    <div className="fixed inset-0 z-[60] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#03050b] text-white" style={{ colorScheme: "dark" }}>
+    <div className="fixed inset-0 z-[60] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-[#0b120f] text-white" style={{ colorScheme: "dark" }}>
       {/* Ambient glow follows the orb's state colour */}
       <div aria-hidden className="pointer-events-none fixed inset-0 transition-[background] duration-1000" style={{ background: `radial-gradient(65% 50% at 50% 40%, ${ui.glow}, transparent 70%)` }} />
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 opacity-[0.07]"
-        style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.4) 1px, transparent 1px)", backgroundSize: "48px 48px", maskImage: "radial-gradient(ellipse at center, black 20%, transparent 75%)" }}
-      />
 
       {/* HUD */}
-      <header className="z-10 shrink-0 border-b border-white/[0.06] bg-[#03050b]/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+      <header className="z-10 shrink-0 border-b border-white/[0.06] bg-[#0b120f]/70 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] flex-col gap-2 px-4 py-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2 sm:py-3">
           <div className="flex items-center gap-3">
             <Link href="/owner" aria-label="Back to dashboard" className="-ml-2 flex size-11 items-center justify-center rounded-full text-white/50 transition hover:bg-white/10 hover:text-white active:scale-95 focus-visible:ring-2 focus-visible:ring-white/40">
               <ArrowLeft className="size-4" />
             </Link>
-            <span className="font-mono text-sm font-semibold tracking-[0.35em]">JARVIS</span>
+            <span className="font-display text-xl">Jarvis</span>
             <span className="flex items-center gap-1.5 rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-white/70" role="status" aria-live="polite">
               <span className={cn("size-1.5 rounded-full", ui.dot)} />
               {ui.label}
@@ -123,7 +118,7 @@ export function JarvisExperience() {
           >
             <JarvisOrb status={j.status} levels={j.levels} />
             {!j.active && !j.error && (
-              <span className="pointer-events-none absolute inset-x-0 bottom-[8%] text-center text-[11px] uppercase tracking-[0.3em] text-white/45">Tap to talk</span>
+              <span className="pointer-events-none absolute inset-x-0 bottom-[8%] text-center text-sm text-white/60">Tap to talk</span>
             )}
           </div>
 
@@ -167,7 +162,7 @@ export function JarvisExperience() {
       </div>
 
       {/* Controls — pinned within thumb reach, safe-area aware */}
-      <div className="z-10 shrink-0 border-t border-white/[0.06] bg-[#03050b]/85 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-xl">
+      <div className="z-10 shrink-0 border-t border-white/[0.06] bg-[#0b120f]/85 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] items-center justify-center gap-3">
           <button
             onClick={j.toggleMute}

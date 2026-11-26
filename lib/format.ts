@@ -15,8 +15,12 @@ export function formatINRExact(paise: number | null | undefined): string {
   return `₹${inrExact.format(Math.round(v * 100) / 100)}`;
 }
 
-export function rupeesToPaise(rupees: number): number {
-  return Math.round(rupees * 100);
+/** Compact ₹ for chart axes: ₹12.3k, ₹1.2L. */
+export function formatINRShort(paise: number): string {
+  const r = paise / 100;
+  if (r >= 100000) return `₹${(r / 100000).toFixed(1)}L`;
+  if (r >= 1000) return `₹${(r / 1000).toFixed(1)}k`;
+  return `₹${Math.round(r)}`;
 }
 
 export function formatNumber(n: number | null | undefined): string {

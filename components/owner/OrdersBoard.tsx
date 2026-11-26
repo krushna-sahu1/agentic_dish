@@ -59,7 +59,7 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid min-h-[60vh] flex-1 auto-cols-[minmax(260px,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2">
+      <div className="grid min-h-[60vh] flex-1 auto-cols-[minmax(205px,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2">
         {COLUMNS.map((col) => {
           const orders = data.active.filter((o) => o.status === col.status).sort((a, b) => a.created_at.localeCompare(b.created_at));
           return (
@@ -69,9 +69,9 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
               </h2>
               <div className="min-h-0 flex-1 space-y-2 overflow-y-auto">
                 {orders.map((o) => (
-                  <article key={o.id} data-testid="board-order" data-order={o.order_number} className={cn("animate-rise rounded-xl border bg-card p-3 text-sm shadow-sm", col.status === "paid" && "border-primary/60 ring-1 ring-primary/30")}>
+                  <article key={o.id} data-testid="board-order" data-order={o.order_number} className={cn("rounded-xl border bg-card p-3 text-sm", col.status === "paid" && "border-turmeric bg-turmeric/10")}>
                     <div className="flex items-center justify-between">
-                      <Link href={`/owner/orders/${o.id}`} className="text-base font-semibold hover:underline">#{o.order_number.split("-").pop()}</Link>
+                      <Link href={`/owner/orders/${o.id}`} className="font-display text-xl hover:underline">#{o.order_number.split("-").pop()}</Link>
                       <span className={cn("flex items-center gap-1 text-xs", o.minutes_in_status > 20 ? "font-semibold text-destructive" : "text-muted-foreground")}>
                         <Clock className="size-3" /> {o.minutes_in_status}m
                       </span>
@@ -141,7 +141,7 @@ export function OrdersBoard({ initial }: { initial: { active: OwnerOrderView[]; 
           }}
         >
           <Input aria-label="Reason" required minLength={3} placeholder="Reason (shared with the customer)" value={reason} onChange={(e) => setReason(e.target.value)} />
-          {cancel?.paid_at && <p className="text-xs text-warning">This order is paid. Cancelling doesn&apos;t refund it — ask the assistant to issue a refund after.</p>}
+          {cancel?.paid_at && <p className="text-xs text-warning">This order is paid. Cancelling doesn&apos;t refund it. Open the order afterwards to issue a refund.</p>}
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setCancel(null)}>Keep order</Button>
             <Button type="submit" variant="destructive" disabled={pending}>Cancel order</Button>
